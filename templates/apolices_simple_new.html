@@ -1,0 +1,267 @@
+{% extends "base_simple.html" %}
+
+{% block title %}Apólices - CLIVER SEGUROS{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h2><i class="fas fa-file-contract"></i> Gerenciamento de Apólices</h2>
+    <a href="{{ url_for('nova_apolice') }}" class="btn">
+        <i class="fas fa-plus"></i> Nova Apólice
+    </a>
+</div>
+
+<!-- Estatísticas -->
+{% set stats = {
+    'ativas': apolices|selectattr('status', 'equalto', 'ativa')|list|length,
+    'total': apolices|length
+} %}
+
+<div class="stats-grid">
+    <div class="stat-card">
+        <div class="stat-value">{{ stats.ativas }}</div>
+        <div class="stat-label">Apólices Ativas</div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-value">{{ stats.total - stats.ativas }}</div>
+        <div class="stat-label">Outras</div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-value">{{ stats.total }}</div>
+        <div class="stat-label">Total de Apólices</div>
+    </div>
+</div>
+
+<!-- Menu de Ações -->
+<div class="action-menu">
+    <a href="{{ url_for('nova_apolice') }}" class="btn">
+        <i class="fas fa-plus"></i> Nova Apólice
+    </a>
+    <a href="{{ url_for('apolices_vencimento') }}" class="btn btn-secondary">
+        <i class="fas fa-calendar"></i> Vencimentos
+    </a>
+    <a href="{{ url_for('relatorios') }}" class="btn btn-secondary">
+        <i class="fas fa-chart-line"></i> Relatórios
+    </a>
+</div>
+
+<!-- Lista de Apólices -->
+<div class="table-container">
+    <h3>Lista de Apólices</h3>
+    <table class="data-table">
+        <thead>
+            <tr>
+                <th>Número</th>
+                <th>Cliente</th>
+                <th>Seguradora</th>
+                <th>Tipo</th>
+                <th>Valor Prêmio</th>
+                <th>Vencimento</th>
+                <th>Status</th>
+                <th>Ações</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for apolice in apolices %}
+            <tr>
+                <td>{{ apolice.numero_apolice }}</td>
+                <td>{{ apolice.cliente_nome }}</td>
+                <td>{{ apolice.seguradora_nome }}</td>
+                <td>{{ apolice.tipo_seguro_nome }}</td>
+                <td>R$ {{ "%.2f"|format(apolice.valor_premio) }}</td>
+                <td>{{ apolice.data_vencimento }}</td>
+                <td>
+                    <span class="status-badge status-{{ apolice.status }}">
+                        {{ apolice.status.title() }}
+                    </span>
+                </td>
+                <td>
+                    <a href="{{ url_for('editar_apolice', apolice_id=apolice.id) }}" class="btn-small btn-edit">
+                        <i class="fas fa-edit"></i> Editar
+                    </a>
+                </td>
+            </tr>
+            {% else %}
+            <tr>
+                <td colspan="8" class="no-data">
+                    <i class="fas fa-file-contract fa-3x" style="color: #ddd; margin-bottom: 1rem;"></i>
+                    <p>Nenhuma apólice cadastrada ainda.</p>
+                    <a href="{{ url_for('nova_apolice') }}" class="btn" style="margin-top: 1rem;">
+                        <i class="fas fa-plus"></i> Cadastrar Primeira Apólice
+                    </a>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+<div style="margin-top: 2rem;">
+    <a href="{{ url_for('dashboard') }}" class="btn btn-secondary">
+        <i class="fas fa-arrow-left"></i> Voltar ao Dashboard
+    </a>
+</div>
+
+<style>
+.page-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 2rem;
+    padding: 1rem;
+    background: white;
+    border-radius: 8px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+}
+
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1rem;
+    margin-bottom: 2rem;
+}
+
+.stat-card {
+    background: white;
+    padding: 1.5rem;
+    border-radius: 8px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    text-align: center;
+    border-left: 4px solid #00B391;
+}
+
+.stat-value {
+    font-size: 2rem;
+    font-weight: bold;
+    color: #00B391;
+    margin-bottom: 0.5rem;
+}
+
+.stat-label {
+    color: #666;
+    font-size: 0.9rem;
+}
+
+.action-menu {
+    display: flex;
+    gap: 1rem;
+    margin-bottom: 2rem;
+    flex-wrap: wrap;
+}
+
+.table-container {
+    background: white;
+    border-radius: 8px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    overflow: hidden;
+    margin-bottom: 2rem;
+}
+
+.table-container h3 {
+    background: #f8f9fa;
+    margin: 0;
+    padding: 1rem 1.5rem;
+    border-bottom: 1px solid #ddd;
+    color: #333;
+}
+
+.data-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 0;
+}
+
+.data-table th,
+.data-table td {
+    padding: 1rem;
+    text-align: left;
+    border-bottom: 1px solid #eee;
+}
+
+.data-table th {
+    background: #f8f9fa;
+    font-weight: 600;
+    color: #333;
+}
+
+.data-table tr:hover {
+    background: #f5f5f5;
+}
+
+.status-badge {
+    padding: 0.25rem 0.75rem;
+    border-radius: 15px;
+    font-size: 0.8rem;
+    font-weight: 500;
+    text-transform: uppercase;
+}
+
+.status-ativa {
+    background: #d4edda;
+    color: #155724;
+}
+
+.status-inativa {
+    background: #f8d7da;
+    color: #721c24;
+}
+
+.status-vencida {
+    background: #f8d7da;
+    color: #721c24;
+}
+
+.btn-small {
+    padding: 0.25rem 0.75rem;
+    font-size: 0.8rem;
+    text-decoration: none;
+    border-radius: 4px;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.25rem;
+}
+
+.btn-edit {
+    background: #007bff;
+    color: white;
+}
+
+.btn-edit:hover {
+    background: #0056b3;
+}
+
+.no-data {
+    text-align: center;
+    color: #666;
+    padding: 3rem !important;
+}
+
+.no-data p {
+    margin: 1rem 0;
+    font-size: 1.1rem;
+}
+
+@media (max-width: 768px) {
+    .page-header {
+        flex-direction: column;
+        gap: 1rem;
+    }
+    
+    .action-menu {
+        justify-content: center;
+    }
+    
+    .stats-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .data-table {
+        font-size: 0.9rem;
+    }
+    
+    .data-table th,
+    .data-table td {
+        padding: 0.75rem 0.5rem;
+    }
+}
+</style>
+{% endblock %}

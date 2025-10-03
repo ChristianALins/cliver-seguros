@@ -1,0 +1,231 @@
+{% extends "base_simple.html" %}
+
+{% block title %}Relatório de Vendas - CLIVER SEGUROS{% endblock %}
+
+{% block content %}
+<div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
+    <h2>Relatório de Vendas</h2>
+    <div>
+        <button class="btn btn-secondary">📊 Exportar PDF</button>
+        <button class="btn">📈 Exportar Excel</button>
+        <a href="/relatorios" class="btn btn-secondary">Voltar</a>
+    </div>
+</div>
+
+<!-- Filtros -->
+<div style="background: white; padding: 1.5rem; border: 1px solid #ddd; border-radius: 8px; margin-bottom: 2rem;">
+    <h3 style="margin-bottom: 1rem;">🔍 Filtros</h3>
+    <form style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; align-items: end;">
+        <div class="form-group">
+            <label for="periodo">Período:</label>
+            <select id="periodo" name="periodo">
+                <option value="mes_atual" selected>Mês Atual</option>
+                <option value="mes_anterior">Mês Anterior</option>
+                <option value="trimestre">Trimestre</option>
+                <option value="ano">Ano Atual</option>
+            </select>
+        </div>
+        <div class="form-group">
+            <label for="tipo_seguro">Tipo de Seguro:</label>
+            <select id="tipo_seguro" name="tipo_seguro">
+                <option value="">Todos</option>
+                <option value="auto">Auto</option>
+                <option value="residencial">Residencial</option>
+                <option value="vida">Vida</option>
+                <option value="empresarial">Empresarial</option>
+            </select>
+        </div>
+        <div class="form-group">
+            <label for="seguradora">Seguradora:</label>
+            <select id="seguradora" name="seguradora">
+                <option value="">Todas</option>
+                <option value="porto">Porto Seguro</option>
+                <option value="bradesco">Bradesco Seguros</option>
+                <option value="sulamerica">SulAmérica</option>
+            </select>
+        </div>
+        <div>
+            <button type="submit" class="btn">Aplicar Filtros</button>
+        </div>
+    </form>
+</div>
+
+<!-- Resumo Executivo -->
+<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; margin-bottom: 2rem;">
+    <div style="background: white; padding: 1.5rem; border: 1px solid #ddd; border-radius: 8px; text-align: center;">
+        <h3 style="color: #00B391; font-size: 2rem; margin-bottom: 0.5rem;">156</h3>
+        <p style="margin: 0; color: #666;">Apólices Vendidas</p>
+        <small style="color: #28a745;">↗ +15% vs mês anterior</small>
+    </div>
+    
+    <div style="background: white; padding: 1.5rem; border: 1px solid #ddd; border-radius: 8px; text-align: center;">
+        <h3 style="color: #28a745; font-size: 2rem; margin-bottom: 0.5rem;">R$ 485.670</h3>
+        <p style="margin: 0; color: #666;">Receita Total</p>
+        <small style="color: #28a745;">↗ +22% vs mês anterior</small>
+    </div>
+    
+    <div style="background: white; padding: 1.5rem; border: 1px solid #ddd; border-radius: 8px; text-align: center;">
+        <h3 style="color: #007bff; font-size: 2rem; margin-bottom: 0.5rem;">R$ 3.114</h3>
+        <p style="margin: 0; color: #666;">Ticket Médio</p>
+        <small style="color: #28a745;">↗ +5% vs mês anterior</small>
+    </div>
+    
+    <div style="background: white; padding: 1.5rem; border: 1px solid #ddd; border-radius: 8px; text-align: center;">
+        <h3 style="color: #ffc107; font-size: 2rem; margin-bottom: 0.5rem;">87%</h3>
+        <p style="margin: 0; color: #666;">Taxa de Conversão</p>
+        <small style="color: #28a745;">↗ +3% vs mês anterior</small>
+    </div>
+</div>
+
+<!-- Gráficos -->
+<div style="display: grid; grid-template-columns: 2fr 1fr; gap: 2rem; margin-bottom: 2rem;">
+    <!-- Vendas por Mês -->
+    <div style="background: white; padding: 2rem; border: 1px solid #ddd; border-radius: 8px;">
+        <h3 style="margin-bottom: 1rem;">📈 Vendas por Mês (2024)</h3>
+        <div style="height: 300px; background: #f8f9fa; border-radius: 4px; display: flex; align-items: end; padding: 1rem; gap: 1rem;">
+            {% for venda in vendas_mes %}
+            <div style="background: #00B391; width: 40px; height: {{ (venda.valor_total / 50000 * 200)|int }}px; border-radius: 4px 4px 0 0; position: relative;">
+                <span style="position: absolute; bottom: -25px; left: 50%; transform: translateX(-50%); font-size: 10px; white-space: nowrap;">{{ venda.mes }}</span>
+                <span style="position: absolute; top: -30px; left: 50%; transform: translateX(-50%); font-size: 10px; background: #333; color: white; padding: 2px 4px; border-radius: 2px; white-space: nowrap;">R$ {{ "%.0f"|format(venda.valor_total) }}</span>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+    
+    <!-- Top Tipos de Seguro -->
+    <div style="background: white; padding: 2rem; border: 1px solid #ddd; border-radius: 8px;">
+        <h3 style="margin-bottom: 1rem;">🏆 Top Tipos de Seguro</h3>
+        <div style="space-y: 1rem;">
+            {% for tipo in top_tipos %}
+            <div style="margin-bottom: 1rem;">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
+                    <span style="font-weight: bold;">{{ tipo.nome }}</span>
+                    <span style="color: #28a745; font-weight: bold;">{{ tipo.quantidade }}</span>
+                </div>
+                <div style="background: #e9ecef; border-radius: 4px; height: 8px;">
+                    <div style="background: #00B391; height: 100%; width: {{ (tipo.quantidade / 20 * 100)|int }}%; border-radius: 4px;"></div>
+                </div>
+                <small style="color: #666;">R$ {{ "%.2f"|format(tipo.valor_total) }}</small>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+
+<!-- Tabela Detalhada -->
+<div style="background: white; padding: 2rem; border: 1px solid #ddd; border-radius: 8px;">
+    <h3 style="margin-bottom: 1rem;">📊 Detalhamento de Vendas</h3>
+    
+    <table>
+        <thead>
+            <tr>
+                <th>Data</th>
+                <th>Cliente</th>
+                <th>Tipo de Seguro</th>
+                <th>Seguradora</th>
+                <th>Apólice</th>
+                <th>Valor</th>
+                <th>Corretor</th>
+                <th>Status</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>01/10/2024</td>
+                <td>João Silva Santos</td>
+                <td>Auto</td>
+                <td>Porto Seguro</td>
+                <td>2024001</td>
+                <td>R$ 2.850,00</td>
+                <td>Maria Silva</td>
+                <td><span style="background: #28a745; color: white; padding: 2px 8px; border-radius: 3px;">Ativa</span></td>
+            </tr>
+            <tr>
+                <td>01/10/2024</td>
+                <td>Maria Costa Santos</td>
+                <td>Residencial</td>
+                <td>SulAmérica</td>
+                <td>2024002</td>
+                <td>R$ 1.200,00</td>
+                <td>João Santos</td>
+                <td><span style="background: #28a745; color: white; padding: 2px 8px; border-radius: 3px;">Ativa</span></td>
+            </tr>
+            <tr>
+                <td>30/09/2024</td>
+                <td>Pedro Lima</td>
+                <td>Vida</td>
+                <td>Bradesco Seguros</td>
+                <td>2024003</td>
+                <td>R$ 980,00</td>
+                <td>Ana Costa</td>
+                <td><span style="background: #28a745; color: white; padding: 2px 8px; border-radius: 3px;">Ativa</span></td>
+            </tr>
+            <tr>
+                <td>29/09/2024</td>
+                <td>Ana Ferreira</td>
+                <td>Empresarial</td>
+                <td>Porto Seguro</td>
+                <td>2024004</td>
+                <td>R$ 5.500,00</td>
+                <td>Maria Silva</td>
+                <td><span style="background: #28a745; color: white; padding: 2px 8px; border-radius: 3px;">Ativa</span></td>
+            </tr>
+            <tr>
+                <td>28/09/2024</td>
+                <td>Carlos Oliveira</td>
+                <td>Auto</td>
+                <td>SulAmérica</td>
+                <td>2024005</td>
+                <td>R$ 3.200,00</td>
+                <td>João Santos</td>
+                <td><span style="background: #28a745; color: white; padding: 2px 8px; border-radius: 3px;">Ativa</span></td>
+            </tr>
+        </tbody>
+    </table>
+    
+    <div style="margin-top: 1rem; display: flex; justify-content: space-between; align-items: center;">
+        <p style="color: #666;">Mostrando 5 de 156 registros</p>
+        <div style="display: flex; gap: 0.5rem;">
+            <button class="btn btn-secondary" style="padding: 5px 10px;">« Anterior</button>
+            <button class="btn btn-secondary" style="padding: 5px 10px;">1</button>
+            <button class="btn" style="padding: 5px 10px;">2</button>
+            <button class="btn btn-secondary" style="padding: 5px 10px;">3</button>
+            <button class="btn btn-secondary" style="padding: 5px 10px;">Próximo »</button>
+        </div>
+    </div>
+</div>
+
+<!-- Análise por Corretor -->
+<div style="background: white; padding: 2rem; border: 1px solid #ddd; border-radius: 8px; margin-top: 2rem;">
+    <h3 style="margin-bottom: 1rem;">👨‍💼 Performance por Corretor</h3>
+    
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1rem;">
+        <div style="border: 1px solid #ddd; border-radius: 8px; padding: 1.5rem;">
+            <h4 style="color: #00B391; margin-bottom: 1rem;">Maria Silva</h4>
+            <p><strong>Vendas:</strong> 65 apólices</p>
+            <p><strong>Receita:</strong> R$ 195.500</p>
+            <p><strong>Ticket Médio:</strong> R$ 3.008</p>
+            <p><strong>Comissão:</strong> R$ 19.550</p>
+            <div style="background: #28a745; width: 100%; height: 8px; border-radius: 4px; margin-top: 1rem;"></div>
+        </div>
+        
+        <div style="border: 1px solid #ddd; border-radius: 8px; padding: 1.5rem;">
+            <h4 style="color: #00B391; margin-bottom: 1rem;">João Santos</h4>
+            <p><strong>Vendas:</strong> 52 apólices</p>
+            <p><strong>Receita:</strong> R$ 165.200</p>
+            <p><strong>Ticket Médio:</strong> R$ 3.177</p>
+            <p><strong>Comissão:</strong> R$ 16.520</p>
+            <div style="background: #007bff; width: 80%; height: 8px; border-radius: 4px; margin-top: 1rem;"></div>
+        </div>
+        
+        <div style="border: 1px solid #ddd; border-radius: 8px; padding: 1.5rem;">
+            <h4 style="color: #00B391; margin-bottom: 1rem;">Ana Costa</h4>
+            <p><strong>Vendas:</strong> 39 apólices</p>
+            <p><strong>Receita:</strong> R$ 124.970</p>
+            <p><strong>Ticket Médio:</strong> R$ 3.204</p>
+            <p><strong>Comissão:</strong> R$ 12.497</p>
+            <div style="background: #ffc107; width: 60%; height: 8px; border-radius: 4px; margin-top: 1rem;"></div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,43 @@
+{% extends 'base.html' %}
+{% block title %}{{ 'Editar' if tarefa else 'Nova' }} Tarefa{% endblock %}
+{% block content %}
+<h2>{{ 'Editar' if tarefa else 'Nova' }} Tarefa</h2>
+<form method="post">
+    <input type="text" name="titulo_tarefa" placeholder="Título" value="{{ tarefa.titulo_tarefa if tarefa else '' }}" required><br>
+    <select name="id_colaborador" required>
+        <option value="">Selecione o Colaborador</option>
+        {% for c in colaboradores %}
+        <option value="{{ c.id_colaborador }}" {% if tarefa and tarefa.id_colaborador==c.id_colaborador %}selected{% endif %}>{{ c.nome_colaborador }}</option>
+        {% endfor %}
+    </select><br>
+    <select name="id_cliente">
+        <option value="">Selecione o Cliente (opcional)</option>
+        {% for cli in clientes %}
+        <option value="{{ cli.id_cliente }}" {% if tarefa and tarefa.id_cliente==cli.id_cliente %}selected{% endif %}>{{ cli.nome }}</option>
+        {% endfor %}
+    </select><br>
+    <select name="id_apolice">
+        <option value="">Selecione a Apólice (opcional)</option>
+        {% for a in apolices %}
+        <option value="{{ a.id_apolice }}" {% if tarefa and tarefa.id_apolice==a.id_apolice %}selected{% endif %}>{{ a.numero_apolice }}</option>
+        {% endfor %}
+    </select><br>
+    <textarea name="descricao_tarefa" placeholder="Descrição">{{ tarefa.descricao_tarefa if tarefa else '' }}</textarea><br>
+    <input type="datetime-local" name="data_vencimento" value="{{ tarefa.data_vencimento if tarefa else '' }}"><br>
+    <select name="prioridade">
+        <option value="Baixa" {% if tarefa and tarefa.prioridade=='Baixa' %}selected{% endif %}>Baixa</option>
+        <option value="Media" {% if tarefa and tarefa.prioridade=='Media' %}selected{% endif %}>Média</option>
+        <option value="Alta" {% if tarefa and tarefa.prioridade=='Alta' %}selected{% endif %}>Alta</option>
+        <option value="Urgente" {% if tarefa and tarefa.prioridade=='Urgente' %}selected{% endif %}>Urgente</option>
+    </select><br>
+    <select name="status_tarefa">
+        <option value="Pendente" {% if tarefa and tarefa.status_tarefa=='Pendente' %}selected{% endif %}>Pendente</option>
+        <option value="Em Andamento" {% if tarefa and tarefa.status_tarefa=='Em Andamento' %}selected{% endif %}>Em Andamento</option>
+        <option value="Concluida" {% if tarefa and tarefa.status_tarefa=='Concluida' %}selected{% endif %}>Concluída</option>
+        <option value="Cancelada" {% if tarefa and tarefa.status_tarefa=='Cancelada' %}selected{% endif %}>Cancelada</option>
+    </select><br>
+    <input type="datetime-local" name="data_conclusao" value="{{ tarefa.data_conclusao if tarefa else '' }}"><br>
+    <button type="submit">Salvar</button>
+</form>
+<a href="{{ url_for('tarefas') }}">Voltar</a>
+{% endblock %}

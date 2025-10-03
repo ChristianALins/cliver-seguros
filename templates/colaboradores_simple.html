@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Colaboradores - CLIVER SEGUROS</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: Arial, sans-serif; background: #f5f5f5; }
+        .container { max-width: 1200px; margin: 0 auto; padding: 2rem; }
+        .header { background: linear-gradient(135deg, #00B391 0%, #00D4AA 100%); color: white; padding: 2rem; text-align: center; }
+        .nav { background: #333; padding: 1rem; }
+        .nav a { color: white; text-decoration: none; margin-right: 2rem; }
+        .nav a:hover { color: #00B391; }
+        .btn { background: #00B391; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px; border: none; cursor: pointer; }
+        .btn:hover { background: #008f7a; }
+        .btn-secondary { background: #6c757d; }
+        .btn-secondary:hover { background: #545b62; }
+        table { width: 100%; background: white; border-collapse: collapse; margin-top: 2rem; border-radius: 8px; overflow: hidden; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+        th, td { padding: 1rem; text-align: left; border-bottom: 1px solid #ddd; }
+        th { background: #00B391; color: white; }
+        tr:hover { background: #f8f9fa; }
+        .actions { display: flex; gap: 0.5rem; }
+        .btn-small { padding: 5px 10px; font-size: 12px; }
+        .status-ativo { background: #28a745; color: white; padding: 3px 8px; border-radius: 3px; font-size: 12px; }
+        .salary { color: #28a745; font-weight: bold; }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>🏢 CLIVER SEGUROS - Colaboradores</h1>
+        <p>Gestão de Equipe e Recursos Humanos</p>
+    </div>
+    
+    <div class="nav">
+        <a href="{{ url_for('dashboard') }}">📊 Dashboard</a>
+        <a href="{{ url_for('clientes_simple') }}">👥 Clientes</a>
+        <a href="{{ url_for('apolices_simple') }}">📋 Apólices</a>
+        <a href="{{ url_for('sinistros_simple') }}">⚠️ Sinistros</a>
+        <a href="{{ url_for('listar_colaboradores') }}" style="color: #00B391;">👨‍💼 Colaboradores</a>
+        <a href="{{ url_for('logout') }}" style="float: right;">🚪 Sair</a>
+    </div>
+
+    <div class="container">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+            <h2>👨‍💼 Equipe Cliver Seguros</h2>
+            <a href="{{ url_for('novo_colaborador') }}" class="btn">
+                ➕ Novo Colaborador
+            </a>
+        </div>
+
+        <div style="display: flex; gap: 1rem; margin-bottom: 2rem;">
+            <div style="background: white; padding: 1rem; border-radius: 8px; flex: 1; text-align: center; box-shadow: 0 2px 5px rgba(0,0,0,0.1);">
+                <h3 style="color: #00B391;">{{ colaboradores|length }}</h3>
+                <p>Total de Colaboradores</p>
+            </div>
+            <div style="background: white; padding: 1rem; border-radius: 8px; flex: 1; text-align: center; box-shadow: 0 2px 5px rgba(0,0,0,0.1);">
+                <h3 style="color: #28a745;">{{ colaboradores|selectattr('status', 'equalto', 'ativo')|list|length }}</h3>
+                <p>Colaboradores Ativos</p>
+            </div>
+        </div>
+
+        <table>
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Nome</th>
+                    <th>E-mail</th>
+                    <th>Cargo</th>
+                    <th>Salário</th>
+                    <th>Admissão</th>
+                    <th>Status</th>
+                    <th>Ações</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for colaborador in colaboradores %}
+                <tr>
+                    <td>{{ colaborador.id_colaborador }}</td>
+                    <td>{{ colaborador.nome_colaborador }}</td>
+                    <td>{{ colaborador.email_colaborador }}</td>
+                    <td>{{ colaborador.cargo }}</td>
+                    <td class="salary">R$ {{ "%.2f"|format(colaborador.salario if colaborador.salario else 0) }}</td>
+                    <td>{{ colaborador.data_admissao if colaborador.data_admissao else '-' }}</td>
+                    <td>
+                        <span class="status-{{ colaborador.status }}">{{ colaborador.status.title() }}</span>
+                    </td>
+                    <td class="actions">
+                        <a href="{{ url_for('editar_colaborador', colaborador_id=colaborador.id_colaborador) }}" 
+                           class="btn btn-small">✏️ Editar</a>
+                    </td>
+                </tr>
+                {% else %}
+                <tr>
+                    <td colspan="8" style="text-align: center; padding: 2rem; color: #666;">
+                        Nenhum colaborador cadastrado.
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+
+        <div style="margin-top: 2rem; display: flex; gap: 1rem;">
+            <a href="{{ url_for('dashboard') }}" class="btn btn-secondary">🔙 Voltar ao Dashboard</a>
+            <a href="{{ url_for('relatorios') }}" class="btn btn-secondary">📈 Relatórios</a>
+        </div>
+    </div>
+</body>
+</html>

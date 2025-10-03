@@ -1,0 +1,28 @@
+{% extends 'base.html' %}
+{% block title %}{{ 'Editar' if sinistro else 'Novo' }} Sinistro{% endblock %}
+{% block content %}
+<h2>{{ 'Editar' if sinistro else 'Novo' }} Sinistro</h2>
+<form method="post">
+    <select name="id_apolice" required>
+        <option value="">Selecione a Apólice</option>
+        {% for a in apolices %}
+        <option value="{{ a.id_apolice }}" {% if sinistro and sinistro.id_apolice==a.id_apolice %}selected{% endif %}>{{ a.numero_apolice }}</option>
+        {% endfor %}
+    </select><br>
+    <input type="date" name="data_ocorrido" value="{{ sinistro.data_ocorrido if sinistro else '' }}" required><br>
+    <input type="datetime-local" name="data_comunicacao" value="{{ sinistro.data_comunicacao if sinistro else '' }}"><br>
+    <textarea name="descricao_sinistro" placeholder="Descrição">{{ sinistro.descricao_sinistro if sinistro else '' }}</textarea><br>
+    <select name="status_sinistro">
+        <option value="Aberto" {% if sinistro and sinistro.status_sinistro=='Aberto' %}selected{% endif %}>Aberto</option>
+        <option value="Em Analise" {% if sinistro and sinistro.status_sinistro=='Em Analise' %}selected{% endif %}>Em Análise</option>
+        <option value="Pago" {% if sinistro and sinistro.status_sinistro=='Pago' %}selected{% endif %}>Pago</option>
+        <option value="Negado" {% if sinistro and sinistro.status_sinistro=='Negado' %}selected{% endif %}>Negado</option>
+        <option value="Encerrado" {% if sinistro and sinistro.status_sinistro=='Encerrado' %}selected{% endif %}>Encerrado</option>
+    </select><br>
+    <input type="text" name="numero_processo_seguradora" placeholder="Nº Processo Seguradora" value="{{ sinistro.numero_processo_seguradora if sinistro else '' }}"><br>
+    <input type="number" step="0.01" name="valor_indenizacao" placeholder="Valor Indenização" value="{{ sinistro.valor_indenizacao if sinistro else '' }}"><br>
+    <textarea name="observacoes" placeholder="Observações">{{ sinistro.observacoes if sinistro else '' }}</textarea><br>
+    <button type="submit">Salvar</button>
+</form>
+<a href="{{ url_for('sinistros') }}">Voltar</a>
+{% endblock %}

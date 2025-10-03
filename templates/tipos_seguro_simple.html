@@ -1,0 +1,329 @@
+{% extends "base_simple.html" %}
+
+{% block title %}Tipos de Seguro - CLIVER SEGUROS{% endblock %}
+
+{% block content %}
+<div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
+    <h2>Tipos de Seguro</h2>
+    <button class="btn">+ Novo Tipo</button>
+</div>
+
+<!-- Estatísticas -->
+<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; margin-bottom: 2rem;">
+    <div style="background: white; padding: 1.5rem; border: 1px solid #ddd; border-radius: 8px; text-align: center;">
+        <h3 style="color: #00B391; font-size: 2rem; margin-bottom: 0.5rem;">{{ tipos|length }}</h3>
+        <p style="margin: 0; color: #666;">Tipos Ativos</p>
+    </div>
+    
+    <div style="background: white; padding: 1.5rem; border: 1px solid #ddd; border-radius: 8px; text-align: center;">
+        <h3 style="color: #28a745; font-size: 2rem; margin-bottom: 0.5rem;">4</h3>
+        <p style="margin: 0; color: #666;">Categorias</p>
+    </div>
+    
+    <div style="background: white; padding: 1.5rem; border: 1px solid #ddd; border-radius: 8px; text-align: center;">
+        <h3 style="color: #007bff; font-size: 2rem; margin-bottom: 0.5rem;">45%</h3>
+        <p style="margin: 0; color: #666;">Mais Vendido (Auto)</p>
+    </div>
+</div>
+
+<!-- Lista de Tipos por Categoria -->
+<div style="display: grid; gap: 2rem;">
+    <!-- Categoria Veículos -->
+    <div style="background: white; border: 1px solid #ddd; border-radius: 8px; overflow: hidden;">
+        <div style="background: linear-gradient(135deg, #007bff, #0056b3); padding: 1.5rem; color: white;">
+            <h3 style="margin: 0;">🚗 Veículos</h3>
+        </div>
+        
+        <div style="padding: 1.5rem;">
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 1rem;">
+                <div style="border: 1px solid #e9ecef; border-radius: 8px; padding: 1rem;">
+                    <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 1rem;">
+                        <div>
+                            <h4 style="margin-bottom: 0.5rem;">Seguro Auto</h4>
+                            <p style="color: #666; margin: 0; font-size: 14px;">Cobertura completa para veículos particulares e comerciais</p>
+                        </div>
+                        <span style="background: #28a745; color: white; padding: 2px 8px; border-radius: 12px; font-size: 11px;">Ativo</span>
+                    </div>
+                    
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 1rem; font-size: 12px;">
+                        <div>
+                            <strong>Apólices:</strong> 70
+                        </div>
+                        <div>
+                            <strong>Comissão:</strong> 10%
+                        </div>
+                    </div>
+                    
+                    <div style="display: flex; gap: 0.5rem;">
+                        <button class="btn" style="flex: 1; padding: 6px 10px; font-size: 12px;">Editar</button>
+                        <button class="btn btn-secondary" style="flex: 1; padding: 6px 10px; font-size: 12px;">Ver Apólices</button>
+                    </div>
+                </div>
+                
+                <div style="border: 1px solid #e9ecef; border-radius: 8px; padding: 1rem;">
+                    <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 1rem;">
+                        <div>
+                            <h4 style="margin-bottom: 0.5rem;">Seguro Moto</h4>
+                            <p style="color: #666; margin: 0; font-size: 14px;">Proteção específica para motocicletas</p>
+                        </div>
+                        <span style="background: #28a745; color: white; padding: 2px 8px; border-radius: 12px; font-size: 11px;">Ativo</span>
+                    </div>
+                    
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 1rem; font-size: 12px;">
+                        <div>
+                            <strong>Apólices:</strong> 12
+                        </div>
+                        <div>
+                            <strong>Comissão:</strong> 12%
+                        </div>
+                    </div>
+                    
+                    <div style="display: flex; gap: 0.5rem;">
+                        <button class="btn" style="flex: 1; padding: 6px 10px; font-size: 12px;">Editar</button>
+                        <button class="btn btn-secondary" style="flex: 1; padding: 6px 10px; font-size: 12px;">Ver Apólices</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Categoria Habitação -->
+    <div style="background: white; border: 1px solid #ddd; border-radius: 8px; overflow: hidden;">
+        <div style="background: linear-gradient(135deg, #28a745, #1e7e34); padding: 1.5rem; color: white;">
+            <h3 style="margin: 0;">🏠 Habitação</h3>
+        </div>
+        
+        <div style="padding: 1.5rem;">
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 1rem;">
+                <div style="border: 1px solid #e9ecef; border-radius: 8px; padding: 1rem;">
+                    <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 1rem;">
+                        <div>
+                            <h4 style="margin-bottom: 0.5rem;">Seguro Residencial</h4>
+                            <p style="color: #666; margin: 0; font-size: 14px;">Proteção completa para residências</p>
+                        </div>
+                        <span style="background: #28a745; color: white; padding: 2px 8px; border-radius: 12px; font-size: 11px;">Ativo</span>
+                    </div>
+                    
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 1rem; font-size: 12px;">
+                        <div>
+                            <strong>Apólices:</strong> 44
+                        </div>
+                        <div>
+                            <strong>Comissão:</strong> 12%
+                        </div>
+                    </div>
+                    
+                    <div style="display: flex; gap: 0.5rem;">
+                        <button class="btn" style="flex: 1; padding: 6px 10px; font-size: 12px;">Editar</button>
+                        <button class="btn btn-secondary" style="flex: 1; padding: 6px 10px; font-size: 12px;">Ver Apólices</button>
+                    </div>
+                </div>
+                
+                <div style="border: 1px solid #e9ecef; border-radius: 8px; padding: 1rem;">
+                    <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 1rem;">
+                        <div>
+                            <h4 style="margin-bottom: 0.5rem;">Seguro Condomínio</h4>
+                            <p style="color: #666; margin: 0; font-size: 14px;">Proteção para condomínios e áreas comuns</p>
+                        </div>
+                        <span style="background: #28a745; color: white; padding: 2px 8px; border-radius: 12px; font-size: 11px;">Ativo</span>
+                    </div>
+                    
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 1rem; font-size: 12px;">
+                        <div>
+                            <strong>Apólices:</strong> 8
+                        </div>
+                        <div>
+                            <strong>Comissão:</strong> 15%
+                        </div>
+                    </div>
+                    
+                    <div style="display: flex; gap: 0.5rem;">
+                        <button class="btn" style="flex: 1; padding: 6px 10px; font-size: 12px;">Editar</button>
+                        <button class="btn btn-secondary" style="flex: 1; padding: 6px 10px; font-size: 12px;">Ver Apólices</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Categoria Pessoas -->
+    <div style="background: white; border: 1px solid #ddd; border-radius: 8px; overflow: hidden;">
+        <div style="background: linear-gradient(135deg, #dc3545, #a71e2a); padding: 1.5rem; color: white;">
+            <h3 style="margin: 0;">❤️ Pessoas</h3>
+        </div>
+        
+        <div style="padding: 1.5rem;">
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 1rem;">
+                <div style="border: 1px solid #e9ecef; border-radius: 8px; padding: 1rem;">
+                    <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 1rem;">
+                        <div>
+                            <h4 style="margin-bottom: 0.5rem;">Seguro de Vida</h4>
+                            <p style="color: #666; margin: 0; font-size: 14px;">Proteção para a família em caso de morte ou invalidez</p>
+                        </div>
+                        <span style="background: #28a745; color: white; padding: 2px 8px; border-radius: 12px; font-size: 11px;">Ativo</span>
+                    </div>
+                    
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 1rem; font-size: 12px;">
+                        <div>
+                            <strong>Apólices:</strong> 23
+                        </div>
+                        <div>
+                            <strong>Comissão:</strong> 15%
+                        </div>
+                    </div>
+                    
+                    <div style="display: flex; gap: 0.5rem;">
+                        <button class="btn" style="flex: 1; padding: 6px 10px; font-size: 12px;">Editar</button>
+                        <button class="btn btn-secondary" style="flex: 1; padding: 6px 10px; font-size: 12px;">Ver Apólices</button>
+                    </div>
+                </div>
+                
+                <div style="border: 1px solid #e9ecef; border-radius: 8px; padding: 1rem;">
+                    <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 1rem;">
+                        <div>
+                            <h4 style="margin-bottom: 0.5rem;">Seguro Saúde</h4>
+                            <p style="color: #666; margin: 0; font-size: 14px;">Cobertura médica e hospitalar</p>
+                        </div>
+                        <span style="background: #ffc107; color: white; padding: 2px 8px; border-radius: 12px; font-size: 11px;">Pendente</span>
+                    </div>
+                    
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 1rem; font-size: 12px;">
+                        <div>
+                            <strong>Apólices:</strong> 0
+                        </div>
+                        <div>
+                            <strong>Comissão:</strong> 8%
+                        </div>
+                    </div>
+                    
+                    <div style="display: flex; gap: 0.5rem;">
+                        <button class="btn" style="flex: 1; padding: 6px 10px; font-size: 12px;">Editar</button>
+                        <button class="btn btn-secondary" style="flex: 1; padding: 6px 10px; font-size: 12px;">Ativar</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Categoria Empresas -->
+    <div style="background: white; border: 1px solid #ddd; border-radius: 8px; overflow: hidden;">
+        <div style="background: linear-gradient(135deg, #6f42c1, #563d7c); padding: 1.5rem; color: white;">
+            <h3 style="margin: 0;">🏢 Empresas</h3>
+        </div>
+        
+        <div style="padding: 1.5rem;">
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 1rem;">
+                <div style="border: 1px solid #e9ecef; border-radius: 8px; padding: 1rem;">
+                    <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 1rem;">
+                        <div>
+                            <h4 style="margin-bottom: 0.5rem;">Seguro Empresarial</h4>
+                            <p style="color: #666; margin: 0; font-size: 14px;">Cobertura completa para empresas e estabelecimentos</p>
+                        </div>
+                        <span style="background: #28a745; color: white; padding: 2px 8px; border-radius: 12px; font-size: 11px;">Ativo</span>
+                    </div>
+                    
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 1rem; font-size: 12px;">
+                        <div>
+                            <strong>Apólices:</strong> 15
+                        </div>
+                        <div>
+                            <strong>Comissão:</strong> 8%
+                        </div>
+                    </div>
+                    
+                    <div style="display: flex; gap: 0.5rem;">
+                        <button class="btn" style="flex: 1; padding: 6px 10px; font-size: 12px;">Editar</button>
+                        <button class="btn btn-secondary" style="flex: 1; padding: 6px 10px; font-size: 12px;">Ver Apólices</button>
+                    </div>
+                </div>
+                
+                <div style="border: 1px solid #e9ecef; border-radius: 8px; padding: 1rem;">
+                    <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 1rem;">
+                        <div>
+                            <h4 style="margin-bottom: 0.5rem;">Responsabilidade Civil</h4>
+                            <p style="color: #666; margin: 0; font-size: 14px;">Proteção contra danos a terceiros</p>
+                        </div>
+                        <span style="background: #28a745; color: white; padding: 2px 8px; border-radius: 12px; font-size: 11px;">Ativo</span>
+                    </div>
+                    
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 1rem; font-size: 12px;">
+                        <div>
+                            <strong>Apólices:</strong> 6
+                        </div>
+                        <div>
+                            <strong>Comissão:</strong> 12%
+                        </div>
+                    </div>
+                    
+                    <div style="display: flex; gap: 0.5rem;">
+                        <button class="btn" style="flex: 1; padding: 6px 10px; font-size: 12px;">Editar</button>
+                        <button class="btn btn-secondary" style="flex: 1; padding: 6px 10px; font-size: 12px;">Ver Apólices</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Resumo Estatístico -->
+<div style="background: white; padding: 2rem; border: 1px solid #ddd; border-radius: 8px; margin-top: 2rem;">
+    <h3 style="margin-bottom: 1rem;">📊 Análise por Tipo de Seguro</h3>
+    
+    <table>
+        <thead>
+            <tr>
+                <th>Tipo de Seguro</th>
+                <th>Categoria</th>
+                <th>Apólices Ativas</th>
+                <th>Valor Médio</th>
+                <th>Comissão</th>
+                <th>Performance</th>
+                <th>Status</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>Seguro Auto</td>
+                <td>Veículos</td>
+                <td>70</td>
+                <td>R$ 2.850</td>
+                <td>10%</td>
+                <td><div style="background: #28a745; width: 90%; height: 6px; border-radius: 3px;"></div></td>
+                <td><span style="background: #28a745; color: white; padding: 2px 8px; border-radius: 3px; font-size: 11px;">Ativo</span></td>
+            </tr>
+            <tr>
+                <td>Seguro Residencial</td>
+                <td>Habitação</td>
+                <td>44</td>
+                <td>R$ 1.200</td>
+                <td>12%</td>
+                <td><div style="background: #007bff; width: 60%; height: 6px; border-radius: 3px;"></div></td>
+                <td><span style="background: #28a745; color: white; padding: 2px 8px; border-radius: 3px; font-size: 11px;">Ativo</span></td>
+            </tr>
+            <tr>
+                <td>Seguro de Vida</td>
+                <td>Pessoas</td>
+                <td>23</td>
+                <td>R$ 980</td>
+                <td>15%</td>
+                <td><div style="background: #ffc107; width: 35%; height: 6px; border-radius: 3px;"></div></td>
+                <td><span style="background: #28a745; color: white; padding: 2px 8px; border-radius: 3px; font-size: 11px;">Ativo</span></td>
+            </tr>
+            <tr>
+                <td>Seguro Empresarial</td>
+                <td>Empresas</td>
+                <td>15</td>
+                <td>R$ 5.500</td>
+                <td>8%</td>
+                <td><div style="background: #6f42c1; width: 25%; height: 6px; border-radius: 3px;"></div></td>
+                <td><span style="background: #28a745; color: white; padding: 2px 8px; border-radius: 3px; font-size: 11px;">Ativo</span></td>
+            </tr>
+        </tbody>
+    </table>
+</div>
+
+<div style="margin-top: 2rem;">
+    <a href="/configuracoes" class="btn btn-secondary">Voltar às Configurações</a>
+    <button class="btn">Relatório Detalhado</button>
+</div>
+{% endblock %}

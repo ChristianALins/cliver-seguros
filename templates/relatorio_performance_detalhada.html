@@ -1,0 +1,592 @@
+{% extends "base.html" %}
+
+{% block title %}Performance Detalhada - CLIVER SEGUROS{% endblock %}
+
+{% block header_title %}Performance Detalhada{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <div class="page-title">
+        <h1><i class="fas fa-trophy"></i> Performance Detalhada</h1>
+        <p>Métricas avançadas de performance e análise de renovações</p>
+    </div>
+    <div class="page-actions">
+        <a href="{{ url_for('relatorios') }}" class="btn btn-secondary">
+            <i class="fas fa-arrow-left"></i> Voltar aos Relatórios
+        </a>
+        <button onclick="window.print()" class="btn btn-primary">
+            <i class="fas fa-print"></i> Imprimir
+        </button>
+    </div>
+</div>
+
+<!-- Performance Individual -->
+<div class="performance-section">
+    <div class="section-header">
+        <h2><i class="fas fa-chart-bar"></i> Performance Individual dos Colaboradores</h2>
+        <p>Métricas detalhadas de vendas e produtividade</p>
+    </div>
+    
+    <div class="performance-grid">
+        {% for perf in performance %}
+        <div class="performance-card">
+            <div class="performance-header">
+                <div class="colaborador-avatar-large">
+                    {{ perf.nome_colaborador[:2].upper() }}
+                </div>
+                <div class="colaborador-info-detailed">
+                    <h3>{{ perf.nome_colaborador }}</h3>
+                    {% if perf.email_colaborador %}
+                    <div class="contact-detail">
+                        <i class="fas fa-envelope"></i> {{ perf.email_colaborador }}
+                    </div>
+                    {% endif %}
+                    {% if perf.telefone_colaborador %}
+                    <div class="contact-detail">
+                        <i class="fas fa-phone"></i> {{ perf.telefone_colaborador }}
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+            
+            <div class="performance-metrics">
+                <div class="metric-row">
+                    <div class="metric-item primary">
+                        <div class="metric-icon">
+                            <i class="fas fa-file-contract"></i>
+                        </div>
+                        <div class="metric-content">
+                            <div class="metric-value">{{ perf.total_vendas or 0 }}</div>
+                            <div class="metric-label">Total de Vendas</div>
+                        </div>
+                    </div>
+                    
+                    <div class="metric-item success">
+                        <div class="metric-icon">
+                            <i class="fas fa-dollar-sign"></i>
+                        </div>
+                        <div class="metric-content">
+                            <div class="metric-value">R$ {{ "{:,.0f}".format(perf.valor_total_vendido or 0) }}</div>
+                            <div class="metric-label">Valor Vendido</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="metric-row">
+                    <div class="metric-item warning">
+                        <div class="metric-icon">
+                            <i class="fas fa-coins"></i>
+                        </div>
+                        <div class="metric-content">
+                            <div class="metric-value">R$ {{ "{:,.0f}".format(perf.comissao_total or 0) }}</div>
+                            <div class="metric-label">Comissão Total</div>
+                        </div>
+                    </div>
+                    
+                    <div class="metric-item info">
+                        <div class="metric-icon">
+                            <i class="fas fa-calculator"></i>
+                        </div>
+                        <div class="metric-content">
+                            <div class="metric-value">R$ {{ "{:,.0f}".format(perf.ticket_medio or 0) }}</div>
+                            <div class="metric-label">Ticket Médio</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="performance-stats">
+                    <div class="stat-item">
+                        <span class="stat-label">Primeira Venda:</span>
+                        <span class="stat-value">
+                            {% if perf.primeira_venda %}
+                                {{ perf.primeira_venda.strftime('%d/%m/%Y') }}
+                            {% else %}
+                                Sem vendas
+                            {% endif %}
+                        </span>
+                    </div>
+                    
+                    <div class="stat-item">
+                        <span class="stat-label">Última Venda:</span>
+                        <span class="stat-value">
+                            {% if perf.ultima_venda %}
+                                {{ perf.ultima_venda.strftime('%d/%m/%Y') }}
+                            {% else %}
+                                -
+                            {% endif %}
+                        </span>
+                    </div>
+                    
+                    <div class="stat-item">
+                        <span class="stat-label">Meses Ativos:</span>
+                        <span class="stat-value">{{ perf.meses_ativos or 0 }}</span>
+                    </div>
+                    
+                    <div class="stat-item">
+                        <span class="stat-label">Vendas/Mês:</span>
+                        <span class="stat-value">{{ "{:.1f}".format(perf.vendas_por_mes or 0) }}</span>
+                    </div>
+                </div>
+                
+                <!-- Performance Score -->
+                {% set score = (perf.total_vendas or 0) * 0.4 + (perf.vendas_por_mes or 0) * 0.6 %}
+                <div class="performance-score">
+                    <div class="score-bar">
+                        <div class="score-fill" style="width: {{ [score * 10, 100]|min }}%"></div>
+                    </div>
+                    <div class="score-text">
+                        {% if score >= 5 %}
+                            <span class="score-excellent">Excelente Performance</span>
+                        {% elif score >= 3 %}
+                            <span class="score-good">Boa Performance</span>
+                        {% elif score >= 1 %}
+                            <span class="score-average">Performance Regular</span>
+                        {% else %}
+                            <span class="score-low">Potencial de Melhoria</span>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+
+<!-- Análise de Renovações -->
+<div class="renovations-section">
+    <div class="section-header">
+        <h2><i class="fas fa-refresh"></i> Análise de Renovações</h2>
+        <p>Taxa de renovação e fidelização de clientes por colaborador</p>
+    </div>
+    
+    <div class="renovations-table-container">
+        <div class="table-responsive">
+            <table class="renovations-table">
+                <thead>
+                    <tr>
+                        <th>Colaborador</th>
+                        <th>Total Renovações</th>
+                        <th>Renovações Concluídas</th>
+                        <th>Taxa de Renovação</th>
+                        <th>Performance</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for ren in renovacoes %}
+                    <tr>
+                        <td>
+                            <div class="colaborador-cell">
+                                <div class="colaborador-avatar-small">
+                                    {{ ren.nome_colaborador[:2].upper() }}
+                                </div>
+                                <span class="colaborador-name">{{ ren.nome_colaborador }}</span>
+                            </div>
+                        </td>
+                        <td>
+                            <div class="renovation-metric">
+                                <span class="metric-number">{{ ren.total_renovacoes or 0 }}</span>
+                                <span class="metric-unit">renovações</span>
+                            </div>
+                        </td>
+                        <td>
+                            <div class="renovation-metric success">
+                                <span class="metric-number">{{ ren.renovacoes_concluidas or 0 }}</span>
+                                <span class="metric-unit">concluídas</span>
+                            </div>
+                        </td>
+                        <td>
+                            <div class="renovation-rate">
+                                {% set taxa = ren.taxa_renovacao or 0 %}
+                                <div class="rate-circle 
+                                    {% if taxa >= 80 %}excellent
+                                    {% elif taxa >= 60 %}good
+                                    {% elif taxa >= 40 %}average
+                                    {% else %}low{% endif %}">
+                                    {{ "{:.0f}".format(taxa) }}%
+                                </div>
+                            </div>
+                        </td>
+                        <td>
+                            <div class="renovation-performance-bar">
+                                {% set taxa = ren.taxa_renovacao or 0 %}
+                                <div class="performance-bar-bg">
+                                    <div class="performance-bar-fill 
+                                        {% if taxa >= 80 %}excellent
+                                        {% elif taxa >= 60 %}good
+                                        {% elif taxa >= 40 %}average
+                                        {% else %}low{% endif %}" 
+                                        style="width: {{ taxa }}%"></div>
+                                </div>
+                                <span class="performance-label">{{ "{:.1f}".format(taxa) }}%</span>
+                            </div>
+                        </td>
+                        <td>
+                            {% set taxa = ren.taxa_renovacao or 0 %}
+                            <span class="status-badge 
+                                {% if taxa >= 80 %}status-excellent
+                                {% elif taxa >= 60 %}status-good
+                                {% elif taxa >= 40 %}status-average
+                                {% else %}status-improvement{% endif %}">
+                                {% if taxa >= 80 %}
+                                    <i class="fas fa-star"></i> Excelente
+                                {% elif taxa >= 60 %}
+                                    <i class="fas fa-thumbs-up"></i> Bom
+                                {% elif taxa >= 40 %}
+                                    <i class="fas fa-minus"></i> Regular
+                                {% else %}
+                                    <i class="fas fa-arrow-up"></i> Melhorar
+                                {% endif %}
+                            </span>
+                        </td>
+                    </tr>
+                    {% else %}
+                    <tr class="empty-state">
+                        <td colspan="6">
+                            <div class="empty-message">
+                                <i class="fas fa-refresh"></i>
+                                <h4>Nenhum dado de renovação encontrado</h4>
+                                <p>Não há informações de renovações para análise.</p>
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<style>
+.performance-section, .renovations-section {
+    margin-bottom: 3rem;
+}
+
+.section-header {
+    margin-bottom: 2rem;
+    text-align: center;
+}
+
+.section-header h2 {
+    color: var(--gray-900);
+    margin-bottom: 0.5rem;
+}
+
+.section-header p {
+    color: var(--gray-600);
+}
+
+.performance-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+    gap: 2rem;
+}
+
+.performance-card {
+    background: var(--white);
+    border-radius: var(--radius-xl);
+    box-shadow: var(--shadow-md);
+    border: 1px solid var(--gray-200);
+    overflow: hidden;
+    transition: all 0.3s ease;
+}
+
+.performance-card:hover {
+    transform: translateY(-4px);
+    box-shadow: var(--shadow-lg);
+}
+
+.performance-header {
+    padding: 2rem;
+    background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-dark) 100%);
+    color: white;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.colaborador-avatar-large {
+    width: 64px;
+    height: 64px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.2);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+    font-weight: 700;
+}
+
+.colaborador-info-detailed h3 {
+    margin: 0 0 0.5rem;
+    font-size: 1.25rem;
+}
+
+.contact-detail {
+    font-size: 0.875rem;
+    opacity: 0.9;
+    margin-bottom: 0.25rem;
+}
+
+.contact-detail i {
+    width: 16px;
+    margin-right: 0.5rem;
+}
+
+.performance-metrics {
+    padding: 2rem;
+}
+
+.metric-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+}
+
+.metric-item {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 1rem;
+    border-radius: var(--radius-lg);
+    border: 1px solid var(--gray-200);
+}
+
+.metric-item.primary {
+    background: rgba(59, 130, 246, 0.05);
+    border-color: rgba(59, 130, 246, 0.2);
+}
+
+.metric-item.success {
+    background: rgba(16, 185, 129, 0.05);
+    border-color: rgba(16, 185, 129, 0.2);
+}
+
+.metric-item.warning {
+    background: rgba(245, 158, 11, 0.05);
+    border-color: rgba(245, 158, 11, 0.2);
+}
+
+.metric-item.info {
+    background: rgba(139, 92, 246, 0.05);
+    border-color: rgba(139, 92, 246, 0.2);
+}
+
+.metric-icon {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 1rem;
+}
+
+.metric-item.primary .metric-icon { background: #3B82F6; }
+.metric-item.success .metric-icon { background: #10B981; }
+.metric-item.warning .metric-icon { background: #F59E0B; }
+.metric-item.info .metric-icon { background: #8B5CF6; }
+
+.metric-value {
+    font-weight: 700;
+    font-size: 1.125rem;
+    color: var(--gray-900);
+}
+
+.metric-label {
+    font-size: 0.75rem;
+    color: var(--gray-600);
+}
+
+.performance-stats {
+    background: var(--gray-50);
+    padding: 1rem;
+    border-radius: var(--radius-lg);
+    margin-bottom: 1.5rem;
+}
+
+.stat-item {
+    display: flex;
+    justify-content: space-between;
+    padding: 0.5rem 0;
+    border-bottom: 1px solid var(--gray-200);
+    font-size: 0.875rem;
+}
+
+.stat-item:last-child {
+    border-bottom: none;
+}
+
+.stat-label {
+    color: var(--gray-600);
+}
+
+.stat-value {
+    font-weight: 500;
+    color: var(--gray-900);
+}
+
+.performance-score {
+    text-align: center;
+}
+
+.score-bar {
+    width: 100%;
+    height: 8px;
+    background: var(--gray-200);
+    border-radius: 4px;
+    overflow: hidden;
+    margin-bottom: 0.5rem;
+}
+
+.score-fill {
+    height: 100%;
+    background: linear-gradient(90deg, #F59E0B, #10B981, #3B82F6);
+    transition: width 0.3s ease;
+}
+
+.score-excellent { color: #10B981; }
+.score-good { color: #3B82F6; }
+.score-average { color: #F59E0B; }
+.score-low { color: #EF4444; }
+
+.renovations-table-container {
+    background: var(--white);
+    border-radius: var(--radius-xl);
+    box-shadow: var(--shadow-md);
+    border: 1px solid var(--gray-200);
+    overflow: hidden;
+}
+
+.renovations-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.renovations-table th {
+    background: var(--gray-50);
+    padding: 1rem;
+    text-align: left;
+    font-weight: 600;
+    color: var(--gray-900);
+    font-size: 0.875rem;
+    border-bottom: 1px solid var(--gray-200);
+}
+
+.renovations-table td {
+    padding: 1rem;
+    border-bottom: 1px solid var(--gray-200);
+    vertical-align: middle;
+}
+
+.colaborador-cell {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+.colaborador-avatar-small {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background: var(--primary-color);
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.75rem;
+    font-weight: 600;
+}
+
+.renovation-metric {
+    text-align: center;
+}
+
+.renovation-metric .metric-number {
+    font-weight: 600;
+    font-size: 1.125rem;
+    color: var(--gray-900);
+}
+
+.renovation-metric .metric-unit {
+    display: block;
+    font-size: 0.75rem;
+    color: var(--gray-500);
+}
+
+.renovation-metric.success .metric-number {
+    color: var(--success-color);
+}
+
+.rate-circle {
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 600;
+    font-size: 0.875rem;
+    color: white;
+    margin: 0 auto;
+}
+
+.rate-circle.excellent { background: #10B981; }
+.rate-circle.good { background: #3B82F6; }
+.rate-circle.average { background: #F59E0B; }
+.rate-circle.low { background: #EF4444; }
+
+.renovation-performance-bar {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.performance-bar-bg {
+    flex: 1;
+    height: 8px;
+    background: var(--gray-200);
+    border-radius: 4px;
+    overflow: hidden;
+}
+
+.performance-bar-fill {
+    height: 100%;
+    transition: width 0.3s ease;
+}
+
+.performance-bar-fill.excellent { background: #10B981; }
+.performance-bar-fill.good { background: #3B82F6; }
+.performance-bar-fill.average { background: #F59E0B; }
+.performance-bar-fill.low { background: #EF4444; }
+
+.performance-label {
+    font-size: 0.75rem;
+    font-weight: 500;
+    color: var(--gray-700);
+    min-width: 40px;
+}
+
+.status-excellent { background: #dcfce7; color: #166534; }
+.status-good { background: #dbeafe; color: #1e40af; }
+.status-average { background: #fef3c7; color: #92400e; }
+.status-improvement { background: #fef2f2; color: #991b1b; }
+
+@media (max-width: 768px) {
+    .performance-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .metric-row {
+        grid-template-columns: 1fr;
+    }
+    
+    .performance-header {
+        flex-direction: column;
+        text-align: center;
+    }
+}
+</style>
+{% endblock %}

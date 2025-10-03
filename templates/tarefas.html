@@ -1,0 +1,24 @@
+{% extends 'base.html' %}
+{% block title %}Tarefas{% endblock %}
+{% block content %}
+<h2>Tarefas</h2>
+<a href="{{ url_for('nova_tarefa') }}">Nova Tarefa</a>
+<table border="1" width="100%" style="margin-top:20px;">
+    <tr>
+        <th>ID</th><th>Título</th><th>Colaborador</th><th>Cliente</th><th>Apólice</th><th>Prioridade</th><th>Status</th><th>Vencimento</th><th>Ações</th>
+    </tr>
+    {% for t in tarefas %}
+    <tr>
+        <td>{{ t.id_tarefa }}</td>
+        <td>{{ t.titulo_tarefa }}</td>
+        <td>{{ t.nome_colaborador }}</td>
+        <td>{{ t.nome_cliente or '-' }}</td>
+        <td>{{ t.numero_apolice or '-' }}</td>
+        <td>{{ t.prioridade }}</td>
+        <td>{{ t.status_tarefa }}</td>
+        <td>{{ t.data_vencimento }}</td>
+        <td><a href="{{ url_for('editar_tarefa', id=t.id_tarefa) }}">Editar</a></td>
+    </tr>
+    {% endfor %}
+</table>
+{% endblock %}

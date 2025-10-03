@@ -1,0 +1,290 @@
+{% extends "base.html" %}
+
+{% block title %}Clientes - CLIVER SEGUROS{% endblock %}
+{% block page_title %}Gestão de Clientes{% endblock %}
+
+{% block content %}
+<div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
+    <div>
+        <p style="color: var(--gray-600); margin: 0;">Gerencie todos os clientes da corretora</p>
+    </div>
+    <a href="{{ url_for('novo_cliente') }}" class="btn btn-primary">
+        <i class="fas fa-user-plus"></i>
+        Novo Cliente
+    </a>
+</div>
+
+<!-- Estatísticas rápidas -->
+<div class="stats-grid" style="margin-bottom: 2rem;">
+    <div class="stat-card">
+        <div class="stat-card-header">
+            <h3 class="stat-card-title">Total de Clientes</h3>
+            <div class="stat-card-icon icon-primary">
+                <i class="fas fa-users"></i>
+            </div>
+        </div>
+        <p class="stat-card-value">{{ stats.total_clientes or 0 }}</p>
+        <div class="stat-card-change">
+            <span>Clientes cadastrados</span>
+        </div>
+    </div>
+    
+    <div class="stat-card">
+        <div class="stat-card-header">
+            <h3 class="stat-card-title">Pessoas Físicas</h3>
+            <div class="stat-card-icon icon-success">
+                <i class="fas fa-user"></i>
+            </div>
+        </div>
+        <p class="stat-card-value">{{ stats.pessoas_fisicas or 0 }}</p>
+        <div class="stat-card-change">
+            <span>Clientes PF</span>
+        </div>
+    </div>
+    
+    <div class="stat-card">
+        <div class="stat-card-header">
+            <h3 class="stat-card-title">Pessoas Jurídicas</h3>
+            <div class="stat-card-icon icon-warning">
+                <i class="fas fa-building"></i>
+            </div>
+        </div>
+        <p class="stat-card-value">{{ stats.pessoas_juridicas or 0 }}</p>
+        <div class="stat-card-change">
+            <span>Clientes PJ</span>
+        </div>
+    </div>
+
+    <div class="stat-card">
+        <div class="stat-card-header">
+            <h3 class="stat-card-title">Cidades</h3>
+            <div class="stat-card-icon icon-info">
+                <i class="fas fa-map-marker-alt"></i>
+            </div>
+        </div>
+        <p class="stat-card-value">{{ stats.total_cidades or 0 }}</p>
+        <div class="stat-card-change">
+            <span>Diferentes cidades</span>
+        </div>
+    </div>
+</div>
+
+<!-- Filtros e Pesquisa -->
+<div class="card" style="margin-bottom: 2rem;">
+    <div class="card-header">
+        <h3>Pesquisar e Filtrar Clientes</h3>
+    </div>
+    <div class="card-body">
+        <form method="GET" style="display: grid; grid-template-columns: 2fr 1fr 1fr 1fr auto; gap: 1rem; align-items: end;">
+            <div>
+                <label for="busca" style="display: block; margin-bottom: 0.5rem; font-weight: 500;">Pesquisar por nome ou documento:</label>
+                <input type="text" 
+                       id="busca" 
+                       name="busca" 
+                       value="{{ filtros.busca }}" 
+                       placeholder="Digite nome ou CPF/CNPJ..."
+                       style="width: 100%; padding: 0.75rem; border: 1px solid #d1d5db; border-radius: 0.375rem;">
+            </div>
+            
+            <div>
+                <label for="tipo_pessoa" style="display: block; margin-bottom: 0.5rem; font-weight: 500;">Tipo:</label>
+                <select id="tipo_pessoa" name="tipo_pessoa" style="width: 100%; padding: 0.75rem; border: 1px solid #d1d5db; border-radius: 0.375rem;">
+                    <option value="">Todos</option>
+                    <option value="Fisica" {{ 'selected' if filtros.tipo_pessoa == 'Fisica' }}>Pessoa Física</option>
+                    <option value="Juridica" {{ 'selected' if filtros.tipo_pessoa == 'Juridica' }}>Pessoa Jurídica</option>
+                </select>
+            </div>
+            
+            <div>
+                <label for="cidade" style="display: block; margin-bottom: 0.5rem; font-weight: 500;">Cidade:</label>
+                <select id="cidade" name="cidade" style="width: 100%; padding: 0.75rem; border: 1px solid #d1d5db; border-radius: 0.375rem;">
+                    <option value="">Todas</option>
+                    {% for cidade in cidades %}
+                    <option value="{{ cidade }}" {{ 'selected' if filtros.cidade == cidade }}>{{ cidade }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            
+            <div>
+                <label for="ordenar" style="display: block; margin-bottom: 0.5rem; font-weight: 500;">Ordenar por:</label>
+                <select id="ordenar" name="ordenar" style="width: 100%; padding: 0.75rem; border: 1px solid #d1d5db; border-radius: 0.375rem;">
+                    <option value="nome" {{ 'selected' if filtros.ordenar == 'nome' }}>Nome</option>
+                    <option value="data_cadastro" {{ 'selected' if filtros.ordenar == 'data_cadastro' }}>Data Cadastro</option>
+                    <option value="total_apolices" {{ 'selected' if filtros.ordenar == 'total_apolices' }}>Número de Apólices</option>
+                    <option value="valor_total" {{ 'selected' if filtros.ordenar == 'valor_total' }}>Valor Total</option>
+                </select>
+            </div>
+            
+            <div style="display: flex; gap: 0.5rem;">
+                <button type="submit" class="btn btn-primary">
+                    <i class="fas fa-search"></i>
+                    Pesquisar
+                </button>
+                <a href="{{ url_for('clientes') }}" class="btn btn-secondary">
+                    <i class="fas fa-times"></i>
+                    Limpar
+                </a>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Tabela de Clientes -->
+<div class="card">
+    <div class="card-header">
+        <h3>Lista de Clientes</h3>
+        <div style="color: var(--gray-600);">
+            {{ clientes|length }} cliente(s) encontrado(s)
+        </div>
+    </div>
+    <div class="card-body" style="padding: 0;">
+        {% if clientes %}
+        <div style="overflow-x: auto;">
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>Nome</th>
+                        <th>Tipo</th>
+                        <th>Documento</th>
+                        <th>Email</th>
+                        <th>Telefone</th>
+                        <th>Cidade</th>
+                        <th>Apólices</th>
+                        <th>Valor Total</th>
+                        <th>Ações</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for cliente in clientes %}
+                    <tr>
+                        <td>
+                            <div style="font-weight: 500;">{{ cliente.nome }}</div>
+                            {% if cliente.data_cadastro %}
+                            <div style="font-size: 0.875rem; color: var(--gray-500);">
+                                Cadastrado em {{ cliente.data_cadastro.strftime('%d/%m/%Y') }}
+                            </div>
+                            {% endif %}
+                        </td>
+                        <td>
+                            <span class="badge {{ 'badge-success' if cliente.tipo_pessoa == 'Fisica' else 'badge-primary' }}">
+                                {{ 'Pessoa Física' if cliente.tipo_pessoa == 'Fisica' else 'Pessoa Jurídica' }}
+                            </span>
+                        </td>
+                        <td style="font-family: monospace;">{{ cliente.documento }}</td>
+                        <td>{{ cliente.email or '-' }}</td>
+                        <td>{{ cliente.telefone or '-' }}</td>
+                        <td>{{ cliente.cidade or '-' }}, {{ cliente.estado or '' }}</td>
+                        <td>
+                            <span class="badge badge-info">{{ cliente.total_apolices }}</span>
+                        </td>
+                        <td>
+                            {% if cliente.valor_total_apolices %}
+                                R$ {{ "{:,.2f}".format(cliente.valor_total_apolices).replace(',', 'X').replace('.', ',').replace('X', '.') }}
+                            {% else %}
+                                R$ 0,00
+                            {% endif %}
+                        </td>
+                        <td>
+                            <div class="action-buttons">
+                                <a href="{{ url_for('detalhes_cliente', id=cliente.id_cliente) }}" 
+                                   class="btn btn-sm btn-info" 
+                                   title="Ver detalhes">
+                                    <i class="fas fa-eye"></i>
+                                </a>
+                                <a href="{{ url_for('editar_cliente', id=cliente.id_cliente) }}" 
+                                   class="btn btn-sm btn-warning" 
+                                   title="Editar">
+                                    <i class="fas fa-edit"></i>
+                                </a>
+                                {% if session.role == 'admin' %}
+                                <form method="POST" 
+                                      action="{{ url_for('excluir_cliente', id=cliente.id_cliente) }}" 
+                                      style="display: inline;"
+                                      onsubmit="return confirm('Tem certeza que deseja excluir o cliente {{ cliente.nome }}?')">
+                                    <button type="submit" 
+                                            class="btn btn-sm btn-danger" 
+                                            title="Excluir">
+                                        <i class="fas fa-trash"></i>
+                                    </button>
+                                </form>
+                                {% endif %}
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <div class="empty-state">
+            <i class="fas fa-users" style="font-size: 3rem; color: var(--gray-400); margin-bottom: 1rem;"></i>
+            <h3 style="color: var(--gray-500); margin-bottom: 0.5rem;">Nenhum cliente encontrado</h3>
+            <p style="color: var(--gray-400); margin-bottom: 2rem;">
+                {% if filtros.busca or filtros.tipo_pessoa or filtros.cidade %}
+                    Tente alterar os filtros de pesquisa ou 
+                    <a href="{{ url_for('clientes') }}">limpar filtros</a>.
+                {% else %}
+                    Comece cadastrando o primeiro cliente.
+                {% endif %}
+            </p>
+            <a href="{{ url_for('novo_cliente') }}" class="btn btn-primary">
+                <i class="fas fa-user-plus"></i>
+                Cadastrar Primeiro Cliente
+            </a>
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+<style>
+.action-buttons {
+    display: flex;
+    gap: 0.25rem;
+}
+
+.action-buttons .btn {
+    padding: 0.25rem 0.5rem;
+}
+
+.empty-state {
+    text-align: center;
+    padding: 3rem 1rem;
+}
+
+.badge {
+    padding: 0.25rem 0.5rem;
+    border-radius: 0.25rem;
+    font-size: 0.75rem;
+    font-weight: 500;
+}
+
+.badge-success {
+    background-color: #10b981;
+    color: white;
+}
+
+.badge-primary {
+    background-color: #3b82f6;
+    color: white;
+}
+
+.badge-info {
+    background-color: #06b6d4;
+    color: white;
+}
+
+@media (max-width: 768px) {
+    .stats-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .card-body form {
+        grid-template-columns: 1fr !important;
+    }
+    
+    .action-buttons {
+        flex-direction: column;
+    }
+}
+</style>
+{% endblock %}

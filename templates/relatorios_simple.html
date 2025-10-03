@@ -1,0 +1,134 @@
+{% extends "base_simple.html" %}
+
+{% block title %}Relatórios - CLIVER SEGUROS{% endblock %}
+
+{% block content %}
+<div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
+    <h2>Centro de Relatórios</h2>
+</div>
+
+<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 2rem; margin-bottom: 3rem;">
+    <!-- Relatórios de Clientes -->
+    <div style="background: white; padding: 2rem; border: 1px solid #ddd; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
+        <h3 style="color: #00B391; margin-bottom: 1rem;">👥 Relatórios de Clientes</h3>
+        <ul style="list-style: none; padding: 0;">
+            <li style="margin-bottom: 0.5rem;">
+                <button class="btn" style="width: 100%; text-align: left;">Clientes Cadastrados</button>
+            </li>
+            <li style="margin-bottom: 0.5rem;">
+                <button class="btn btn-secondary" style="width: 100%; text-align: left;">Clientes por Região</button>
+            </li>
+            <li style="margin-bottom: 0.5rem;">
+                <button class="btn btn-secondary" style="width: 100%; text-align: left;">Aniversariantes do Mês</button>
+            </li>
+        </ul>
+    </div>
+    
+    <!-- Relatórios de Apólices -->
+    <div style="background: white; padding: 2rem; border: 1px solid #ddd; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
+        <h3 style="color: #00B391; margin-bottom: 1rem;">📋 Relatórios de Apólices</h3>
+        <ul style="list-style: none; padding: 0;">
+            <li style="margin-bottom: 0.5rem;">
+                <button class="btn" style="width: 100%; text-align: left;">Apólices Ativas</button>
+            </li>
+            <li style="margin-bottom: 0.5rem;">
+                <button class="btn btn-secondary" style="width: 100%; text-align: left;">Vencimentos</button>
+            </li>
+            <li style="margin-bottom: 0.5rem;">
+                <button class="btn btn-secondary" style="width: 100%; text-align: left;">Por Tipo de Seguro</button>
+            </li>
+        </ul>
+    </div>
+    
+    <!-- Relatórios Financeiros -->
+    <div style="background: white; padding: 2rem; border: 1px solid #ddd; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
+        <h3 style="color: #00B391; margin-bottom: 1rem;">💰 Relatórios Financeiros</h3>
+        <ul style="list-style: none; padding: 0;">
+            <li style="margin-bottom: 0.5rem;">
+                <button class="btn" style="width: 100%; text-align: left;">Comissões</button>
+            </li>
+            <li style="margin-bottom: 0.5rem;">
+                <button class="btn btn-secondary" style="width: 100%; text-align: left;">Faturamento Mensal</button>
+            </li>
+            <li style="margin-bottom: 0.5rem;">
+                <button class="btn btn-secondary" style="width: 100%; text-align: left;">Prêmios por Seguradora</button>
+            </li>
+        </ul>
+    </div>
+    
+    <!-- Relatórios de Sinistros -->
+    <div style="background: white; padding: 2rem; border: 1px solid #ddd; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
+        <h3 style="color: #00B391; margin-bottom: 1rem;">⚠️ Relatórios de Sinistros</h3>
+        <ul style="list-style: none; padding: 0;">
+            <li style="margin-bottom: 0.5rem;">
+                <button class="btn" style="width: 100%; text-align: left;">Sinistros por Status</button>
+            </li>
+            <li style="margin-bottom: 0.5rem;">
+                <button class="btn btn-secondary" style="width: 100%; text-align: left;">Sinistralidade</button>
+            </li>
+            <li style="margin-bottom: 0.5rem;">
+                <button class="btn btn-secondary" style="width: 100%; text-align: left;">Análise de Riscos</button>
+            </li>
+        </ul>
+    </div>
+    
+    <!-- Relatórios de Performance -->
+    <div style="background: white; padding: 2rem; border: 1px solid #ddd; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
+        <h3 style="color: #00B391; margin-bottom: 1rem;">📊 Performance</h3>
+        <ul style="list-style: none; padding: 0;">
+            <li style="margin-bottom: 0.5rem;">
+                <button class="btn" style="width: 100%; text-align: left;">Vendas por Corretor</button>
+            </li>
+            <li style="margin-bottom: 0.5rem;">
+                <button class="btn btn-secondary" style="width: 100%; text-align: left;">Meta vs Realizado</button>
+            </li>
+            <li style="margin-bottom: 0.5rem;">
+                <button class="btn btn-secondary" style="width: 100%; text-align: left;">Produtividade</button>
+            </li>
+        </ul>
+    </div>
+    
+    <!-- Relatórios Personalizados -->
+    <div style="background: white; padding: 2rem; border: 1px solid #ddd; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
+        <h3 style="color: #00B391; margin-bottom: 1rem;">🔧 Personalizados</h3>
+        <ul style="list-style: none; padding: 0;">
+            <li style="margin-bottom: 0.5rem;">
+                <button class="btn" style="width: 100%; text-align: left;">Criar Relatório</button>
+            </li>
+            <li style="margin-bottom: 0.5rem;">
+                <button class="btn btn-secondary" style="width: 100%; text-align: left;">Relatórios Salvos</button>
+            </li>
+            <li style="margin-bottom: 0.5rem;">
+                <button class="btn btn-secondary" style="width: 100%; text-align: left;">Agendamentos</button>
+            </li>
+        </ul>
+    </div>
+</div>
+
+<div style="background: #f8f9fa; padding: 2rem; border-radius: 8px; margin-bottom: 2rem;">
+    <h3>Relatório de Exemplo - Resumo Geral</h3>
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; margin: 1rem 0;">
+        <div style="text-align: center; padding: 1rem; background: white; border-radius: 4px;">
+            <h4 style="color: #00B391;">1,247</h4>
+            <p>Total de Clientes</p>
+        </div>
+        <div style="text-align: center; padding: 1rem; background: white; border-radius: 4px;">
+            <h4 style="color: #28a745;">R$ 2.4M</h4>
+            <p>Prêmios Arrecadados</p>
+        </div>
+        <div style="text-align: center; padding: 1rem; background: white; border-radius: 4px;">
+            <h4 style="color: #ffc107;">187</h4>
+            <p>Sinistros Ativos</p>
+        </div>
+        <div style="text-align: center; padding: 1rem; background: white; border-radius: 4px;">
+            <h4 style="color: #17a2b8;">94.5%</h4>
+            <p>Satisfação Cliente</p>
+        </div>
+    </div>
+</div>
+
+<div style="margin-top: 2rem;">
+    <a href="/dashboard" class="btn btn-secondary">Voltar ao Dashboard</a>
+    <button class="btn">Exportar Dados</button>
+</div>
+{% endblock %}

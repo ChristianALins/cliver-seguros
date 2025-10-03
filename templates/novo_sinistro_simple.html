@@ -1,0 +1,148 @@
+{% extends "base_simple.html" %}
+
+{% block title %}Novo Sinistro - CLIVER SEGUROS{% endblock %}
+
+{% block content %}
+<div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
+    <h2>Novo Sinistro</h2>
+    <a href="{{ url_for('sinistros_simple') }}" class="btn btn-secondary">Voltar para Lista</a>
+</div>
+
+<div style="background: white; padding: 2rem; border: 1px solid #ddd; border-radius: 8px;">
+    <form method="POST">
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; margin-bottom: 2rem;">
+            <div>
+                <h3 style="color: #00B391; margin-bottom: 1rem;">Dados do Sinistro</h3>
+                
+                <div class="form-group">
+                    <label for="apolice_id">Apólice*:</label>
+                    <select id="apolice_id" name="apolice_id" required>
+                        <option value="">Selecione uma apólice...</option>
+                        {% for apolice in apolices %}
+                        <option value="{{ apolice.id }}">
+                            {{ apolice.numero_apolice }} - {{ apolice.cliente_nome }}
+                        </option>
+                        {% endfor %}
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label for="tipo_sinistro">Tipo de Sinistro*:</label>
+                    <select id="tipo_sinistro" name="tipo_sinistro" required>
+                        <option value="">Selecione o tipo...</option>
+                        <option value="colisao">Colisão</option>
+                        <option value="furto_roubo">Furto/Roubo</option>
+                        <option value="incendio">Incêndio</option>
+                        <option value="danos_naturais">Danos Naturais</option>
+                        <option value="vidros">Vidros</option>
+                        <option value="terceiros">Danos a Terceiros</option>
+                        <option value="outros">Outros</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label for="data_ocorrencia">Data da Ocorrência*:</label>
+                    <input type="date" id="data_ocorrencia" name="data_ocorrencia" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="data_comunicacao">Data da Comunicação*:</label>
+                    <input type="date" id="data_comunicacao" name="data_comunicacao" required>
+                </div>
+            </div>
+            
+            <div>
+                <h3 style="color: #00B391; margin-bottom: 1rem;">Valores Estimados</h3>
+                
+                <div class="form-group">
+                    <label for="valor_estimado">Valor Estimado do Dano (R$):</label>
+                    <input type="number" id="valor_estimado" name="valor_estimado" step="0.01" 
+                           placeholder="0,00">
+                </div>
+                
+                <div class="form-group">
+                    <label for="valor_franquia">Valor da Franquia (R$):</label>
+                    <input type="number" id="valor_franquia" name="valor_franquia" step="0.01" 
+                           placeholder="0,00">
+                </div>
+                
+                <div style="background: #f8f9fa; padding: 1rem; border-radius: 4px; margin-top: 1rem;">
+                    <h4 style="margin-bottom: 0.5rem;">Protocolo</h4>
+                    <p style="margin: 0; color: #666;">
+                        O protocolo será gerado automaticamente após o cadastro
+                    </p>
+                </div>
+            </div>
+        </div>
+        
+        <div class="form-group">
+            <label for="descricao">Descrição do Sinistro*:</label>
+            <textarea id="descricao" name="descricao" rows="4" required
+                      placeholder="Descreva detalhadamente como ocorreu o sinistro..."></textarea>
+        </div>
+        
+        <div class="form-group">
+            <label for="observacoes">Observações Adicionais:</label>
+            <textarea id="observacoes" name="observacoes" rows="3" 
+                      placeholder="Informações adicionais, documentos necessários, etc..."></textarea>
+        </div>
+        
+        <div style="display: flex; gap: 1rem; margin-top: 2rem;">
+            <button type="submit" class="btn">Registrar Sinistro</button>
+            <button type="reset" class="btn btn-secondary">Limpar Formulário</button>
+        </div>
+    </form>
+</div>
+
+<div style="background: #e7f3ff; padding: 1.5rem; border-radius: 8px; margin-top: 2rem;">
+    <h4 style="color: #0066cc; margin-bottom: 1rem;">📋 Documentos Necessários</h4>
+    <ul style="color: #333; margin: 0;">
+        <li>Boletim de Ocorrência (quando aplicável)</li>
+        <li>Fotos do local e dos danos</li>
+        <li>Documentos do veículo/bem segurado</li>
+        <li>CNH do condutor (para seguros auto)</li>
+        <li>Relatório de vistoria (quando solicitado)</li>
+        <li>Orçamentos de reparo (mínimo 2)</li>
+    </ul>
+</div>
+
+<script>
+// Definir data atual como padrão para comunicação
+document.addEventListener('DOMContentLoaded', function() {
+    var hoje = new Date();
+    var ano = hoje.getFullYear();
+    var mes = String(hoje.getMonth() + 1).padStart(2, '0');
+    var dia = String(hoje.getDate()).padStart(2, '0');
+    
+    document.getElementById('data_comunicacao').value = ano + '-' + mes + '-' + dia;
+});
+
+// Validação: data de ocorrência não pode ser futura
+document.getElementById('data_ocorrencia').addEventListener('change', function() {
+    var hoje = new Date();
+    var dataOcorrencia = new Date(this.value);
+    
+    if (dataOcorrencia > hoje) {
+        alert('A data de ocorrência não pode ser futura!');
+        this.value = '';
+    }
+});
+
+// Formatação de valores monetários
+document.querySelectorAll('input[type="number"]').forEach(function(input) {
+    input.addEventListener('blur', function() {
+        if (this.value) {
+            this.value = parseFloat(this.value).toFixed(2);
+        }
+    });
+});
+
+// Busca dinâmica de apólices
+document.getElementById('apolice_id').addEventListener('change', function() {
+    if (this.value) {
+        // Aqui poderia ser implementada uma busca AJAX para carregar dados da apólice
+        console.log('Apólice selecionada:', this.value);
+    }
+});
+</script>
+{% endblock %}

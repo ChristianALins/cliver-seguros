@@ -1,0 +1,484 @@
+{% extends 'base.html' %}
+{% block title %}{{ 'Editar' if apolice else 'Nova' }} Apólice{% endblock %}
+{% block content %}
+<div class="page-header">
+    <div class="page-title">
+        <h1><i class="fas fa-file-alt"></i> {{ 'Editar' if apolice else 'Nova' }} Apólice</h1>
+        <p class="page-subtitle">{{ 'Modificar os dados da apólice selecionada' if apolice else 'Registrar uma nova apólice no sistema' }}</p>
+    </div>
+    <div class="page-actions">
+        <a href="{{ url_for('apolices') }}" class="btn btn-secondary">
+            <i class="fas fa-arrow-left"></i> Voltar para Lista
+        </a>
+    </div>
+</div>
+
+<div class="form-container">
+    <form method="post" class="apolice-form">
+        <!-- Dados Principais -->
+        <div class="form-section">
+            <h3><i class="fas fa-info-circle"></i> Dados Principais</h3>
+            <div class="form-grid">
+                <div class="form-group">
+                    <label for="numero_apolice">Número da Apólice</label>
+                    <input type="text" 
+                           name="numero_apolice" 
+                           id="numero_apolice"
+                           placeholder="Ex: APL-2024-0001 (deixe vazio para gerar automaticamente)" 
+                           value="{{ apolice.numero_apolice if apolice else '' }}"
+                           class="form-control">
+                    <small class="form-help">Deixe vazio para gerar automaticamente</small>
+                </div>
+                
+                <div class="form-group">
+                    <label for="status_apolice">Status da Apólice</label>
+                    <select name="status_apolice" id="status_apolice" class="form-control">
+                        <option value="Ativa" {% if not apolice or apolice.status_apolice=='Ativa' %}selected{% endif %}>Ativa</option>
+                        <option value="Vencida" {% if apolice and apolice.status_apolice=='Vencida' %}selected{% endif %}>Vencida</option>
+                        <option value="Cancelada" {% if apolice and apolice.status_apolice=='Cancelada' %}selected{% endif %}>Cancelada</option>
+                        <option value="Renovada" {% if apolice and apolice.status_apolice=='Renovada' %}selected{% endif %}>Renovada</option>
+                        <option value="Aguardando Pagamento" {% if apolice and apolice.status_apolice=='Aguardando Pagamento' %}selected{% endif %}>Aguardando Pagamento</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+
+        <!-- Participantes -->
+        <div class="form-section">
+            <h3><i class="fas fa-users"></i> Participantes</h3>
+            <div class="form-grid">
+                <div class="form-group">
+                    <label for="id_cliente">Cliente *</label>
+                    <select name="id_cliente" id="id_cliente" required class="form-control">
+                        <option value="">Selecione o Cliente</option>
+                        {% for c in clientes %}
+                        <option value="{{ c.id_cliente }}" 
+                                {% if apolice and apolice.id_cliente==c.id_cliente %}selected{% endif %}
+                                data-email="{{ c.email }}" data-telefone="{{ c.telefone }}">
+                            {{ c.nome }}
+                        </option>
+                        {% endfor %}
+                    </select>
+                    <div id="cliente-info" class="info-box" style="display: none;"></div>
+                </div>
+
+                <div class="form-group">
+                    <label for="id_seguradora">Seguradora *</label>
+                    <select name="id_seguradora" id="id_seguradora" required class="form-control">
+                        <option value="">Selecione a Seguradora</option>
+                        {% for s in seguradoras %}
+                        <option value="{{ s.id_seguradora }}" {% if apolice and apolice.id_seguradora==s.id_seguradora %}selected{% endif %}>{{ s.nome_seguradora }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="id_tipo_seguro">Tipo de Seguro *</label>
+                    <select name="id_tipo_seguro" id="id_tipo_seguro" required class="form-control">
+                        <option value="">Selecione o Tipo de Seguro</option>
+                        {% for t in tipos_seguro %}
+                        <option value="{{ t.id_tipo_seguro }}" 
+                                {% if apolice and apolice.id_tipo_seguro==t.id_tipo_seguro %}selected{% endif %}
+                                data-descricao="{{ t.descricao_tipo_seguro }}">
+                            {{ t.nome_tipo_seguro }}
+                        </option>
+                        {% endfor %}
+                    </select>
+                    <div id="tipo-info" class="info-box" style="display: none;"></div>
+                </div>
+
+                <div class="form-group">
+                    <label for="id_colaborador">Colaborador Responsável *</label>
+                    <select name="id_colaborador" id="id_colaborador" required class="form-control">
+                        <option value="">Selecione o Colaborador</option>
+                        {% for col in colaboradores %}
+                        <option value="{{ col.id_colaborador }}" 
+                                {% if apolice and apolice.id_colaborador==col.id_colaborador %}selected{% endif %}
+                                data-email="{{ col.email_colaborador }}">
+                            {{ col.nome_colaborador }}
+                        </option>
+                        {% endfor %}
+                    </select>
+                    <div id="colaborador-info" class="info-box" style="display: none;"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Vigência -->
+        <div class="form-section">
+            <h3><i class="fas fa-calendar"></i> Período de Vigência</h3>
+            <div class="form-grid">
+                <div class="form-group">
+                    <label for="data_inicio_vigencia">Data de Início *</label>
+                    <input type="date" 
+                           name="data_inicio_vigencia" 
+                           id="data_inicio_vigencia"
+                           value="{{ apolice.data_inicio_vigencia if apolice else '' }}" 
+                           required 
+                           class="form-control">
+                </div>
+
+                <div class="form-group">
+                    <label for="data_fim_vigencia">Data de Fim *</label>
+                    <input type="date" 
+                           name="data_fim_vigencia" 
+                           id="data_fim_vigencia"
+                           value="{{ apolice.data_fim_vigencia if apolice else '' }}" 
+                           required 
+                           class="form-control">
+                </div>
+            </div>
+            <div id="periodo-info" class="info-box" style="display: none;"></div>
+        </div>
+
+        <!-- Valores e Comissões -->
+        <div class="form-section">
+            <h3><i class="fas fa-dollar-sign"></i> Valores e Comissões</h3>
+            <div class="form-grid">
+                <div class="form-group">
+                    <label for="valor_premio">Valor do Prêmio *</label>
+                    <input type="number" 
+                           step="0.01" 
+                           min="0"
+                           name="valor_premio" 
+                           id="valor_premio"
+                           placeholder="0,00" 
+                           value="{{ apolice.valor_premio if apolice else '' }}" 
+                           required 
+                           class="form-control">
+                </div>
+
+                <div class="form-group">
+                    <label for="percentual_comissao_seguradora">% Comissão Corretora</label>
+                    <input type="number" 
+                           step="0.01" 
+                           min="0" 
+                           max="100"
+                           name="percentual_comissao_seguradora" 
+                           id="percentual_comissao_seguradora"
+                           placeholder="15,00" 
+                           value="{{ apolice.percentual_comissao_seguradora if apolice else '15' }}" 
+                           class="form-control">
+                    <small class="form-help">Percentual da comissão para a corretora</small>
+                </div>
+
+                <div class="form-group">
+                    <label for="percentual_comissao_colaborador">% Comissão Colaborador</label>
+                    <input type="number" 
+                           step="0.01" 
+                           min="0" 
+                           max="100"
+                           name="percentual_comissao_colaborador" 
+                           id="percentual_comissao_colaborador"
+                           placeholder="10,00" 
+                           value="{{ apolice.percentual_comissao_colaborador if apolice else '10' }}" 
+                           class="form-control">
+                    <small class="form-help">Percentual da comissão para o colaborador</small>
+                </div>
+            </div>
+            
+            <div id="comissoes-preview" class="comissoes-box">
+                <h4>Preview das Comissões</h4>
+                <div class="comissoes-grid">
+                    <div class="comissao-item">
+                        <span class="label">Comissão Corretora:</span>
+                        <span class="valor" id="comissao-corretora">R$ 0,00</span>
+                    </div>
+                    <div class="comissao-item">
+                        <span class="label">Comissão Colaborador:</span>
+                        <span class="valor" id="comissao-colaborador">R$ 0,00</span>
+                    </div>
+                    <div class="comissao-item total">
+                        <span class="label">Total Comissões:</span>
+                        <span class="valor" id="total-comissoes">R$ 0,00</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Observações -->
+        <div class="form-section">
+            <h3><i class="fas fa-comment"></i> Observações</h3>
+            <div class="form-group">
+                <label for="observacoes">Observações Gerais</label>
+                <textarea name="observacoes" 
+                         id="observacoes"
+                         placeholder="Informações adicionais sobre a apólice..." 
+                         rows="4"
+                         class="form-control">{{ apolice.observacoes if apolice else '' }}</textarea>
+            </div>
+        </div>
+
+        <!-- Botões de Ação -->
+        <div class="form-actions">
+            <button type="submit" class="btn btn-primary">
+                <i class="fas fa-save"></i> {{ 'Atualizar' if apolice else 'Cadastrar' }} Apólice
+            </button>
+            <a href="{{ url_for('apolices') }}" class="btn btn-secondary">
+                <i class="fas fa-times"></i> Cancelar
+            </a>
+        </div>
+    </form>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Elementos
+    const clienteSelect = document.getElementById('id_cliente');
+    const colaboradorSelect = document.getElementById('id_colaborador');
+    const tipoSelect = document.getElementById('id_tipo_seguro');
+    const valorInput = document.getElementById('valor_premio');
+    const percCorretora = document.getElementById('percentual_comissao_seguradora');
+    const percColaborador = document.getElementById('percentual_comissao_colaborador');
+    const dataInicio = document.getElementById('data_inicio_vigencia');
+    const dataFim = document.getElementById('data_fim_vigencia');
+
+    // Mostrar informações do cliente
+    clienteSelect.addEventListener('change', function() {
+        const option = this.options[this.selectedIndex];
+        const infoDiv = document.getElementById('cliente-info');
+        
+        if (option.value) {
+            const email = option.dataset.email || 'Não informado';
+            const telefone = option.dataset.telefone || 'Não informado';
+            infoDiv.innerHTML = `
+                <strong>Contato:</strong><br>
+                Email: ${email}<br>
+                Telefone: ${telefone}
+            `;
+            infoDiv.style.display = 'block';
+        } else {
+            infoDiv.style.display = 'none';
+        }
+    });
+
+    // Mostrar informações do colaborador
+    colaboradorSelect.addEventListener('change', function() {
+        const option = this.options[this.selectedIndex];
+        const infoDiv = document.getElementById('colaborador-info');
+        
+        if (option.value) {
+            const email = option.dataset.email || 'Não informado';
+            infoDiv.innerHTML = `<strong>Email:</strong> ${email}`;
+            infoDiv.style.display = 'block';
+        } else {
+            infoDiv.style.display = 'none';
+        }
+    });
+
+    // Mostrar informações do tipo de seguro
+    tipoSelect.addEventListener('change', function() {
+        const option = this.options[this.selectedIndex];
+        const infoDiv = document.getElementById('tipo-info');
+        
+        if (option.value && option.dataset.descricao) {
+            infoDiv.innerHTML = `<strong>Descrição:</strong> ${option.dataset.descricao}`;
+            infoDiv.style.display = 'block';
+        } else {
+            infoDiv.style.display = 'none';
+        }
+    });
+
+    // Calcular período de vigência
+    function calcularPeriodo() {
+        const inicio = dataInicio.value;
+        const fim = dataFim.value;
+        const infoDiv = document.getElementById('periodo-info');
+        
+        if (inicio && fim) {
+            const dataI = new Date(inicio);
+            const dataF = new Date(fim);
+            const diffTime = dataF - dataI;
+            const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+            
+            if (diffDays > 0) {
+                const anos = Math.floor(diffDays / 365);
+                const meses = Math.floor((diffDays % 365) / 30);
+                const dias = diffDays % 30;
+                
+                let periodo = 'Período: ';
+                if (anos > 0) periodo += `${anos} ano${anos > 1 ? 's' : ''} `;
+                if (meses > 0) periodo += `${meses} mês${meses > 1 ? 'es' : ''} `;
+                if (dias > 0) periodo += `${dias} dia${dias > 1 ? 's' : ''}`;
+                
+                infoDiv.innerHTML = periodo;
+                infoDiv.style.display = 'block';
+                infoDiv.className = 'info-box success';
+            } else {
+                infoDiv.innerHTML = 'Atenção: Data fim deve ser posterior à data início';
+                infoDiv.style.display = 'block';
+                infoDiv.className = 'info-box error';
+            }
+        } else {
+            infoDiv.style.display = 'none';
+        }
+    }
+
+    // Calcular comissões
+    function calcularComissoes() {
+        const valor = parseFloat(valorInput.value) || 0;
+        const percC = parseFloat(percCorretora.value) || 0;
+        const percCol = parseFloat(percColaborador.value) || 0;
+        
+        const comissaoCorretora = valor * (percC / 100);
+        const comissaoColaborador = valor * (percCol / 100);
+        const totalComissoes = comissaoCorretora + comissaoColaborador;
+        
+        document.getElementById('comissao-corretora').textContent = 
+            comissaoCorretora.toLocaleString('pt-BR', {style: 'currency', currency: 'BRL'});
+        document.getElementById('comissao-colaborador').textContent = 
+            comissaoColaborador.toLocaleString('pt-BR', {style: 'currency', currency: 'BRL'});
+        document.getElementById('total-comissoes').textContent = 
+            totalComissoes.toLocaleString('pt-BR', {style: 'currency', currency: 'BRL'});
+    }
+
+    // Event listeners
+    dataInicio.addEventListener('change', calcularPeriodo);
+    dataFim.addEventListener('change', calcularPeriodo);
+    valorInput.addEventListener('input', calcularComissoes);
+    percCorretora.addEventListener('input', calcularComissoes);
+    percColaborador.addEventListener('input', calcularComissoes);
+
+    // Calcular na inicialização
+    calcularComissoes();
+    calcularPeriodo();
+});
+</script>
+
+<style>
+.apolice-form {
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+.form-section {
+    background: #fff;
+    padding: 20px;
+    margin-bottom: 20px;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.form-section h3 {
+    margin-top: 0;
+    margin-bottom: 20px;
+    color: #2c3e50;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.form-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 20px;
+    margin-bottom: 15px;
+}
+
+.form-group {
+    display: flex;
+    flex-direction: column;
+}
+
+.form-group label {
+    margin-bottom: 5px;
+    font-weight: 600;
+    color: #34495e;
+}
+
+.form-control {
+    padding: 10px;
+    border: 2px solid #ddd;
+    border-radius: 5px;
+    font-size: 14px;
+    transition: border-color 0.3s;
+}
+
+.form-control:focus {
+    outline: none;
+    border-color: #3498db;
+}
+
+.form-help {
+    margin-top: 5px;
+    font-size: 12px;
+    color: #7f8c8d;
+}
+
+.info-box {
+    margin-top: 10px;
+    padding: 10px;
+    border-radius: 5px;
+    font-size: 13px;
+    line-height: 1.4;
+}
+
+.info-box.success {
+    background: #d4edda;
+    color: #155724;
+    border: 1px solid #c3e6cb;
+}
+
+.info-box.error {
+    background: #f8d7da;
+    color: #721c24;
+    border: 1px solid #f5c6cb;
+}
+
+.comissoes-box {
+    margin-top: 15px;
+    padding: 15px;
+    background: #f8f9fa;
+    border-radius: 5px;
+    border-left: 4px solid #3498db;
+}
+
+.comissoes-box h4 {
+    margin-top: 0;
+    margin-bottom: 10px;
+    color: #2c3e50;
+}
+
+.comissoes-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 10px;
+}
+
+.comissao-item {
+    display: flex;
+    justify-content: space-between;
+    padding: 8px;
+    background: #fff;
+    border-radius: 4px;
+}
+
+.comissao-item.total {
+    background: #3498db;
+    color: #fff;
+    font-weight: bold;
+}
+
+.form-actions {
+    display: flex;
+    gap: 10px;
+    justify-content: flex-end;
+    padding-top: 20px;
+    border-top: 1px solid #eee;
+}
+
+@media (max-width: 768px) {
+    .form-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .form-actions {
+        flex-direction: column;
+    }
+    
+    .btn {
+        width: 100%;
+    }
+}
+</style>
+{% endblock %}

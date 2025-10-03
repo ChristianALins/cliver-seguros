@@ -1,0 +1,21 @@
+{% extends 'base.html' %}
+{% block title %}Colaboradores{% endblock %}
+{% block content %}
+<h2>Colaboradores</h2>
+<a href="{{ url_for('novo_colaborador') }}">Novo Colaborador</a>
+<table border="1" width="100%" style="margin-top:20px;">
+    <tr>
+        <th>ID</th><th>Nome</th><th>Email</th><th>Cargo</th><th>Status</th><th>Ações</th>
+    </tr>
+    {% for c in colaboradores %}
+    <tr>
+        <td>{{ c.id_colaborador }}</td>
+        <td>{{ c.nome_colaborador }}</td>
+        <td>{{ c.email_colaborador }}</td>
+        <td>{{ c.cargo }}</td>
+        <td>{{ c.status }}</td>
+        <td><a href="{{ url_for('editar_colaborador', id=c.id_colaborador) }}">Editar</a></td>
+    </tr>
+    {% endfor %}
+</table>
+{% endblock %}

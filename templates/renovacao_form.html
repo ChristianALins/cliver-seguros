@@ -1,0 +1,501 @@
+{% extends 'base.html' %}
+{% block title %}Renovar Apólice{% endblock %}
+{% block content %}
+<div class="page-header">
+    <div class="page-title">
+        <h1><i class="fas fa-sync-alt"></i> Renovar Apólice</h1>
+        <p class="page-subtitle">Criar renovação para apólice vencida</p>
+    </div>
+    <div class="page-actions">
+        <a href="{{ url_for('apolices') }}" class="btn btn-secondary">
+            <i class="fas fa-arrow-left"></i> Voltar para Apólices
+        </a>
+    </div>
+</div>
+
+<div class="renovation-container">
+    <!-- Dados da Apólice Original -->
+    <div class="original-policy-card">
+        <h3><i class="fas fa-file-alt"></i> Apólice Original</h3>
+        <div class="policy-grid">
+            <div class="policy-item">
+                <label>Número da Apólice:</label>
+                <span class="policy-number">{{ apolice.numero_apolice }}</span>
+            </div>
+            <div class="policy-item">
+                <label>Cliente:</label>
+                <span>{{ apolice.cliente_nome }}</span>
+            </div>
+            <div class="policy-item">
+                <label>Seguradora:</label>
+                <span>{{ apolice.nome_seguradora }}</span>
+            </div>
+            <div class="policy-item">
+                <label>Tipo de Seguro:</label>
+                <span>{{ apolice.nome_tipo_seguro }}</span>
+            </div>
+            <div class="policy-item">
+                <label>Colaborador:</label>
+                <span>{{ apolice.nome_colaborador }}</span>
+            </div>
+            <div class="policy-item">
+                <label>Período Original:</label>
+                <span>{{ apolice.data_inicio_vigencia.strftime('%d/%m/%Y') }} até {{ apolice.data_fim_vigencia.strftime('%d/%m/%Y') }}</span>
+            </div>
+            <div class="policy-item">
+                <label>Valor do Prêmio:</label>
+                <span class="currency">R$ {{ "{:,.2f}".format(apolice.valor_premio) }}</span>
+            </div>
+            <div class="policy-item">
+                <label>Status Atual:</label>
+                <span class="status-badge {{ apolice.status_apolice.lower() }}">{{ apolice.status_apolice }}</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Formulário de Renovação -->
+    <div class="renewal-form-card">
+        <h3><i class="fas fa-edit"></i> Dados da Renovação</h3>
+        
+        <form method="post" class="renewal-form">
+            <div class="form-section">
+                <h4>Informações da Nova Apólice</h4>
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label for="numero_apolice_nova">Número da Nova Apólice *</label>
+                        <input type="text" 
+                               name="numero_apolice_nova" 
+                               id="numero_apolice_nova"
+                               placeholder="Ex: APL-2024-0002" 
+                               required 
+                               class="form-control">
+                        <small class="form-help">Número único para a nova apólice</small>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="valor_premio">Novo Valor do Prêmio *</label>
+                        <input type="number" 
+                               step="0.01" 
+                               min="0"
+                               name="valor_premio" 
+                               id="valor_premio"
+                               value="{{ apolice.valor_premio }}"
+                               required 
+                               class="form-control">
+                        <small class="form-help">Valor atualizado do prêmio</small>
+                    </div>
+                </div>
+
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label for="data_inicio_vigencia">Data de Início da Nova Vigência *</label>
+                        <input type="date" 
+                               name="data_inicio_vigencia" 
+                               id="data_inicio_vigencia"
+                               value="{{ (apolice.data_fim_vigencia.strftime('%Y-%m-%d') if apolice.data_fim_vigencia else '') }}"
+                               required 
+                               class="form-control">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="data_fim_vigencia">Data de Fim da Nova Vigência *</label>
+                        <input type="date" 
+                               name="data_fim_vigencia" 
+                               id="data_fim_vigencia"
+                               required 
+                               class="form-control">
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-section">
+                <h4>Comissões</h4>
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label for="percentual_comissao_seguradora">% Comissão Corretora</label>
+                        <input type="number" 
+                               step="0.01" 
+                               min="0" 
+                               max="100"
+                               name="percentual_comissao_seguradora" 
+                               id="percentual_comissao_seguradora"
+                               value="{{ apolice.percentual_comissao_seguradora }}"
+                               class="form-control">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="percentual_comissao_colaborador">% Comissão Colaborador</label>
+                        <input type="number" 
+                               step="0.01" 
+                               min="0" 
+                               max="100"
+                               name="percentual_comissao_colaborador" 
+                               id="percentual_comissao_colaborador"
+                               value="{{ apolice.percentual_comissao_colaborador }}"
+                               class="form-control">
+                    </div>
+                </div>
+
+                <div id="comissoes-preview" class="comissoes-box">
+                    <h5>Preview das Comissões</h5>
+                    <div class="comissoes-grid">
+                        <div class="comissao-item">
+                            <span class="label">Comissão Corretora:</span>
+                            <span class="valor" id="comissao-corretora">R$ 0,00</span>
+                        </div>
+                        <div class="comissao-item">
+                            <span class="label">Comissão Colaborador:</span>
+                            <span class="valor" id="comissao-colaborador">R$ 0,00</span>
+                        </div>
+                        <div class="comissao-item total">
+                            <span class="label">Total Comissões:</span>
+                            <span class="valor" id="total-comissoes">R$ 0,00</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-section">
+                <h4>Observações</h4>
+                <div class="form-group">
+                    <label for="observacoes">Observações da Nova Apólice</label>
+                    <textarea name="observacoes" 
+                             id="observacoes"
+                             placeholder="Informações adicionais sobre a renovação..."
+                             rows="3"
+                             class="form-control">{{ apolice.observacoes if apolice.observacoes else '' }}</textarea>
+                </div>
+
+                <div class="form-group">
+                    <label for="observacoes_renovacao">Observações da Renovação</label>
+                    <textarea name="observacoes_renovacao" 
+                             id="observacoes_renovacao"
+                             placeholder="Motivos da renovação, alterações realizadas, etc..."
+                             rows="3"
+                             class="form-control"></textarea>
+                </div>
+            </div>
+
+            <div class="comparison-section">
+                <h4><i class="fas fa-balance-scale"></i> Comparação</h4>
+                <div class="comparison-grid">
+                    <div class="comparison-item">
+                        <h5>Valor do Prêmio</h5>
+                        <div class="comparison-values">
+                            <span class="old-value">Anterior: R$ {{ "{:,.2f}".format(apolice.valor_premio) }}</span>
+                            <span class="new-value">Novo: <span id="novo-valor">R$ {{ "{:,.2f}".format(apolice.valor_premio) }}</span></span>
+                            <span class="variation" id="variacao-valor">+0%</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-actions">
+                <button type="submit" class="btn btn-success">
+                    <i class="fas fa-sync-alt"></i> Confirmar Renovação
+                </button>
+                <a href="{{ url_for('apolices') }}" class="btn btn-secondary">
+                    <i class="fas fa-times"></i> Cancelar
+                </a>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const valorInput = document.getElementById('valor_premio');
+    const percCorretora = document.getElementById('percentual_comissao_seguradora');
+    const percColaborador = document.getElementById('percentual_comissao_colaborador');
+    const dataInicio = document.getElementById('data_inicio_vigencia');
+    const dataFim = document.getElementById('data_fim_vigencia');
+    
+    const valorOriginal = {{ apolice.valor_premio }};
+
+    // Calcular data fim automática (1 ano após início)
+    dataInicio.addEventListener('change', function() {
+        if (this.value) {
+            const inicio = new Date(this.value);
+            inicio.setFullYear(inicio.getFullYear() + 1);
+            dataFim.value = inicio.toISOString().split('T')[0];
+        }
+    });
+
+    // Calcular comissões e variação
+    function calcularComissoes() {
+        const valor = parseFloat(valorInput.value) || 0;
+        const percC = parseFloat(percCorretora.value) || 0;
+        const percCol = parseFloat(percColaborador.value) || 0;
+        
+        const comissaoCorretora = valor * (percC / 100);
+        const comissaoColaborador = valor * (percCol / 100);
+        const totalComissoes = comissaoCorretora + comissaoColaborador;
+        
+        document.getElementById('comissao-corretora').textContent = 
+            comissaoCorretora.toLocaleString('pt-BR', {style: 'currency', currency: 'BRL'});
+        document.getElementById('comissao-colaborador').textContent = 
+            comissaoColaborador.toLocaleString('pt-BR', {style: 'currency', currency: 'BRL'});
+        document.getElementById('total-comissoes').textContent = 
+            totalComissoes.toLocaleString('pt-BR', {style: 'currency', currency: 'BRL'});
+
+        // Atualizar comparação
+        document.getElementById('novo-valor').textContent = 
+            valor.toLocaleString('pt-BR', {style: 'currency', currency: 'BRL'});
+        
+        const variacao = ((valor - valorOriginal) / valorOriginal * 100);
+        const variacaoEl = document.getElementById('variacao-valor');
+        variacaoEl.textContent = (variacao >= 0 ? '+' : '') + variacao.toFixed(1) + '%';
+        variacaoEl.className = 'variation ' + (variacao > 0 ? 'positive' : variacao < 0 ? 'negative' : 'neutral');
+    }
+
+    // Event listeners
+    valorInput.addEventListener('input', calcularComissoes);
+    percCorretora.addEventListener('input', calcularComissoes);
+    percColaborador.addEventListener('input', calcularComissoes);
+
+    // Calcular na inicialização
+    calcularComissoes();
+});
+</script>
+
+<style>
+.renovation-container {
+    display: grid;
+    grid-template-columns: 1fr 2fr;
+    gap: 20px;
+    max-width: 1400px;
+    margin: 0 auto;
+}
+
+.original-policy-card, .renewal-form-card {
+    background: #fff;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    height: fit-content;
+}
+
+.original-policy-card h3, .renewal-form-card h3 {
+    margin-top: 0;
+    margin-bottom: 20px;
+    color: #2c3e50;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.policy-grid {
+    display: grid;
+    gap: 15px;
+}
+
+.policy-item {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+}
+
+.policy-item label {
+    font-weight: 600;
+    color: #7f8c8d;
+    font-size: 13px;
+}
+
+.policy-item span {
+    color: #2c3e50;
+    font-weight: 500;
+}
+
+.policy-number {
+    background: #3498db;
+    color: white;
+    padding: 5px 10px;
+    border-radius: 4px;
+    font-weight: bold;
+    width: fit-content;
+}
+
+.status-badge {
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-size: 12px;
+    font-weight: 500;
+    width: fit-content;
+}
+
+.status-badge.ativa { background: #d4edda; color: #155724; }
+.status-badge.vencida { background: #f8d7da; color: #721c24; }
+.status-badge.cancelada { background: #e2e3e5; color: #383d41; }
+
+.renewal-form {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.form-section {
+    padding: 15px;
+    border: 1px solid #e9ecef;
+    border-radius: 5px;
+}
+
+.form-section h4 {
+    margin-top: 0;
+    margin-bottom: 15px;
+    color: #495057;
+}
+
+.form-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 15px;
+    margin-bottom: 15px;
+}
+
+.form-group {
+    display: flex;
+    flex-direction: column;
+}
+
+.form-group label {
+    margin-bottom: 5px;
+    font-weight: 600;
+    color: #495057;
+}
+
+.form-control {
+    padding: 8px;
+    border: 1px solid #ced4da;
+    border-radius: 4px;
+    font-size: 14px;
+}
+
+.form-control:focus {
+    outline: none;
+    border-color: #3498db;
+}
+
+.form-help {
+    margin-top: 3px;
+    font-size: 11px;
+    color: #6c757d;
+}
+
+.comissoes-box {
+    margin-top: 15px;
+    padding: 15px;
+    background: #f8f9fa;
+    border-radius: 5px;
+    border-left: 4px solid #3498db;
+}
+
+.comissoes-box h5 {
+    margin-top: 0;
+    margin-bottom: 10px;
+    color: #2c3e50;
+}
+
+.comissoes-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 10px;
+}
+
+.comissao-item {
+    display: flex;
+    justify-content: space-between;
+    padding: 8px;
+    background: #fff;
+    border-radius: 4px;
+}
+
+.comissao-item.total {
+    background: #3498db;
+    color: #fff;
+    font-weight: bold;
+}
+
+.comparison-section {
+    background: #f8f9fa;
+    padding: 15px;
+    border-radius: 5px;
+    border-left: 4px solid #17a2b8;
+}
+
+.comparison-section h4 {
+    margin-top: 0;
+    color: #17a2b8;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.comparison-grid {
+    display: grid;
+    gap: 15px;
+}
+
+.comparison-item h5 {
+    margin-bottom: 10px;
+    color: #495057;
+}
+
+.comparison-values {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+}
+
+.old-value {
+    color: #6c757d;
+    font-size: 14px;
+}
+
+.new-value {
+    font-weight: bold;
+    color: #28a745;
+    font-size: 16px;
+}
+
+.variation {
+    font-weight: bold;
+    font-size: 14px;
+    padding: 2px 6px;
+    border-radius: 3px;
+    width: fit-content;
+}
+
+.variation.positive { background: #d4edda; color: #155724; }
+.variation.negative { background: #f8d7da; color: #721c24; }
+.variation.neutral { background: #e2e3e5; color: #383d41; }
+
+.form-actions {
+    display: flex;
+    gap: 10px;
+    justify-content: flex-end;
+    padding-top: 20px;
+    border-top: 1px solid #e9ecef;
+}
+
+.currency {
+    font-weight: 600;
+    color: #28a745;
+}
+
+@media (max-width: 1024px) {
+    .renovation-container {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media (max-width: 768px) {
+    .form-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .form-actions {
+        flex-direction: column;
+    }
+}
+</style>
+{% endblock %}

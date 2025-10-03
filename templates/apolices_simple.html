@@ -1,0 +1,115 @@
+{% extends "base_simple.html" %}
+
+{% block title %}Apólices - CLIVER SEGUROS{% endblock %}
+
+{% block content %}
+<div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
+    <h2>Gerenciamento de Apólices</h2>
+    <a href="{{ url_for('nova_apolice') }}" class="btn">Nova Apólice</a>
+</div>
+
+{% set stats = {
+    'ativas': apolices|selectattr('status', 'equalto', 'ativa')|list|length,
+    'vencendo': 0,
+    'vencidas': 0,
+    'total': apolices|length
+} %}
+
+<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; margin-bottom: 2rem;">
+    <div style="background: white; padding: 1rem; border: 1px solid #ddd; border-radius: 4px; text-align: center;">
+        <h3 style="color: #00B391;">{{ stats.ativas }}</h3>
+        <p>Apólices Ativas</p>
+    </div>
+    <div style="background: white; padding: 1rem; border: 1px solid #ddd; border-radius: 4px; text-align: center;">
+        <h3 style="color: #ffc107;">{{ stats.vencendo }}</h3>
+        <p>Vencendo em 30 dias</p>
+    </div>
+    <div style="background: white; padding: 1rem; border: 1px solid #ddd; border-radius: 4px; text-align: center;">
+        <h3 style="color: #dc3545;">{{ stats.vencidas }}</h3>
+        <p>Vencidas</p>
+    </div>
+    <div style="background: white; padding: 1rem; border: 1px solid #ddd; border-radius: 4px; text-align: center;">
+        <h3 style="color: #28a745;">{{ stats.total }}</h3>
+        <p>Total</p>
+    </div>
+</div>
+
+<div style="display: flex; gap: 1rem; margin-bottom: 2rem; flex-wrap: wrap;">
+    <a href="{{ url_for('nova_apolice') }}" class="btn">
+        <i class="fas fa-plus"></i> Nova Apólice
+    </a>
+    <a href="{{ url_for('apolices_vencimento') }}" class="btn btn-secondary">
+        <i class="fas fa-calendar"></i> Vencimentos
+    </a>
+    <a href="{{ url_for('relatorios') }}" class="btn btn-secondary">
+        <i class="fas fa-chart-line"></i> Relatórios
+    </a>
+</div>
+
+<h3>Apólices Recentes:</h3>
+<table>
+    <thead>
+        <tr>
+            <th>Número</th>
+            <th>Cliente</th>
+            <th>Tipo</th>
+            <th>Valor</th>
+            <th>Vencimento</th>
+            <th>Status</th>
+            <th>Ações</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for apolice in apolices %}
+        <tr>
+            <td>{{ apolice.numero_apolice }}</td>
+            <td>{{ apolice.cliente_nome }}</td>
+            <td>{{ apolice.tipo_seguro_nome }}</td>
+            <td>R$ {{ "%.2f"|format(apolice.valor_premio) }}</td>
+            <td>{{ apolice.data_vencimento }}</td>
+            <td>
+                <span class="status-badge status-{{ apolice.status }}">
+                    {{ apolice.status.title() }}
+                </span>
+            </td>
+            <td>
+                <a href="{{ url_for('editar_apolice', apolice_id=apolice.id) }}" class="btn-small btn-edit">
+                    <i class="fas fa-edit"></i> Editar
+                </a>
+            </td>
+        </tr>
+        {% else %}
+        <tr>
+            <td>2024002</td>
+            <td>Maria Santos</td>
+            <td>Residencial</td>
+            <td>R$ 800,00</td>
+            <td>20/10/2024</td>
+            <td><span style="background: #ffc107; color: white; padding: 2px 8px; border-radius: 3px;">Vencendo</span></td>
+            <td>
+                <a href="/editar_apolice/2" class="btn" style="padding: 5px 10px; font-size: 12px;">Editar</a>
+                <a href="/nova_renovacao/2" class="btn btn-secondary" style="padding: 5px 10px; font-size: 12px;">Renovar</a>
+            </td>
+        </tr>
+        <tr>
+            <td>2024003</td>
+            <td>Pedro Oliveira</td>
+            <td>Vida</td>
+            <td>R$ 2.500,00</td>
+            <td>30/12/2024</td>
+            <td><span style="background: #28a745; color: white; padding: 2px 8px; border-radius: 3px;">Ativa</span></td>
+            <td>
+                <a href="/editar_apolice/3" class="btn" style="padding: 5px 10px; font-size: 12px;">Editar</a>
+                <a href="/nova_renovacao/3" class="btn btn-secondary" style="padding: 5px 10px; font-size: 12px;">Renovar</a>
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+<div style="margin-top: 2rem; display: flex; gap: 1rem;">
+    <a href="/dashboard" class="btn btn-secondary">Voltar ao Dashboard</a>
+    <a href="/tipos_seguro" class="btn btn-secondary">Tipos de Seguro</a>
+    <a href="/seguradoras" class="btn btn-secondary">Seguradoras</a>
+</div>
+{% endblock %}

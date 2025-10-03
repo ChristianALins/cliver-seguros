@@ -1,0 +1,304 @@
+{% extends "base.html" %}
+
+{% block title %}{{ cliente.nome }} - Detalhes do Cliente{% endblock %}
+{% block page_title %}Detalhes do Cliente{% endblock %}
+
+{% block content %}
+<div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
+    <div>
+        <h1 style="margin: 0; font-size: 2rem; color: var(--gray-900);">{{ cliente.nome }}</h1>
+        <p style="color: var(--gray-600); margin: 0.5rem 0 0 0;">
+            {{ 'Pessoa Física' if cliente.tipo_pessoa == 'Fisica' else 'Pessoa Jurídica' }} • 
+            {{ cliente.documento }}
+        </p>
+    </div>
+    <div style="display: flex; gap: 0.5rem;">
+        <a href="{{ url_for('clientes') }}" class="btn btn-secondary">
+            <i class="fas fa-arrow-left"></i>
+            Voltar
+        </a>
+        <a href="{{ url_for('editar_cliente', id=cliente.id_cliente) }}" class="btn btn-primary">
+            <i class="fas fa-edit"></i>
+            Editar
+        </a>
+    </div>
+</div>
+
+<!-- Estatísticas do Cliente -->
+<div class="stats-grid" style="margin-bottom: 2rem;">
+    <div class="stat-card">
+        <div class="stat-card-header">
+            <h3 class="stat-card-title">Total de Apólices</h3>
+            <div class="stat-card-icon icon-primary">
+                <i class="fas fa-file-contract"></i>
+            </div>
+        </div>
+        <p class="stat-card-value">{{ stats.total_apolices or 0 }}</p>
+        <div class="stat-card-change">
+            <span>Apólices cadastradas</span>
+        </div>
+    </div>
+    
+    <div class="stat-card">
+        <div class="stat-card-header">
+            <h3 class="stat-card-title">Apólices Ativas</h3>
+            <div class="stat-card-icon icon-success">
+                <i class="fas fa-check-circle"></i>
+            </div>
+        </div>
+        <p class="stat-card-value">{{ stats.apolices_ativas or 0 }}</p>
+        <div class="stat-card-change">
+            <span>Em vigência</span>
+        </div>
+    </div>
+    
+    <div class="stat-card">
+        <div class="stat-card-header">
+            <h3 class="stat-card-title">Valor Total</h3>
+            <div class="stat-card-icon icon-warning">
+                <i class="fas fa-dollar-sign"></i>
+            </div>
+        </div>
+        <p class="stat-card-value">
+            {% if stats.valor_total_ativo %}
+                R$ {{ "{:,.0f}".format(stats.valor_total_ativo).replace(',', '.') }}
+            {% else %}
+                R$ 0
+            {% endif %}
+        </p>
+        <div class="stat-card-change">
+            <span>Em apólices ativas</span>
+        </div>
+    </div>
+
+    <div class="stat-card">
+        <div class="stat-card-header">
+            <h3 class="stat-card-title">Cliente desde</h3>
+            <div class="stat-card-icon icon-info">
+                <i class="fas fa-calendar"></i>
+            </div>
+        </div>
+        <p class="stat-card-value">
+            {% if stats.primeira_apolice %}
+                {{ stats.primeira_apolice.strftime('%Y') }}
+            {% else %}
+                -
+            {% endif %}
+        </p>
+        <div class="stat-card-change">
+            <span>Primeira apólice</span>
+        </div>
+    </div>
+</div>
+
+<div style="display: grid; grid-template-columns: 1fr 2fr; gap: 2rem;">
+    <!-- Informações do Cliente -->
+    <div class="card">
+        <div class="card-header">
+            <h3>Informações Pessoais</h3>
+        </div>
+        <div class="card-body">
+            <div style="display: grid; gap: 1rem;">
+                <div>
+                    <label style="font-weight: 500; color: var(--gray-700); display: block; margin-bottom: 0.25rem;">
+                        Nome Completo:
+                    </label>
+                    <div style="color: var(--gray-900);">{{ cliente.nome }}</div>
+                </div>
+
+                <div>
+                    <label style="font-weight: 500; color: var(--gray-700); display: block; margin-bottom: 0.25rem;">
+                        Tipo de Pessoa:
+                    </label>
+                    <span class="badge {{ 'badge-success' if cliente.tipo_pessoa == 'Fisica' else 'badge-primary' }}">
+                        {{ 'Pessoa Física' if cliente.tipo_pessoa == 'Fisica' else 'Pessoa Jurídica' }}
+                    </span>
+                </div>
+
+                <div>
+                    <label style="font-weight: 500; color: var(--gray-700); display: block; margin-bottom: 0.25rem;">
+                        Documento:
+                    </label>
+                    <div style="color: var(--gray-900); font-family: monospace;">{{ cliente.documento }}</div>
+                </div>
+
+                {% if cliente.data_nascimento %}
+                <div>
+                    <label style="font-weight: 500; color: var(--gray-700); display: block; margin-bottom: 0.25rem;">
+                        Data de Nascimento:
+                    </label>
+                    <div style="color: var(--gray-900);">{{ cliente.data_nascimento.strftime('%d/%m/%Y') }}</div>
+                </div>
+                {% endif %}
+
+                {% if cliente.email %}
+                <div>
+                    <label style="font-weight: 500; color: var(--gray-700); display: block; margin-bottom: 0.25rem;">
+                        Email:
+                    </label>
+                    <div style="color: var(--gray-900);">
+                        <a href="mailto:{{ cliente.email }}" style="color: var(--primary-600);">{{ cliente.email }}</a>
+                    </div>
+                </div>
+                {% endif %}
+
+                {% if cliente.telefone %}
+                <div>
+                    <label style="font-weight: 500; color: var(--gray-700); display: block; margin-bottom: 0.25rem;">
+                        Telefone:
+                    </label>
+                    <div style="color: var(--gray-900);">
+                        <a href="tel:{{ cliente.telefone }}" style="color: var(--primary-600);">{{ cliente.telefone }}</a>
+                    </div>
+                </div>
+                {% endif %}
+
+                {% if cliente.endereco %}
+                <div>
+                    <label style="font-weight: 500; color: var(--gray-700); display: block; margin-bottom: 0.25rem;">
+                        Endereço:
+                    </label>
+                    <div style="color: var(--gray-900);">
+                        {{ cliente.endereco }}<br>
+                        {% if cliente.cidade %}{{ cliente.cidade }}{% endif %}{% if cliente.estado %}, {{ cliente.estado }}{% endif %}
+                        {% if cliente.cep %}<br>CEP: {{ cliente.cep }}{% endif %}
+                    </div>
+                </div>
+                {% endif %}
+
+                {% if cliente.data_cadastro %}
+                <div>
+                    <label style="font-weight: 500; color: var(--gray-700); display: block; margin-bottom: 0.25rem;">
+                        Cadastrado em:
+                    </label>
+                    <div style="color: var(--gray-900);">{{ cliente.data_cadastro.strftime('%d/%m/%Y às %H:%M') }}</div>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <!-- Apólices do Cliente -->
+    <div class="card">
+        <div class="card-header">
+            <h3>Apólices do Cliente</h3>
+            <div style="color: var(--gray-600);">
+                {{ apolices|length }} apólice(s) cadastrada(s)
+            </div>
+        </div>
+        <div class="card-body" style="padding: 0;">
+            {% if apolices %}
+            <div style="overflow-x: auto;">
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>Número</th>
+                            <th>Seguradora</th>
+                            <th>Tipo</th>
+                            <th>Corretor</th>
+                            <th>Vigência</th>
+                            <th>Valor</th>
+                            <th>Status</th>
+                            <th>Ações</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for apolice in apolices %}
+                        <tr>
+                            <td style="font-family: monospace; font-weight: 500;">{{ apolice.numero_apolice }}</td>
+                            <td>{{ apolice.nome_seguradora }}</td>
+                            <td>{{ apolice.nome_tipo_seguro }}</td>
+                            <td>{{ apolice.nome_colaborador }}</td>
+                            <td>
+                                {{ apolice.data_inicio_vigencia.strftime('%d/%m/%Y') }} -<br>
+                                {{ apolice.data_fim_vigencia.strftime('%d/%m/%Y') }}
+                                {% if apolice.situacao_vigencia == 'Vencida' %}
+                                    <span class="badge badge-danger" style="display: block; margin-top: 0.25rem;">Vencida</span>
+                                {% elif apolice.situacao_vigencia == 'Vencendo' %}
+                                    <span class="badge badge-warning" style="display: block; margin-top: 0.25rem;">Vencendo</span>
+                                {% endif %}
+                            </td>
+                            <td>R$ {{ "{:,.2f}".format(apolice.valor_premio).replace(',', 'X').replace('.', ',').replace('X', '.') }}</td>
+                            <td>
+                                <span class="badge {{ 'badge-success' if apolice.status_apolice == 'Ativa' else 'badge-secondary' }}">
+                                    {{ apolice.status_apolice }}
+                                </span>
+                            </td>
+                            <td>
+                                <a href="{{ url_for('editar_apolice', id=apolice.id_apolice) }}" 
+                                   class="btn btn-sm btn-warning" 
+                                   title="Editar apólice">
+                                    <i class="fas fa-edit"></i>
+                                </a>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            {% else %}
+            <div class="empty-state">
+                <i class="fas fa-file-contract" style="font-size: 3rem; color: var(--gray-400); margin-bottom: 1rem;"></i>
+                <h3 style="color: var(--gray-500); margin-bottom: 0.5rem;">Nenhuma apólice encontrada</h3>
+                <p style="color: var(--gray-400); margin-bottom: 2rem;">
+                    Este cliente ainda não possui apólices cadastradas.
+                </p>
+                <a href="{{ url_for('nova_apolice') }}?cliente_id={{ cliente.id_cliente }}" class="btn btn-primary">
+                    <i class="fas fa-plus"></i>
+                    Cadastrar Primeira Apólice
+                </a>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<style>
+.badge {
+    padding: 0.25rem 0.5rem;
+    border-radius: 0.25rem;
+    font-size: 0.75rem;
+    font-weight: 500;
+}
+
+.badge-success {
+    background-color: #10b981;
+    color: white;
+}
+
+.badge-primary {
+    background-color: #3b82f6;
+    color: white;
+}
+
+.badge-secondary {
+    background-color: #6b7280;
+    color: white;
+}
+
+.badge-warning {
+    background-color: #f59e0b;
+    color: white;
+}
+
+.badge-danger {
+    background-color: #ef4444;
+    color: white;
+}
+
+.empty-state {
+    text-align: center;
+    padding: 3rem 1rem;
+}
+
+@media (max-width: 768px) {
+    div[style*="grid-template-columns: 1fr 2fr"] {
+        grid-template-columns: 1fr !important;
+    }
+    
+    .stats-grid {
+        grid-template-columns: 1fr 1fr !important;
+    }
+}
+</style>
+{% endblock %}

@@ -1,0 +1,320 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - CLIVER SEGUROS</title>
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        :root {
+            /* Paleta de Cores Oficial CLIVER */
+            --primary-color: #00B391;      /* Crescimento (Teal) */
+            --primary-dark: #009478;       /* Teal mais escuro */
+            --primary-light: #33c4a6;      /* Teal mais claro */
+            --secondary-color: #54595F;     /* Solidez (Cinza Escuro) */
+            --background-color: #FFFFFF;    /* Fundo principal */
+            --background-secondary: #F4F6F9; /* Apoio (Cinza Claro) */
+            --neutral-50: #F4F6F9;         /* Cinza claro CLIVER */
+            --neutral-100: #F4F6F9;        /* Cinza claro CLIVER */
+            --neutral-200: #e8eaed;        /* Cinza intermediário */
+            --neutral-400: #9aa0a6;        /* Cinza médio */
+            --neutral-600: #54595F;        /* Cinza escuro CLIVER */
+            --neutral-800: #54595F;        /* Cinza escuro CLIVER */
+            --white: #FFFFFF;
+            --shadow-soft: 0 2px 12px rgba(0, 179, 145, 0.08);
+            --shadow-medium: 0 4px 24px rgba(0, 179, 145, 0.12);
+            --radius-soft: 20px;
+            --font-primary: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: var(--font-primary);
+            background: linear-gradient(135deg, var(--background-secondary) 0%, var(--background-color) 40%, var(--primary-color) 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 2rem;
+            font-size: 15px;
+            line-height: 1.5;
+            color: var(--neutral-600);
+            -webkit-font-smoothing: antialiased;
+        }
+        
+        .login-container {
+            background: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            border-radius: var(--radius-soft);
+            box-shadow: var(--shadow-medium);
+            padding: 3rem;
+            width: 100%;
+            max-width: 400px;
+            animation: fadeInUp 0.6s ease-out;
+        }
+        
+        .logo-container {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+        
+        .logo {
+            width: 80px;
+            height: auto;
+            border-radius: 12px;
+            filter: drop-shadow(0 4px 12px rgba(0, 0, 0, 0.1));
+            transition: transform 0.3s ease;
+        }
+        
+        .logo:hover {
+            transform: scale(1.05);
+        }
+        
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+        
+        .form-label {
+            display: block;
+            font-size: 14px;
+            font-weight: 500;
+            color: var(--neutral-600);
+            margin-bottom: 0.5rem;
+        }
+        
+        .input-wrapper {
+            position: relative;
+        }
+        
+        .form-input {
+            width: 100%;
+            padding: 1rem 1rem 1rem 3rem;
+            border: 2px solid var(--neutral-200);
+            border-radius: 16px;
+            background: var(--white);
+            font-size: 15px;
+            font-family: inherit;
+            color: var(--neutral-800);
+            transition: all 0.3s ease;
+            outline: none;
+        }
+        
+        .form-input:focus {
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 4px rgba(0, 179, 145, 0.1);
+        }
+        
+        .form-input::placeholder {
+            color: var(--neutral-400);
+        }
+        
+        .input-icon {
+            position: absolute;
+            left: 1rem;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--neutral-400);
+            font-size: 16px;
+            transition: color 0.3s ease;
+        }
+        
+        .form-input:focus + .input-icon {
+            color: var(--primary-medium);
+        }
+        
+        .password-toggle {
+            position: absolute;
+            right: 1rem;
+            top: 50%;
+            transform: translateY(-50%);
+            background: none;
+            border: none;
+            color: var(--neutral-400);
+            cursor: pointer;
+            font-size: 16px;
+            transition: color 0.3s ease;
+        }
+        
+        .password-toggle:hover {
+            color: var(--primary-color);
+        }
+        
+        .login-btn {
+            width: 100%;
+            padding: 1rem;
+            background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
+            border: none;
+            border-radius: 16px;
+            color: var(--white);
+            font-size: 16px;
+            font-weight: 500;
+            font-family: inherit;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: var(--shadow-soft);
+            margin-top: 0.5rem;
+        }
+        
+        .login-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-medium);
+        }
+        
+        .login-btn:active {
+            transform: translateY(0);
+        }
+        
+        .login-btn:disabled {
+            background: var(--neutral-200);
+            color: var(--neutral-400);
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+        
+        .alert {
+            background: #fee;
+            border: 1px solid #fcc;
+            border-radius: 12px;
+            color: #a00;
+            padding: 0.75rem 1rem;
+            margin-bottom: 1rem;
+            font-size: 14px;
+        }
+        
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        @media (max-width: 480px) {
+            body {
+                padding: 1rem;
+            }
+            
+            .login-container {
+                padding: 2rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="login-container">
+        <div class="logo-container">
+            <img src="{{ url_for('static', filename='images/cliver-logo-mini.jpg') }}" alt="Cliver" class="logo">
+        </div>
+        
+        <!-- Flash Messages -->
+        {% with messages = get_flashed_messages() %}
+            {% if messages %}
+                {% for message in messages %}
+                    <div class="alert">{{ message }}</div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+        
+        <form method="post" id="loginForm">
+            <div class="form-group">
+                <label for="username" class="form-label">Usuário</label>
+                <div class="input-wrapper">
+                    <input type="text" 
+                           id="username" 
+                           name="username" 
+                           class="form-input" 
+                           placeholder="Digite seu usuário" 
+                           required 
+                           autocomplete="username">
+                    <i class="fas fa-user input-icon"></i>
+                </div>
+            </div>
+            
+            <div class="form-group">
+                <label for="password" class="form-label">Senha</label>
+                <div class="input-wrapper">
+                    <input type="password" 
+                           id="password" 
+                           name="password" 
+                           class="form-input" 
+                           placeholder="Digite sua senha" 
+                           required 
+                           autocomplete="current-password">
+                    <i class="fas fa-lock input-icon"></i>
+                    <button type="button" class="password-toggle" id="togglePassword">
+                        <i class="fas fa-eye"></i>
+                    </button>
+                </div>
+            </div>
+            
+            <button type="submit" class="login-btn">
+                <i class="fas fa-sign-in-alt" style="margin-right: 0.5rem;"></i>
+                Entrar
+            </button>
+        </form>
+        
+        <!-- Credenciais de Demonstração -->
+        <div style="margin-top: 2rem; padding: 1rem; background: rgba(0, 179, 145, 0.1); border-radius: 12px; border-left: 4px solid #00B391;">
+            <h4 style="color: #00B391; font-size: 14px; margin-bottom: 0.5rem;">
+                <i class="fas fa-info-circle" style="margin-right: 0.5rem;"></i>
+                Credenciais de Demonstração
+            </h4>
+            <div style="font-size: 13px; color: #54595F; line-height: 1.4;">
+                <p style="margin: 0.25rem 0;"><strong>Administrador:</strong> admin / admin</p>
+                <p style="margin: 0.25rem 0;"><strong>Usuário Demo:</strong> demo / demo</p>
+                <p style="margin: 0.25rem 0; font-style: italic; opacity: 0.8;">Sistema CLIVER - Versão Demonstração</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Toggle password visibility
+        document.getElementById('togglePassword').addEventListener('click', function() {
+            const passwordInput = document.getElementById('password');
+            const icon = this.querySelector('i');
+            
+            if (passwordInput.type === 'password') {
+                passwordInput.type = 'text';
+                icon.className = 'fas fa-eye-slash';
+            } else {
+                passwordInput.type = 'password';
+                icon.className = 'fas fa-eye';
+            }
+        });
+
+        // Form submission with loading state
+        document.getElementById('loginForm').addEventListener('submit', function(e) {
+            const submitButton = this.querySelector('.login-btn');
+            const icon = submitButton.querySelector('i');
+            
+            // Add loading state
+            icon.className = 'fas fa-spinner fa-spin';
+            submitButton.disabled = true;
+            submitButton.innerHTML = '<i class="fas fa-spinner fa-spin" style="margin-right: 0.5rem;"></i>Entrando...';
+        });
+
+        // Focus on first input when page loads
+        document.addEventListener('DOMContentLoaded', function() {
+            document.getElementById('username').focus();
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,260 @@
+{% extends "base.html" %}
+
+{% block title %}Tipos de Seguro - CLIVER SEGUROS{% endblock %}
+
+{% block header_title %}Tipos de Seguro{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <div class="page-title">
+        <h1><i class="fas fa-shield-alt"></i> Tipos de Seguro</h1>
+        <p>Configure e gerencie os tipos de seguro oferecidos</p>
+    </div>
+    <div class="page-actions">
+        <a href="{{ url_for('novo_tipo_seguro') }}" class="btn btn-primary">
+            <i class="fas fa-plus"></i> Novo Tipo
+        </a>
+    </div>
+</div>
+
+<!-- Cards de Estatísticas -->
+<div class="stats-grid">
+    <div class="stat-card">
+        <div class="stat-icon" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
+            <i class="fas fa-shield-alt"></i>
+        </div>
+        <div class="stat-content">
+            <div class="stat-number">{{ tipos_seguro|length or 0 }}</div>
+            <div class="stat-label">Tipos Cadastrados</div>
+            <div class="stat-change neutral">Total disponível</div>
+        </div>
+    </div>
+
+    <div class="stat-card">
+        <div class="stat-icon" style="background: linear-gradient(135deg, #48BB78 0%, #38A169 100%);">
+            <i class="fas fa-check-circle"></i>
+        </div>
+        <div class="stat-content">
+            <div class="stat-number">{{ tipos_seguro|length or 0 }}</div>
+            <div class="stat-label">Tipos Ativos</div>
+            <div class="stat-change positive">Todos ativos</div>
+        </div>
+    </div>
+
+    <div class="stat-card">
+        <div class="stat-icon" style="background: linear-gradient(135deg, #ECC94B 0%, #D69E2E 100%);">
+            <i class="fas fa-file-contract"></i>
+        </div>
+        <div class="stat-content">
+            <div class="stat-number">-</div>
+            <div class="stat-label">Mais Vendido</div>
+            <div class="stat-change neutral">Em análise</div>
+        </div>
+    </div>
+
+    <div class="stat-card">
+        <div class="stat-icon" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
+            <i class="fas fa-chart-line"></i>
+        </div>
+        <div class="stat-content">
+            <div class="stat-number">100%</div>
+            <div class="stat-label">Disponibilidade</div>
+            <div class="stat-change positive">Sistema ativo</div>
+        </div>
+    </div>
+</div>
+
+<!-- Filtros e Pesquisa -->
+<div class="data-controls">
+    <div class="search-container">
+        <i class="fas fa-search search-icon"></i>
+        <input type="text" id="searchInput" placeholder="Pesquisar tipos de seguro..." class="search-input">
+    </div>
+    
+    <div class="filters">
+        <button class="btn btn-secondary" onclick="clearFilters()">
+            <i class="fas fa-times"></i> Limpar Pesquisa
+        </button>
+    </div>
+</div>
+
+<!-- Tabela de Tipos de Seguro -->
+<div class="data-table-container">
+    <div class="table-responsive">
+        <table class="data-table" id="tiposTable">
+            <thead>
+                <tr>
+                    <th>Tipo de Seguro</th>
+                    <th>Descrição</th>
+                    <th>Status</th>
+                    <th>Ações</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for t in tipos_seguro %}
+                <tr class="table-row">
+                    <td>
+                        <div class="type-info">
+                            <div class="type-icon">
+                                <i class="fas fa-shield-alt"></i>
+                            </div>
+                            <div class="type-details">
+                                <div class="type-name">{{ t.nome_tipo_seguro }}</div>
+                                <div class="type-id">ID: {{ t.id_tipo_seguro }}</div>
+                            </div>
+                        </div>
+                    </td>
+                    <td>
+                        <div class="description">
+                            {% if t.descricao_tipo_seguro %}
+                                {{ t.descricao_tipo_seguro[:100] + '...' if t.descricao_tipo_seguro|length > 100 else t.descricao_tipo_seguro }}
+                            {% else %}
+                                <span class="text-muted">Sem descrição</span>
+                            {% endif %}
+                        </div>
+                    </td>
+                    <td>
+                        <span class="status-badge status-ativo">
+                            <i class="fas fa-check-circle"></i>
+                            Ativo
+                        </span>
+                    </td>
+                    <td>
+                        <div class="action-buttons">
+                            <button class="btn-icon btn-view" title="Visualizar">
+                                <i class="fas fa-eye"></i>
+                            </button>
+                            <a href="{{ url_for('editar_tipo_seguro', id=t.id_tipo_seguro) }}" class="btn-icon btn-edit" title="Editar">
+                                <i class="fas fa-edit"></i>
+                            </a>
+                            <button class="btn-icon btn-delete" title="Excluir">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </div>
+                    </td>
+                </tr>
+                {% else %}
+                <tr class="empty-state">
+                    <td colspan="4">
+                        <div class="empty-message">
+                            <i class="fas fa-shield-alt"></i>
+                            <h3>Nenhum tipo de seguro cadastrado</h3>
+                            <p>Comece adicionando os tipos de seguro que sua corretora oferece.</p>
+                            <a href="{{ url_for('novo_tipo_seguro') }}" class="btn btn-primary">
+                                <i class="fas fa-plus"></i> Adicionar Primeiro Tipo
+                            </a>
+                        </div>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const searchInput = document.getElementById('searchInput');
+    const tableRows = document.querySelectorAll('.table-row');
+
+    function filterTable() {
+        const searchTerm = searchInput.value.toLowerCase();
+        let visibleRows = 0;
+
+        tableRows.forEach(row => {
+            const text = row.textContent.toLowerCase();
+            const matches = text.includes(searchTerm);
+
+            if (matches) {
+                row.style.display = '';
+                visibleRows++;
+            } else {
+                row.style.display = 'none';
+            }
+        });
+
+        // Mostrar mensagem se não houver resultados
+        const emptyMessage = document.querySelector('.empty-state');
+        if (emptyMessage) {
+            emptyMessage.style.display = visibleRows === 0 ? '' : 'none';
+        }
+    }
+
+    searchInput.addEventListener('input', filterTable);
+});
+
+function clearFilters() {
+    document.getElementById('searchInput').value = '';
+    
+    const event = new Event('input');
+    document.getElementById('searchInput').dispatchEvent(event);
+}
+
+// Animação de contadores
+document.addEventListener('DOMContentLoaded', function() {
+    const counters = document.querySelectorAll('.stat-number');
+    
+    counters.forEach(counter => {
+        const text = counter.innerText;
+        if (!isNaN(text) && text !== '-') {
+            const target = parseInt(text) || 0;
+            const duration = 2000;
+            const increment = target / (duration / 16);
+            let current = 0;
+            
+            const timer = setInterval(() => {
+                current += increment;
+                if (current >= target) {
+                    current = target;
+                    clearInterval(timer);
+                }
+                counter.innerText = Math.floor(current);
+            }, 16);
+        }
+    });
+});
+</script>
+
+<style>
+.type-info {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.type-icon {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 1rem;
+}
+
+.type-details {
+    display: flex;
+    flex-direction: column;
+}
+
+.type-name {
+    font-weight: 600;
+    color: var(--gray-900);
+    font-size: 0.875rem;
+}
+
+.type-id {
+    font-size: 0.75rem;
+    color: var(--gray-500);
+}
+
+.description {
+    max-width: 300px;
+    font-size: 0.875rem;
+    line-height: 1.4;
+    color: var(--gray-700);
+}
+</style>
+{% endblock %}

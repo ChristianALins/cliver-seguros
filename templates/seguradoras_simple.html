@@ -1,0 +1,94 @@
+{% extends "base_simple.html" %}
+
+{% block title %}Seguradoras - CLIVER SEGUROS{% endblock %}
+
+{% block content %}
+<div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
+    <h2>Seguradoras Parceiras</h2>
+    <button class="btn">+ Nova Seguradora</button>
+</div>
+
+<!-- Estatísticas -->
+<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; margin-bottom: 2rem;">
+    <div style="background: white; padding: 1.5rem; border: 1px solid #ddd; border-radius: 8px; text-align: center;">
+        <h3 style="color: #00B391; font-size: 2rem; margin-bottom: 0.5rem;">{{ seguradoras|length }}</h3>
+        <p style="margin: 0; color: #666;">Seguradoras Ativas</p>
+    </div>
+    
+    <div style="background: white; padding: 1.5rem; border: 1px solid #ddd; border-radius: 8px; text-align: center;">
+        <h3 style="color: #28a745; font-size: 2rem; margin-bottom: 0.5rem;">156</h3>
+        <p style="margin: 0; color: #666;">Apólices Vendidas</p>
+    </div>
+    
+    <div style="background: white; padding: 1.5rem; border: 1px solid #ddd; border-radius: 8px; text-align: center;">
+        <h3 style="color: #007bff; font-size: 2rem; margin-bottom: 0.5rem;">R$ 485.670</h3>
+        <p style="margin: 0; color: #666;">Valor Vendido</p>
+    </div>
+</div>
+
+<!-- Lista de Seguradoras -->
+<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(350px, 1fr)); gap: 2rem;">
+    {% for seguradora in seguradoras %}
+    <div style="background: white; border: 1px solid #ddd; border-radius: 8px; overflow: hidden;">
+        <!-- Header da Seguradora -->
+        <div style="background: linear-gradient(135deg, #00B391, #007d6a); padding: 1.5rem; color: white;">
+            <h3 style="margin-bottom: 0.5rem;">{{ seguradora.nome }}</h3>
+            <p style="margin: 0; opacity: 0.9;">SUSEP: {{ seguradora.susep or 'Não informado' }}</p>
+        </div>
+        
+        <!-- Conteúdo -->
+        <div style="padding: 1.5rem;">
+            <div style="margin-bottom: 1rem;">
+                <p><strong>CNPJ:</strong> {{ seguradora.cnpj or 'Não informado' }}</p>
+                <p><strong>Contato:</strong> {{ seguradora.contato_nome or 'Não informado' }}</p>
+                <p><strong>Telefone:</strong> {{ seguradora.contato_telefone or 'Não informado' }}</p>
+                <p><strong>Email:</strong> {{ seguradora.contato_email or 'Não informado' }}</p>
+            </div>
+            
+            <div style="margin-bottom: 1rem;">
+                <span style="background: {% if seguradora.status == 'ativa' %}#28a745{% else %}#dc3545{% endif %}; color: white; padding: 4px 12px; border-radius: 15px; font-size: 12px;">
+                    {{ seguradora.status|title }}
+                </span>
+            </div>
+            
+            <!-- Métricas da Seguradora -->
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 1rem; padding-top: 1rem; border-top: 1px solid #eee;">
+                <div style="text-align: center;">
+                    <div style="font-size: 1.2rem; font-weight: bold; color: #00B391;">25</div>
+                    <div style="color: #666; font-size: 12px;">Apólices</div>
+                </div>
+                <div style="text-align: center;">
+                    <div style="font-size: 1.2rem; font-weight: bold; color: #28a745;">R$ 125k</div>
+                    <div style="color: #666; font-size: 12px;">Vendido</div>
+                </div>
+            </div>
+            
+            <!-- Ações -->
+            <div style="display: flex; gap: 0.5rem;">
+                <button class="btn" style="flex: 1; padding: 8px 12px; font-size: 12px;">Editar</button>
+                <button class="btn btn-secondary" style="flex: 1; padding: 8px 12px; font-size: 12px;">Ver Apólices</button>
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+
+<!-- Modal para Nova Seguradora (placeholder) -->
+<div style="margin-top: 2rem; background: #f8f9fa; padding: 1.5rem; border-radius: 8px;">
+    <h4>📋 Informações para Cadastro</h4>
+    <p>Para cadastrar uma nova seguradora, você precisará dos seguintes dados:</p>
+    <ul>
+        <li>Nome da seguradora</li>
+        <li>CNPJ</li>
+        <li>Código SUSEP</li>
+        <li>Dados do contato comercial</li>
+        <li>Telefone e email para comunicação</li>
+        <li>Percentuais de comissão por tipo de seguro</li>
+    </ul>
+</div>
+
+<div style="margin-top: 2rem;">
+    <a href="/configuracoes" class="btn btn-secondary">Voltar às Configurações</a>
+    <button class="btn">Relatório de Performance</button>
+</div>
+{% endblock %}

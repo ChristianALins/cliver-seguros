@@ -1,0 +1,374 @@
+{% extends "base.html" %}
+
+{% block title %}Apólices - CLIVER SEGUROS{% endblock %}
+
+{% block header_title %}Apólices{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <div class="page-title">
+        <h1><i class="fas fa-file-contract"></i> Gerenciar Apólices</h1>
+        <p>Controle todas as apólices de seguro da corretora</p>
+    </div>
+    <div class="page-actions">
+        <a href="{{ url_for('nova_apolice') }}" class="btn btn-primary">
+            <i class="fas fa-plus"></i> Nova Apólice
+        </a>
+    </div>
+</div>
+
+<!-- Cards de Estatísticas -->
+<div class="stats-grid">
+    <div class="stat-card">
+        <div class="stat-icon" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
+            <i class="fas fa-file-contract"></i>
+        </div>
+        <div class="stat-content">
+            <div class="stat-number">{{ apolices|length or 0 }}</div>
+            <div class="stat-label">Total de Apólices</div>
+            <div class="stat-change positive">Atualizado</div>
+        </div>
+    </div>
+
+    <div class="stat-card">
+        <div class="stat-icon" style="background: linear-gradient(135deg, #48BB78 0%, #38A169 100%);">
+            <i class="fas fa-check-circle"></i>
+        </div>
+        <div class="stat-content">
+            <div class="stat-number">{{ (apolices|selectattr('status_apolice', 'equalto', 'Ativa')|list)|length or 0 }}</div>
+            <div class="stat-label">Apólices Ativas</div>
+            <div class="stat-change neutral">Status atual</div>
+        </div>
+    </div>
+
+    <div class="stat-card">
+        <div class="stat-icon" style="background: linear-gradient(135deg, #F56565 0%, #E53E3E 100%);">
+            <i class="fas fa-exclamation-triangle"></i>
+        </div>
+        <div class="stat-content">
+            <div class="stat-number">{{ (apolices|selectattr('status_apolice', 'equalto', 'Vencida')|list)|length or 0 }}</div>
+            <div class="stat-label">Apólices Vencidas</div>
+            <div class="stat-change warning">Necessário renovar</div>
+        </div>
+    </div>
+
+    <div class="stat-card">
+        <div class="stat-icon" style="background: linear-gradient(135deg, #ECC94B 0%, #D69E2E 100%);">
+            <i class="fas fa-dollar-sign"></i>
+        </div>
+        <div class="stat-content">
+            <div class="stat-number">{{ apolices|sum(attribute='valor_premio')|default(0, true)|round(2) }}</div>
+            <div class="stat-label">Valor Total (R$)</div>
+            <div class="stat-change positive">Prêmios ativos</div>
+        </div>
+    </div>
+</div>
+
+<!-- Filtros e Pesquisa -->
+<div class="data-controls">
+    <div class="search-container">
+        <i class="fas fa-search search-icon"></i>
+        <input type="text" id="searchInput" placeholder="Pesquisar por número, cliente ou seguradora..." class="search-input">
+    </div>
+    
+    <div class="filters">
+        <select id="statusFilter" class="filter-select">
+            <option value="">Todos os Status</option>
+            <option value="Ativa">Ativa</option>
+            <option value="Vencida">Vencida</option>
+            <option value="Cancelada">Cancelada</option>
+            <option value="Renovada">Renovada</option>
+        </select>
+        
+        <button class="btn btn-secondary" onclick="clearFilters()">
+            <i class="fas fa-times"></i> Limpar Filtros
+        </button>
+    </div>
+</div>
+
+<!-- Tabela de Apólices -->
+<div class="data-table-container">
+    <div class="table-responsive">
+        <table class="data-table" id="apolicesTable">
+            <thead>
+                <tr>
+                    <th>Número</th>
+                    <th>Cliente</th>
+                    <th>Seguradora</th>
+                    <th>Tipo de Seguro</th>
+                    <th>Valor Prêmio</th>
+                    <th>Colaborador</th>
+                    <th>Status</th>
+                    <th>Ações</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for a in apolices %}
+                <tr class="table-row" data-status="{{ a.status_apolice }}" data-tipo="{{ a.nome_tipo_seguro }}">
+                    <td>
+                        <div class="cell-content">
+                            <strong>{{ a.numero_apolice }}</strong>
+                        </div>
+                    </td>
+                    <td>
+                        <div class="user-info">
+                            <div class="user-avatar">
+                                <i class="fas fa-user"></i>
+                            </div>
+                            <div class="user-details">
+                                <div class="user-name">{{ a.nome_cliente }}</div>
+                                <div class="user-email">Cliente</div>
+                            </div>
+                        </div>
+                    </td>
+                    <td>
+                        <div class="company-info">
+                            <strong>{{ a.nome_seguradora }}</strong>
+                        </div>
+                    </td>
+                    <td>
+                        <span class="badge badge-info">{{ a.nome_tipo_seguro }}</span>
+                    </td>
+                    <td>
+                        <div class="amount">R$ {{ "{:,.2f}".format(a.valor_premio or 0) }}</div>
+                    </td>
+                    <td>
+                        <span class="badge badge-secondary">{{ a.nome_colaborador }}</span>
+                    </td>
+                    <td>
+                        <span class="status-badge status-{{ a.status_apolice.lower() }}">
+                            {% if a.status_apolice == 'Ativa' %}
+                                <i class="fas fa-check-circle"></i>
+                            {% elif a.status_apolice == 'Vencida' %}
+                                <i class="fas fa-exclamation-triangle"></i>
+                            {% elif a.status_apolice == 'Cancelada' %}
+                                <i class="fas fa-times-circle"></i>
+                            {% else %}
+                                <i class="fas fa-refresh"></i>
+                            {% endif %}
+                            {{ a.status_apolice }}
+                        </span>
+                    </td>
+                    <td>
+                        <div class="action-buttons">
+                            {% if a.status_apolice == 'Vencida' %}
+                            <a href="{{ url_for('nova_renovacao', id_apolice=a.id_apolice) }}" 
+                               class="btn-icon btn-renew" 
+                               title="Renovar Apólice">
+                                <i class="fas fa-sync-alt"></i>
+                            </a>
+                            {% endif %}
+                            <button class="btn-icon btn-view" 
+                                    onclick="showPolicyDetails({{ a.id_apolice }}, '{{ a.numero_apolice }}', '{{ a.nome_cliente }}', '{{ "{:,.2f}".format(a.valor_premio or 0) }}', '{{ a.nome_colaborador }}', {{ a.percentual_comissao_seguradora or 0 }}, {{ a.percentual_comissao_colaborador or 0 }})"
+                                    title="Ver Detalhes e Comissões">
+                                <i class="fas fa-eye"></i>
+                            </button>
+                            <a href="{{ url_for('editar_apolice', id=a.id_apolice) }}" class="btn-icon btn-edit" title="Editar">
+                                <i class="fas fa-edit"></i>
+                            </a>
+                            <button class="btn-icon btn-delete" 
+                                    onclick="confirmDelete({{ a.id_apolice }}, '{{ a.numero_apolice }}')"
+                                    title="Excluir">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </div>
+                    </td>
+                </tr>
+                {% else %}
+                <tr class="empty-state">
+                    <td colspan="8">
+                        <div class="empty-message">
+                            <i class="fas fa-file-contract"></i>
+                            <h3>Nenhuma apólice encontrada</h3>
+                            <p>Comece adicionando uma nova apólice para seus clientes.</p>
+                            <a href="{{ url_for('nova_apolice') }}" class="btn btn-primary">
+                                <i class="fas fa-plus"></i> Adicionar Primeira Apólice
+                            </a>
+                        </div>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const searchInput = document.getElementById('searchInput');
+    const statusFilter = document.getElementById('statusFilter');
+    const tableRows = document.querySelectorAll('.table-row');
+
+    function filterTable() {
+        const searchTerm = searchInput.value.toLowerCase();
+        const statusValue = statusFilter.value.toLowerCase();
+
+        let visibleRows = 0;
+
+        tableRows.forEach(row => {
+            const text = row.textContent.toLowerCase();
+            const status = row.getAttribute('data-status').toLowerCase();
+
+            const matchesSearch = text.includes(searchTerm);
+            const matchesStatus = !statusValue || status === statusValue;
+
+            if (matchesSearch && matchesStatus) {
+                row.style.display = '';
+                visibleRows++;
+            } else {
+                row.style.display = 'none';
+            }
+        });
+
+        // Mostrar mensagem se não houver resultados
+        const emptyMessage = document.querySelector('.empty-state');
+        if (emptyMessage) {
+            emptyMessage.style.display = visibleRows === 0 ? '' : 'none';
+        }
+    }
+
+    searchInput.addEventListener('input', filterTable);
+    statusFilter.addEventListener('change', filterTable);
+});
+
+function clearFilters() {
+    document.getElementById('searchInput').value = '';
+    document.getElementById('statusFilter').value = '';
+    
+    const event = new Event('input');
+    document.getElementById('searchInput').dispatchEvent(event);
+}
+
+// Animação de contadores
+document.addEventListener('DOMContentLoaded', function() {
+    const counters = document.querySelectorAll('.stat-number');
+    
+    counters.forEach(counter => {
+        const target = parseFloat(counter.innerText.replace(/[^\d.-]/g, '')) || 0;
+        const duration = 2000;
+        const increment = target / (duration / 16);
+        let current = 0;
+        
+        const timer = setInterval(() => {
+            current += increment;
+            if (current >= target) {
+                current = target;
+                clearInterval(timer);
+            }
+            counter.innerText = Math.floor(current).toLocaleString('pt-BR');
+        }, 16);
+    });
+});
+
+// Função para mostrar detalhes da apólice e comissões
+function showPolicyDetails(idApolice, numeroApolice, nomeCliente, valorPremio, nomeColaborador, percSeguradora, percColaborador) {
+    const valorPremioNum = parseFloat(valorPremio.replace(/[R$\s.]/g, '').replace(',', '.')) || 0;
+    const comissaoSeguradora = (valorPremioNum * percSeguradora / 100);
+    const comissaoColaborador = (valorPremioNum * percColaborador / 100);
+    
+    const modalHtml = `
+        <div id="policyModal" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 1000; display: flex; align-items: center; justify-content: center;">
+            <div style="background: white; border-radius: 8px; padding: 2rem; max-width: 500px; width: 90%; max-height: 80vh; overflow-y: auto;">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; border-bottom: 1px solid #e5e7eb; padding-bottom: 1rem;">
+                    <h3 style="margin: 0; color: #1f2937;">Detalhes da Apólice</h3>
+                    <button onclick="closePolicyModal()" style="background: none; border: none; font-size: 1.5rem; cursor: pointer; color: #6b7280;">&times;</button>
+                </div>
+                
+                <div style="display: grid; gap: 1rem;">
+                    <div>
+                        <label style="font-weight: 600; color: #374151; display: block; margin-bottom: 0.25rem;">Número da Apólice:</label>
+                        <div style="color: #1f2937; font-family: monospace; font-size: 1.1rem;">${numeroApolice}</div>
+                    </div>
+                    
+                    <div>
+                        <label style="font-weight: 600; color: #374151; display: block; margin-bottom: 0.25rem;">Cliente:</label>
+                        <div style="color: #1f2937;">${nomeCliente}</div>
+                    </div>
+                    
+                    <div>
+                        <label style="font-weight: 600; color: #374151; display: block; margin-bottom: 0.25rem;">Corretor Responsável:</label>
+                        <div style="color: #1f2937;">${nomeColaborador}</div>
+                    </div>
+                    
+                    <div style="background: #f9fafb; padding: 1rem; border-radius: 6px; border: 1px solid #e5e7eb;">
+                        <h4 style="margin: 0 0 1rem 0; color: #1f2937;">Informações Financeiras</h4>
+                        
+                        <div style="display: grid; gap: 0.75rem;">
+                            <div style="display: flex; justify-content: space-between;">
+                                <span style="color: #374151;">Valor do Prêmio:</span>
+                                <span style="font-weight: 600; color: #1f2937;">R$ ${valorPremioNum.toLocaleString('pt-BR', {minimumFractionDigits: 2, maximumFractionDigits: 2})}</span>
+                            </div>
+                            
+                            <div style="border-top: 1px solid #e5e7eb; padding-top: 0.75rem;">
+                                <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem;">
+                                    <span style="color: #374151;">Comissão Corretora (${percSeguradora}%):</span>
+                                    <span style="font-weight: 600; color: #059669;">R$ ${comissaoSeguradora.toLocaleString('pt-BR', {minimumFractionDigits: 2, maximumFractionDigits: 2})}</span>
+                                </div>
+                                
+                                <div style="display: flex; justify-content: space-between;">
+                                    <span style="color: #374151;">Comissão Corretor (${percColaborador}%):</span>
+                                    <span style="font-weight: 600; color: #3b82f6;">R$ ${comissaoColaborador.toLocaleString('pt-BR', {minimumFractionDigits: 2, maximumFractionDigits: 2})}</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div style="margin-top: 2rem; display: flex; gap: 1rem; justify-content: flex-end;">
+                    <button onclick="closePolicyModal()" style="padding: 0.5rem 1rem; border: 1px solid #d1d5db; background: white; color: #374151; border-radius: 4px; cursor: pointer;">Fechar</button>
+                    <a href="/apolices/editar/${idApolice}" style="padding: 0.5rem 1rem; background: #3b82f6; color: white; text-decoration: none; border-radius: 4px;">Editar Apólice</a>
+                </div>
+            </div>
+        </div>
+    `;
+    
+    document.body.insertAdjacentHTML('beforeend', modalHtml);
+}
+
+function closePolicyModal() {
+    const modal = document.getElementById('policyModal');
+    if (modal) {
+        modal.remove();
+    }
+}
+
+// Função para confirmar exclusão
+function confirmDelete(idApolice, numeroApolice) {
+    if (confirm(`Tem certeza que deseja excluir a apólice ${numeroApolice}?`)) {
+        // Criar formulário para POST request
+        const form = document.createElement('form');
+        form.method = 'POST';
+        form.action = `/apolices/excluir/${idApolice}`;
+        
+        // Adicionar CSRF token se necessário (implementar depois)
+        document.body.appendChild(form);
+        form.submit();
+    }
+}
+</script>
+
+<style>
+.btn-renew {
+    background: #28a745 !important;
+    color: white !important;
+}
+
+.btn-renew:hover {
+    background: #218838 !important;
+    transform: scale(1.1);
+}
+
+.btn-icon {
+    padding: 6px 8px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 12px;
+}
+</style>
+{% endblock %}

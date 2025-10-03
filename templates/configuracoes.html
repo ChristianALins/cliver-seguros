@@ -1,0 +1,348 @@
+{% extends "base_simple.html" %}
+
+{% block title %}Configurações - CLIVER SEGUROS{% endblock %}
+
+{% block content %}
+<div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
+    <h2>Configurações do Sistema</h2>
+</div>
+
+<!-- Menu de Configurações -->
+<div style="display: grid; grid-template-columns: 250px 1fr; gap: 2rem;">
+    <!-- Menu Lateral -->
+    <div style="background: white; padding: 1rem; border: 1px solid #ddd; border-radius: 8px; height: fit-content;">
+        <h3 style="margin-bottom: 1rem; color: #00B391;">Menu</h3>
+        <ul style="list-style: none; padding: 0; margin: 0;">
+            <li style="margin-bottom: 0.5rem;">
+                <a href="#geral" style="display: block; padding: 0.75rem; background: #f8f9fa; border-radius: 4px; text-decoration: none; color: #333;">🏢 Configurações Gerais</a>
+            </li>
+            <li style="margin-bottom: 0.5rem;">
+                <a href="#usuarios" style="display: block; padding: 0.75rem; background: #f8f9fa; border-radius: 4px; text-decoration: none; color: #333;">👥 Usuários e Permissões</a>
+            </li>
+            <li style="margin-bottom: 0.5rem;">
+                <a href="#seguradoras" style="display: block; padding: 0.75rem; background: #f8f9fa; border-radius: 4px; text-decoration: none; color: #333;">🏛️ Seguradoras</a>
+            </li>
+            <li style="margin-bottom: 0.5rem;">
+                <a href="#tipos-seguro" style="display: block; padding: 0.75rem; background: #f8f9fa; border-radius: 4px; text-decoration: none; color: #333;">📋 Tipos de Seguro</a>
+            </li>
+            <li style="margin-bottom: 0.5rem;">
+                <a href="#backup" style="display: block; padding: 0.75rem; background: #f8f9fa; border-radius: 4px; text-decoration: none; color: #333;">💾 Backup e Restauração</a>
+            </li>
+            <li style="margin-bottom: 0.5rem;">
+                <a href="#sistema" style="display: block; padding: 0.75rem; background: #f8f9fa; border-radius: 4px; text-decoration: none; color: #333;">⚙️ Configurações do Sistema</a>
+            </li>
+        </ul>
+    </div>
+    
+    <!-- Conteúdo Principal -->
+    <div>
+        <!-- Configurações Gerais -->
+        <div id="geral" style="background: white; padding: 2rem; border: 1px solid #ddd; border-radius: 8px; margin-bottom: 2rem;">
+            <h3 style="color: #00B391; margin-bottom: 1rem;">🏢 Configurações Gerais</h3>
+            <form>
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 1rem;">
+                    <div class="form-group">
+                        <label for="nome_empresa">Nome da Empresa:</label>
+                        <input type="text" id="nome_empresa" name="nome_empresa" value="CLIVER SEGUROS">
+                    </div>
+                    <div class="form-group">
+                        <label for="cnpj">CNPJ:</label>
+                        <input type="text" id="cnpj" name="cnpj" placeholder="00.000.000/0001-00">
+                    </div>
+                </div>
+                
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 1rem;">
+                    <div class="form-group">
+                        <label for="telefone_empresa">Telefone:</label>
+                        <input type="text" id="telefone_empresa" name="telefone_empresa" placeholder="(11) 99999-9999">
+                    </div>
+                    <div class="form-group">
+                        <label for="email_empresa">Email:</label>
+                        <input type="email" id="email_empresa" name="email_empresa" placeholder="contato@cliverseguros.com.br">
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="endereco_empresa">Endereço Completo:</label>
+                    <textarea id="endereco_empresa" name="endereco_empresa" rows="3" placeholder="Rua, número, bairro, cidade, CEP"></textarea>
+                </div>
+                
+                <button type="submit" class="btn">Salvar Configurações</button>
+            </form>
+        </div>
+        
+        <!-- Usuários e Permissões -->
+        <div id="usuarios" style="background: white; padding: 2rem; border: 1px solid #ddd; border-radius: 8px; margin-bottom: 2rem;">
+            <h3 style="color: #00B391; margin-bottom: 1rem;">👥 Usuários e Permissões</h3>
+            
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+                <h4>Usuários Cadastrados</h4>
+                <button class="btn">+ Novo Usuário</button>
+            </div>
+            
+            <table>
+                <thead>
+                    <tr>
+                        <th>Nome</th>
+                        <th>Email</th>
+                        <th>Perfil</th>
+                        <th>Status</th>
+                        <th>Último Acesso</th>
+                        <th>Ações</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Administrador</td>
+                        <td>admin@cliverseguros.com.br</td>
+                        <td><span style="background: #dc3545; color: white; padding: 2px 8px; border-radius: 3px;">Admin</span></td>
+                        <td><span style="background: #28a745; color: white; padding: 2px 8px; border-radius: 3px;">Ativo</span></td>
+                        <td>01/10/2024 15:30</td>
+                        <td>
+                            <button class="btn" style="padding: 5px 10px; font-size: 12px;">Editar</button>
+                            <button class="btn btn-secondary" style="padding: 5px 10px; font-size: 12px;">Resetar Senha</button>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>Maria Silva</td>
+                        <td>maria@cliverseguros.com.br</td>
+                        <td><span style="background: #007bff; color: white; padding: 2px 8px; border-radius: 3px;">Corretor</span></td>
+                        <td><span style="background: #28a745; color: white; padding: 2px 8px; border-radius: 3px;">Ativo</span></td>
+                        <td>01/10/2024 14:15</td>
+                        <td>
+                            <button class="btn" style="padding: 5px 10px; font-size: 12px;">Editar</button>
+                            <button class="btn btn-secondary" style="padding: 5px 10px; font-size: 12px;">Resetar Senha</button>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        
+        <!-- Seguradoras -->
+        <div id="seguradoras" style="background: white; padding: 2rem; border: 1px solid #ddd; border-radius: 8px; margin-bottom: 2rem;">
+            <h3 style="color: #00B391; margin-bottom: 1rem;">🏛️ Seguradoras Parceiras</h3>
+            
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+                <h4>Seguradoras Cadastradas</h4>
+                <button class="btn">+ Nova Seguradora</button>
+            </div>
+            
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 1rem;">
+                <div style="border: 1px solid #ddd; border-radius: 8px; padding: 1.5rem;">
+                    <h4 style="margin-bottom: 1rem;">Porto Seguro</h4>
+                    <p><strong>SUSEP:</strong> 05.991.235/0001-59</p>
+                    <p><strong>Contato:</strong> (11) 3003-9303</p>
+                    <p><strong>Status:</strong> <span style="background: #28a745; color: white; padding: 2px 8px; border-radius: 3px;">Ativa</span></p>
+                    <div style="margin-top: 1rem;">
+                        <button class="btn" style="padding: 5px 10px; font-size: 12px;">Editar</button>
+                        <button class="btn btn-secondary" style="padding: 5px 10px; font-size: 12px;">Ver Detalhes</button>
+                    </div>
+                </div>
+                
+                <div style="border: 1px solid #ddd; border-radius: 8px; padding: 1.5rem;">
+                    <h4 style="margin-bottom: 1rem;">Bradesco Seguros</h4>
+                    <p><strong>SUSEP:</strong> 92.693.118/0001-60</p>
+                    <p><strong>Contato:</strong> (11) 4002-4112</p>
+                    <p><strong>Status:</strong> <span style="background: #28a745; color: white; padding: 2px 8px; border-radius: 3px;">Ativa</span></p>
+                    <div style="margin-top: 1rem;">
+                        <button class="btn" style="padding: 5px 10px; font-size: 12px;">Editar</button>
+                        <button class="btn btn-secondary" style="padding: 5px 10px; font-size: 12px;">Ver Detalhes</button>
+                    </div>
+                </div>
+                
+                <div style="border: 1px solid #ddd; border-radius: 8px; padding: 1.5rem;">
+                    <h4 style="margin-bottom: 1rem;">SulAmérica</h4>
+                    <p><strong>SUSEP:</strong> 01.578.308/0001-30</p>
+                    <p><strong>Contato:</strong> (11) 4020-1111</p>
+                    <p><strong>Status:</strong> <span style="background: #28a745; color: white; padding: 2px 8px; border-radius: 3px;">Ativa</span></p>
+                    <div style="margin-top: 1rem;">
+                        <button class="btn" style="padding: 5px 10px; font-size: 12px;">Editar</button>
+                        <button class="btn btn-secondary" style="padding: 5px 10px; font-size: 12px;">Ver Detalhes</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Tipos de Seguro -->
+        <div id="tipos-seguro" style="background: white; padding: 2rem; border: 1px solid #ddd; border-radius: 8px; margin-bottom: 2rem;">
+            <h3 style="color: #00B391; margin-bottom: 1rem;">📋 Tipos de Seguro</h3>
+            
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+                <h4>Tipos Cadastrados</h4>
+                <button class="btn">+ Novo Tipo</button>
+            </div>
+            
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1rem;">
+                <div style="border: 1px solid #ddd; border-radius: 8px; padding: 1rem; display: flex; justify-content: space-between; align-items: center;">
+                    <div>
+                        <h4>🚗 Seguro Auto</h4>
+                        <p style="color: #666; font-size: 12px;">Cobertura completa para veículos</p>
+                    </div>
+                    <button class="btn" style="padding: 5px 10px; font-size: 12px;">Editar</button>
+                </div>
+                
+                <div style="border: 1px solid #ddd; border-radius: 8px; padding: 1rem; display: flex; justify-content: space-between; align-items: center;">
+                    <div>
+                        <h4>🏠 Seguro Residencial</h4>
+                        <p style="color: #666; font-size: 12px;">Proteção para residências</p>
+                    </div>
+                    <button class="btn" style="padding: 5px 10px; font-size: 12px;">Editar</button>
+                </div>
+                
+                <div style="border: 1px solid #ddd; border-radius: 8px; padding: 1rem; display: flex; justify-content: space-between; align-items: center;">
+                    <div>
+                        <h4>❤️ Seguro Vida</h4>
+                        <p style="color: #666; font-size: 12px;">Proteção para a família</p>
+                    </div>
+                    <button class="btn" style="padding: 5px 10px; font-size: 12px;">Editar</button>
+                </div>
+                
+                <div style="border: 1px solid #ddd; border-radius: 8px; padding: 1rem; display: flex; justify-content: space-between; align-items: center;">
+                    <div>
+                        <h4>🏢 Seguro Empresarial</h4>
+                        <p style="color: #666; font-size: 12px;">Cobertura para empresas</p>
+                    </div>
+                    <button class="btn" style="padding: 5px 10px; font-size: 12px;">Editar</button>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Backup e Restauração -->
+        <div id="backup" style="background: white; padding: 2rem; border: 1px solid #ddd; border-radius: 8px; margin-bottom: 2rem;">
+            <h3 style="color: #00B391; margin-bottom: 1rem;">💾 Backup e Restauração</h3>
+            
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 2rem;">
+                <div>
+                    <h4>Backup Automático</h4>
+                    <form style="margin-bottom: 1rem;">
+                        <div class="form-group">
+                            <label for="backup_frequencia">Frequência:</label>
+                            <select id="backup_frequencia" name="backup_frequencia">
+                                <option value="diario">Diário</option>
+                                <option value="semanal">Semanal</option>
+                                <option value="mensal">Mensal</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="backup_horario">Horário:</label>
+                            <input type="time" id="backup_horario" name="backup_horario" value="02:00">
+                        </div>
+                        <button type="submit" class="btn">Salvar Configuração</button>
+                    </form>
+                </div>
+                
+                <div>
+                    <h4>Backup Manual</h4>
+                    <p style="margin-bottom: 1rem;">Gere um backup imediato do sistema</p>
+                    <button class="btn" style="width: 100%;">Gerar Backup Agora</button>
+                    
+                    <h4 style="margin-top: 2rem;">Restaurar Backup</h4>
+                    <div class="form-group">
+                        <label for="arquivo_backup">Arquivo de Backup:</label>
+                        <input type="file" id="arquivo_backup" name="arquivo_backup" accept=".sql,.db">
+                    </div>
+                    <button class="btn btn-secondary" style="width: 100%;">Restaurar Sistema</button>
+                </div>
+            </div>
+            
+            <div style="margin-top: 2rem;">
+                <h4>Histórico de Backups</h4>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Data</th>
+                            <th>Tipo</th>
+                            <th>Tamanho</th>
+                            <th>Status</th>
+                            <th>Ações</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>01/10/2024 02:00</td>
+                            <td>Automático</td>
+                            <td>2.5 MB</td>
+                            <td><span style="background: #28a745; color: white; padding: 2px 8px; border-radius: 3px;">Sucesso</span></td>
+                            <td>
+                                <button class="btn" style="padding: 5px 10px; font-size: 12px;">Download</button>
+                                <button class="btn btn-secondary" style="padding: 5px 10px; font-size: 12px;">Restaurar</button>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        
+        <!-- Configurações do Sistema -->
+        <div id="sistema" style="background: white; padding: 2rem; border: 1px solid #ddd; border-radius: 8px;">
+            <h3 style="color: #00B391; margin-bottom: 1rem;">⚙️ Configurações do Sistema</h3>
+            
+            <form>
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 2rem;">
+                    <div>
+                        <h4>Configurações Gerais</h4>
+                        <div class="form-group">
+                            <label for="timezone">Fuso Horário:</label>
+                            <select id="timezone" name="timezone">
+                                <option value="America/Sao_Paulo">América/São Paulo (UTC-3)</option>
+                                <option value="America/Manaus">América/Manaus (UTC-4)</option>
+                            </select>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="moeda">Moeda:</label>
+                            <select id="moeda" name="moeda">
+                                <option value="BRL">Real Brasileiro (R$)</option>
+                                <option value="USD">Dólar Americano (US$)</option>
+                            </select>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="idioma">Idioma:</label>
+                            <select id="idioma" name="idioma">
+                                <option value="pt-BR">Português (Brasil)</option>
+                                <option value="en-US">English (US)</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div>
+                        <h4>Segurança</h4>
+                        <div class="form-group">
+                            <label>
+                                <input type="checkbox" checked> Requerer senha forte
+                            </label>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label>
+                                <input type="checkbox" checked> Logout automático (30 min)
+                            </label>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label>
+                                <input type="checkbox"> Autenticação de dois fatores
+                            </label>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="tentativas_login">Máximo tentativas de login:</label>
+                            <input type="number" id="tentativas_login" name="tentativas_login" value="3" min="1" max="10">
+                        </div>
+                    </div>
+                </div>
+                
+                <div style="margin-top: 2rem;">
+                    <button type="submit" class="btn">Salvar Todas as Configurações</button>
+                    <button type="button" class="btn btn-secondary">Restaurar Padrões</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<div style="margin-top: 2rem;">
+    <a href="/dashboard" class="btn btn-secondary">Voltar ao Dashboard</a>
+</div>
+{% endblock %}

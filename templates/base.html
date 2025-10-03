@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}CLIVER SEGUROS{% endblock %}</title>
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    
+    {% block head %}{% endblock %}
+</head>
+<body>
+    <div class="app-container">
+        <!-- Sidebar -->
+        <aside class="sidebar" id="sidebar">
+            <div class="sidebar-header">
+                <img src="{{ url_for('static', filename='images/cliver-logo.png') }}" alt="Cliver Seguros" class="sidebar-logo">
+                <h1 class="company-name">CLIVER SEGUROS</h1>
+                <p class="company-subtitle">Sua proteção, nossa prioridade</p>
+            </div>
+            
+            <nav class="sidebar-nav">
+                <div class="nav-section">
+                    <div class="nav-section-title">Principal</div>
+                    <div class="nav-item">
+                        <a href="{{ url_for('dashboard') }}" class="nav-link {% if request.endpoint == 'dashboard' %}active{% endif %}">
+                            <i class="fas fa-tachometer-alt"></i>
+                            Dashboard
+                        </a>
+                    </div>
+                </div>
+                
+                <div class="nav-section">
+                    <div class="nav-section-title">Gestão</div>
+                    <div class="nav-item">
+                        <a href="{{ url_for('clientes') }}" class="nav-link {% if request.endpoint in ['clientes', 'novo_cliente', 'editar_cliente'] %}active{% endif %}">
+                            <i class="fas fa-users"></i>
+                            Clientes
+                        </a>
+                    </div>
+                    <div class="nav-item">
+                        <a href="{{ url_for('seguradoras') }}" class="nav-link {% if request.endpoint in ['seguradoras', 'nova_seguradora', 'editar_seguradora'] %}active{% endif %}">
+                            <i class="fas fa-building"></i>
+                            Seguradoras
+                        </a>
+                    </div>
+                    <div class="nav-item">
+                        <a href="{{ url_for('colaboradores') }}" class="nav-link {% if request.endpoint in ['colaboradores', 'novo_colaborador', 'editar_colaborador'] %}active{% endif %}">
+                            <i class="fas fa-user-tie"></i>
+                            Colaboradores
+                        </a>
+                    </div>
+                    <div class="nav-item">
+                        <a href="{{ url_for('tipos_seguro') }}" class="nav-link {% if request.endpoint in ['tipos_seguro', 'novo_tipo_seguro', 'editar_tipo_seguro'] %}active{% endif %}">
+                            <i class="fas fa-shield-alt"></i>
+                            Tipos de Seguro
+                        </a>
+                    </div>
+                </div>
+                
+                <div class="nav-section">
+                    <div class="nav-section-title">Operações</div>
+                    <div class="nav-item">
+                        <a href="{{ url_for('apolices') }}" class="nav-link {% if request.endpoint in ['apolices', 'nova_apolice', 'editar_apolice'] %}active{% endif %}">
+                            <i class="fas fa-file-contract"></i>
+                            Apólices
+                        </a>
+                    </div>
+                    <div class="nav-item">
+                        <a href="{{ url_for('sinistros') }}" class="nav-link {% if request.endpoint in ['sinistros', 'novo_sinistro', 'editar_sinistro'] %}active{% endif %}">
+                            <i class="fas fa-exclamation-triangle"></i>
+                            Sinistros
+                        </a>
+                    </div>
+                    <div class="nav-item">
+                        <a href="{{ url_for('renovacoes') }}" class="nav-link {% if request.endpoint in ['renovacoes', 'nova_renovacao'] %}active{% endif %}">
+                            <i class="fas fa-sync-alt"></i>
+                            Renovações
+                        </a>
+                    </div>
+                    <div class="nav-item">
+                        <a href="{{ url_for('apolices_vencimento') }}" class="nav-link {% if request.endpoint == 'apolices_vencimento' %}active{% endif %}">
+                            <i class="fas fa-clock"></i>
+                            Apólices Vencendo
+                        </a>
+                    </div>
+                    <div class="nav-item">
+                        <a href="{{ url_for('tarefas') }}" class="nav-link {% if request.endpoint in ['tarefas', 'nova_tarefa', 'editar_tarefa'] %}active{% endif %}">
+                            <i class="fas fa-tasks"></i>
+                            Tarefas
+                        </a>
+                    </div>
+                </div>
+                
+                <div class="nav-section">
+                    <div class="nav-section-title">Relatórios</div>
+                    <div class="nav-item">
+                        <a href="{{ url_for('relatorios') }}" class="nav-link {% if request.endpoint in ['relatorios', 'relatorio_comissoes', 'relatorio_vendas_periodo', 'relatorio_performance_detalhada'] %}active{% endif %}">
+                            <i class="fas fa-chart-bar"></i>
+                            Central de Relatórios
+                        </a>
+                    </div>
+                    <div class="nav-item">
+                        <a href="{{ url_for('relatorio_comissoes') }}" class="nav-link {% if request.endpoint == 'relatorio_comissoes' %}active{% endif %}">
+                            <i class="fas fa-dollar-sign"></i>
+                            Comissões
+                        </a>
+                    </div>
+                    <div class="nav-item">
+                        <a href="{{ url_for('relatorio_vendas_periodo') }}" class="nav-link {% if request.endpoint == 'relatorio_vendas_periodo' %}active{% endif %}">
+                            <i class="fas fa-chart-line"></i>
+                            Vendas por Período
+                        </a>
+                    </div>
+                </div>
+                
+                <div class="nav-section">
+                    <div class="nav-section-title">Sistema</div>
+                    <div class="nav-item">
+                        <a href="{{ url_for('banco_dashboard') }}" class="nav-link {% if request.endpoint == 'banco_dashboard' %}active{% endif %}">
+                            <i class="fas fa-database"></i>
+                            Banco de Dados
+                        </a>
+                    </div>
+                    <div class="nav-item">
+                        <a href="{{ url_for('logout') }}" class="nav-link">
+                            <i class="fas fa-sign-out-alt"></i>
+                            Sair
+                        </a>
+                    </div>
+                </div>
+            </nav>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Header -->
+            <header class="main-header">
+                <button class="mobile-menu-toggle" onclick="toggleSidebar()">
+                    <i class="fas fa-bars"></i>
+                </button>
+                
+                <h1 class="header-title">{% block page_title %}Dashboard{% endblock %}</h1>
+                
+                <div class="header-actions">
+                    <div class="user-info">
+                        <div class="user-avatar">
+                            {{ session.username[0].upper() if session.username else 'U' }}
+                        </div>
+                        <span>{{ session.username or 'Usuário' }}</span>
+                    </div>
+                </div>
+            </header>
+
+            <!-- Content -->
+            <div class="content-area">
+                <!-- Flash Messages -->
+                {% with messages = get_flashed_messages() %}
+                    {% if messages %}
+                        {% for message in messages %}
+                            <div class="alert alert-danger fade-in">
+                                <i class="fas fa-exclamation-circle"></i>
+                                {{ message }}
+                            </div>
+                        {% endfor %}
+                    {% endif %}
+                {% endwith %}
+
+                <!-- Page Content -->
+                {% block content %}{% endblock %}
+            </div>
+        </main>
+    </div>
+
+    <!-- JavaScript -->
+    <script>
+        // Toggle Sidebar on Mobile
+        function toggleSidebar() {
+            const sidebar = document.getElementById('sidebar');
+            sidebar.classList.toggle('active');
+        }
+
+        // Close sidebar when clicking outside on mobile
+        document.addEventListener('click', function(event) {
+            const sidebar = document.getElementById('sidebar');
+            const toggle = document.querySelector('.mobile-menu-toggle');
+            
+            if (window.innerWidth <= 768) {
+                if (!sidebar.contains(event.target) && !toggle.contains(event.target)) {
+                    sidebar.classList.remove('active');
+                }
+            }
+        });
+
+        // Add fade-in animation to elements
+        document.addEventListener('DOMContentLoaded', function() {
+            const elements = document.querySelectorAll('.stat-card, .chart-card, .recent-activities');
+            elements.forEach((el, index) => {
+                setTimeout(() => {
+                    el.classList.add('fade-in');
+                }, index * 100);
+            });
+        });
+
+        // Format currency values
+        function formatCurrency(value) {
+            return new Intl.NumberFormat('pt-BR', {
+                style: 'currency',
+                currency: 'BRL'
+            }).format(value);
+        }
+
+        // Format numbers
+        function formatNumber(value) {
+            return new Intl.NumberFormat('pt-BR').format(value);
+        }
+
+        // Auto-hide alerts after 5 seconds
+        document.addEventListener('DOMContentLoaded', function() {
+            const alerts = document.querySelectorAll('.alert');
+            alerts.forEach(alert => {
+                setTimeout(() => {
+                    alert.style.opacity = '0';
+                    alert.style.transform = 'translateY(-10px)';
+                    setTimeout(() => alert.remove(), 300);
+                }, 5000);
+            });
+        });
+    </script>
+
+    {% block scripts %}{% endblock %}
+</body>
+</html>

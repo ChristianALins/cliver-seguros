@@ -1,0 +1,321 @@
+{% extends "base.html" %}
+
+{% block title %}Clientes - CLIVER SEGUROS{% endblock %}
+{% block page_title %}Gestão de Clientes{% endblock %}
+
+{% block content %}
+<div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
+    <div>
+        <p style="color: var(--gray-600); margin: 0;">Gerencie todos os clientes da corretora</p>
+    </div>
+    <a href="{{ url_for('novo_cliente') }}" class="btn btn-primary">
+        <i class="fas fa-user-plus"></i>
+        Novo Cliente
+    </a>
+</div>
+
+<!-- Estatísticas rápidas -->
+<div class="stats-grid" style="margin-bottom: 2rem;">
+    <div class="stat-card">
+        <div class="stat-card-header">
+            <h3 class="stat-card-title">Total de Clientes</h3>
+            <div class="stat-card-icon icon-primary">
+                <i class="fas fa-users"></i>
+            </div>
+        </div>
+        <p class="stat-card-value">{{ stats.total_clientes or 0 }}</p>
+        <div class="stat-card-change">
+            <span>Clientes cadastrados</span>
+        </div>
+    </div>
+    
+    <div class="stat-card">
+        <div class="stat-card-header">
+            <h3 class="stat-card-title">Pessoas Físicas</h3>
+            <div class="stat-card-icon icon-success">
+                <i class="fas fa-user"></i>
+            </div>
+        </div>
+        <p class="stat-card-value">{{ stats.pessoas_fisicas or 0 }}</p>
+        <div class="stat-card-change">
+            <span>Clientes PF</span>
+        </div>
+    </div>
+    
+    <div class="stat-card">
+        <div class="stat-card-header">
+            <h3 class="stat-card-title">Pessoas Jurídicas</h3>
+            <div class="stat-card-icon icon-warning">
+                <i class="fas fa-building"></i>
+            </div>
+        </div>
+        <p class="stat-card-value">{{ stats.pessoas_juridicas or 0 }}</p>
+        <div class="stat-card-change">
+            <span>Clientes PJ</span>
+        </div>
+    </div>
+
+    <div class="stat-card">
+        <div class="stat-card-header">
+            <h3 class="stat-card-title">Cidades</h3>
+            <div class="stat-card-icon icon-info">
+                <i class="fas fa-map-marker-alt"></i>
+            </div>
+        </div>
+        <p class="stat-card-value">{{ stats.total_cidades or 0 }}</p>
+        <div class="stat-card-change">
+            <span>Diferentes cidades</span>
+        </div>
+    </div>
+</div>
+
+<!-- Filtros e Pesquisa -->
+<div class="card" style="margin-bottom: 2rem;">
+    <div class="card-header">
+        <h3>Pesquisar e Filtrar Clientes</h3>
+    </div>
+    <div class="card-body">
+        <form method="GET" style="display: grid; grid-template-columns: 2fr 1fr 1fr 1fr auto; gap: 1rem; align-items: end;">
+            <div>
+                <label for="busca" style="display: block; margin-bottom: 0.5rem; font-weight: 500;">Pesquisar por nome ou documento:</label>
+                <input type="text" 
+                       id="busca" 
+                       name="busca" 
+                       value="{{ filtros.busca }}" 
+                       placeholder="Digite nome ou CPF/CNPJ..."
+                       style="width: 100%; padding: 0.75rem; border: 1px solid #d1d5db; border-radius: 0.375rem;">
+            </div>
+            
+            <div>
+                <label for="tipo_pessoa" style="display: block; margin-bottom: 0.5rem; font-weight: 500;">Tipo:</label>
+                <select id="tipo_pessoa" name="tipo_pessoa" style="width: 100%; padding: 0.75rem; border: 1px solid #d1d5db; border-radius: 0.375rem;">
+                    <option value="">Todos</option>
+                    <option value="Fisica" {{ 'selected' if filtros.tipo_pessoa == 'Fisica' }}>Pessoa Física</option>
+                    <option value="Juridica" {{ 'selected' if filtros.tipo_pessoa == 'Juridica' }}>Pessoa Jurídica</option>
+                </select>
+            </div>
+            
+            <div>
+                <label for="cidade" style="display: block; margin-bottom: 0.5rem; font-weight: 500;">Cidade:</label>
+                <select id="cidade" name="cidade" style="width: 100%; padding: 0.75rem; border: 1px solid #d1d5db; border-radius: 0.375rem;">
+                    <option value="">Todas</option>
+                    {% for cidade in cidades %}
+                    <option value="{{ cidade }}" {{ 'selected' if filtros.cidade == cidade }}>{{ cidade }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            
+            <div>
+                <label for="ordenar" style="display: block; margin-bottom: 0.5rem; font-weight: 500;">Ordenar por:</label>
+                <select id="ordenar" name="ordenar" style="width: 100%; padding: 0.75rem; border: 1px solid #d1d5db; border-radius: 0.375rem;">
+                    <option value="nome" {{ 'selected' if filtros.ordenar == 'nome' }}>Nome</option>
+                    <option value="data_cadastro" {{ 'selected' if filtros.ordenar == 'data_cadastro' }}>Data Cadastro</option>
+                    <option value="total_apolices" {{ 'selected' if filtros.ordenar == 'total_apolices' }}>Número de Apólices</option>
+                    <option value="valor_total" {{ 'selected' if filtros.ordenar == 'valor_total' }}>Valor Total</option>
+                </select>
+            </div>
+            
+            <div style="display: flex; gap: 0.5rem;">
+                <button type="submit" class="btn btn-primary">
+                    <i class="fas fa-search"></i>
+                    Pesquisar
+                </button>
+                <a href="{{ url_for('clientes') }}" class="btn btn-secondary">
+                    <i class="fas fa-times"></i>
+                    Limpar
+                </a>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Tabela de Clientes -->
+        </div>
+        <p class="stat-card-value">{{ clientes | selectattr('tipo_pessoa', 'equalto', 'Juridica') | list | length }}</p>
+        <div class="stat-card-change">
+            <span>Clientes PJ</span>
+        </div>
+    </div>
+</div>
+
+<!-- Filtros e Pesquisa -->
+<div class="table-container">
+    <div style="padding: 1.5rem; border-bottom: 1px solid var(--gray-200);">
+        <div style="display: flex; gap: 1rem; align-items: center; flex-wrap: wrap;">
+            <div style="flex: 1; min-width: 300px;">
+                <input 
+                    type="text" 
+                    id="searchInput" 
+                    placeholder="Pesquisar por nome, documento ou email..." 
+                    class="form-control"
+                    style="margin: 0;"
+                >
+            </div>
+            <select id="tipoFilter" class="form-control" style="width: auto; margin: 0;">
+                <option value="">Todos os tipos</option>
+                <option value="Fisica">Pessoa Física</option>
+                <option value="Juridica">Pessoa Jurídica</option>
+            </select>
+        </div>
+    </div>
+
+    {% if clientes %}
+        <table class="table" id="clientesTable">
+            <thead>
+                <tr>
+                    <th>
+                        <i class="fas fa-hashtag"></i>
+                        ID
+                    </th>
+                    <th>
+                        <i class="fas fa-user"></i>
+                        Nome
+                    </th>
+                    <th>
+                        <i class="fas fa-id-card"></i>
+                        Tipo
+                    </th>
+                    <th>
+                        <i class="fas fa-file-alt"></i>
+                        Documento
+                    </th>
+                    <th>
+                        <i class="fas fa-envelope"></i>
+                        Email
+                    </th>
+                    <th>
+                        <i class="fas fa-phone"></i>
+                        Telefone
+                    </th>
+                    <th>
+                        <i class="fas fa-map-marker-alt"></i>
+                        Cidade
+                    </th>
+                    <th style="text-align: center;">
+                        <i class="fas fa-cogs"></i>
+                        Ações
+                    </th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for c in clientes %}
+                <tr data-tipo="{{ c.tipo_pessoa }}" class="table-row">
+                    <td>
+                        <span style="font-weight: 600; color: var(--primary-color);">#{{ c.id_cliente }}</span>
+                    </td>
+                    <td>
+                        <div style="display: flex; align-items: center; gap: 0.5rem;">
+                            <div style="width: 40px; height: 40px; border-radius: 50%; background: var(--primary-color); display: flex; align-items: center; justify-content: center; color: white; font-weight: 600; font-size: 0.875rem;">
+                                {{ c.nome[0].upper() if c.nome else '?' }}
+                            </div>
+                            <div>
+                                <div style="font-weight: 500; color: var(--gray-900);">{{ c.nome }}</div>
+                            </div>
+                        </div>
+                    </td>
+                    <td>
+                        {% if c.tipo_pessoa == 'Fisica' %}
+                            <span style="background: rgba(22, 163, 74, 0.1); color: var(--success-color); padding: 0.25rem 0.5rem; border-radius: 0.375rem; font-size: 0.75rem; font-weight: 500;">
+                                <i class="fas fa-user"></i> Pessoa Física
+                            </span>
+                        {% else %}
+                            <span style="background: rgba(202, 138, 4, 0.1); color: var(--warning-color); padding: 0.25rem 0.5rem; border-radius: 0.375rem; font-size: 0.75rem; font-weight: 500;">
+                                <i class="fas fa-building"></i> Pessoa Jurídica
+                            </span>
+                        {% endif %}
+                    </td>
+                    <td>
+                        <code style="background: var(--gray-100); padding: 0.25rem 0.5rem; border-radius: 0.25rem; font-size: 0.875rem;">
+                            {{ c.documento }}
+                        </code>
+                    </td>
+                    <td>
+                        {% if c.email %}
+                            <a href="mailto:{{ c.email }}" style="color: var(--primary-color); text-decoration: none;">
+                                {{ c.email }}
+                            </a>
+                        {% else %}
+                            <span style="color: var(--gray-400);">-</span>
+                        {% endif %}
+                    </td>
+                    <td>
+                        {% if c.telefone %}
+                            <a href="tel:{{ c.telefone }}" style="color: var(--gray-700); text-decoration: none;">
+                                {{ c.telefone }}
+                            </a>
+                        {% else %}
+                            <span style="color: var(--gray-400);">-</span>
+                        {% endif %}
+                    </td>
+                    <td>
+                        <span style="color: var(--gray-600);">
+                            <i class="fas fa-map-marker-alt" style="color: var(--gray-400); margin-right: 0.25rem;"></i>
+                            {{ c.cidade or '-' }}
+                        </span>
+                    </td>
+                    <td style="text-align: center;">
+                        <a href="{{ url_for('editar_cliente', id=c.id_cliente) }}" class="btn btn-secondary" style="padding: 0.375rem 0.75rem; font-size: 0.75rem;">
+                            <i class="fas fa-edit"></i>
+                            Editar
+                        </a>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    {% else %}
+        <div style="text-align: center; padding: 3rem;">
+            <i class="fas fa-users" style="font-size: 4rem; color: var(--gray-300); margin-bottom: 1rem;"></i>
+            <h3 style="color: var(--gray-600); margin-bottom: 0.5rem;">Nenhum cliente cadastrado</h3>
+            <p style="color: var(--gray-500); margin-bottom: 2rem;">Cadastre o primeiro cliente para começar a gerenciar sua carteira.</p>
+            <a href="{{ url_for('novo_cliente') }}" class="btn btn-primary">
+                <i class="fas fa-user-plus"></i>
+                Cadastrar Primeiro Cliente
+            </a>
+        </div>
+    {% endif %}
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    // Funcionalidade de pesquisa
+    document.getElementById('searchInput').addEventListener('keyup', function() {
+        const searchValue = this.value.toLowerCase();
+        const rows = document.querySelectorAll('#clientesTable tbody tr');
+        
+        rows.forEach(row => {
+            const text = row.textContent.toLowerCase();
+            if (text.includes(searchValue)) {
+                row.style.display = '';
+            } else {
+                row.style.display = 'none';
+            }
+        });
+    });
+
+    // Filtro por tipo
+    document.getElementById('tipoFilter').addEventListener('change', function() {
+        const filterValue = this.value;
+        const rows = document.querySelectorAll('#clientesTable tbody tr');
+        
+        rows.forEach(row => {
+            if (filterValue === '' || row.dataset.tipo === filterValue) {
+                row.style.display = '';
+            } else {
+                row.style.display = 'none';
+            }
+        });
+    });
+
+    // Animação de entrada das linhas da tabela
+    document.addEventListener('DOMContentLoaded', function() {
+        const rows = document.querySelectorAll('.table-row');
+        rows.forEach((row, index) => {
+            setTimeout(() => {
+                row.classList.add('fade-in');
+            }, index * 50);
+        });
+    });
+</script>
+{% endblock %}

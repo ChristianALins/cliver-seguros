@@ -1,0 +1,274 @@
+{% extends "base.html" %}
+
+{% block title %}Dashboard - CLIVER SEGUROS{% endblock %}
+{% block page_title %}Dashboard{% endblock %}
+
+{% block content %}
+<!-- Stats Cards -->
+<div class="stats-grid">
+    <div class="stat-card">
+        <div class="stat-card-header">
+            <h3 class="stat-card-title">Total de Clientes</h3>
+            <div class="stat-card-icon icon-primary">
+                <i class="fas fa-users"></i>
+            </div>
+        </div>
+        <p class="stat-card-value">{{ "{:,}".format(stats.total_clientes).replace(',', '.') }}</p>
+        <div class="stat-card-change">
+            <i class="fas fa-arrow-up" style="color: var(--success-color);"></i>
+            <span style="color: var(--success-color);">Ativos no sistema</span>
+        </div>
+    </div>
+    
+    <div class="stat-card">
+        <div class="stat-card-header">
+            <h3 class="stat-card-title">Apólices Ativas</h3>
+            <div class="stat-card-icon icon-success">
+                <i class="fas fa-file-contract"></i>
+            </div>
+        </div>
+        <p class="stat-card-value">{{ "{:,}".format(stats.apolices_ativas).replace(',', '.') }}</p>
+        <div class="stat-card-change">
+            <span>de {{ "{:,}".format(stats.total_apolices).replace(',', '.') }} total</span>
+        </div>
+    </div>
+    
+    <div class="stat-card">
+        <div class="stat-card-header">
+            <h3 class="stat-card-title">Sinistros Registrados</h3>
+            <div class="stat-card-icon icon-warning">
+                <i class="fas fa-exclamation-triangle"></i>
+            </div>
+        </div>
+        <p class="stat-card-value">{{ "{:,}".format(stats.total_sinistros).replace(',', '.') }}</p>
+        <div class="stat-card-change">
+            <span>Acompanhamento ativo</span>
+        </div>
+    </div>
+    
+    <div class="stat-card">
+        <div class="stat-card-header">
+            <h3 class="stat-card-title">Valor Total Prêmios</h3>
+            <div class="stat-card-icon icon-primary">
+                <i class="fas fa-dollar-sign"></i>
+            </div>
+        </div>
+        <p class="stat-card-value">{{ "R$ {:,.2f}".format(stats.valor_total_premios).replace(',', 'X').replace('.', ',').replace('X', '.') }}</p>
+        <div class="stat-card-change">
+            <i class="fas fa-arrow-up" style="color: var(--success-color);"></i>
+            <span style="color: var(--success-color);">Apólices ativas</span>
+        </div>
+    </div>
+</div>
+
+<!-- Charts Section -->
+<div class="charts-grid">
+    <!-- Apólices por Tipo Chart -->
+    <div class="chart-card">
+        <div class="chart-header">
+            <h3 class="chart-title">Apólices por Tipo de Seguro</h3>
+        </div>
+        <div class="chart-container">
+            <canvas id="apolicesPorTipoChart"></canvas>
+        </div>
+    </div>
+    
+    <!-- Sinistros por Status Chart -->
+    <div class="chart-card">
+        <div class="chart-header">
+            <h3 class="chart-title">Status dos Sinistros</h3>
+        </div>
+        <div class="chart-container">
+            <canvas id="sinistrosStatusChart"></canvas>
+        </div>
+    </div>
+</div>
+
+<!-- Recent Activities -->
+<div class="recent-activities">
+    <div class="recent-activities-header">
+        <h3 class="recent-activities-title">Apólices Recentes</h3>
+    </div>
+    <div class="activities-list">
+        {% if apolices_recentes %}
+            {% for apolice in apolices_recentes %}
+                <div class="activity-item">
+                    <div class="activity-content">
+                        <div class="activity-info">
+                            <h4>Apólice #{{ apolice.numero_apolice }}</h4>
+                            <p>{{ apolice.nome }} - {{ apolice.nome_seguradora }}</p>
+                            <p><small>Vigência: {{ apolice.data_inicio_vigencia.strftime('%d/%m/%Y') if apolice.data_inicio_vigencia else 'N/A' }}</small></p>
+                        </div>
+                        <div class="activity-value">
+                            {{ "R$ {:,.2f}".format(apolice.valor_premio).replace(',', 'X').replace('.', ',').replace('X', '.') }}
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        {% else %}
+            <div class="activity-item">
+                <div class="activity-content">
+                    <div class="activity-info">
+                        <h4>Nenhuma apólice encontrada</h4>
+                        <p>Cadastre a primeira apólice para começar</p>
+                    </div>
+                </div>
+            </div>
+        {% endif %}
+    </div>
+</div>
+
+<!-- Quick Actions -->
+<div style="margin-top: 2rem;">
+    <h3 style="margin-bottom: 1rem; color: var(--gray-900);">Ações Rápidas</h3>
+    <div style="display: flex; gap: 1rem; flex-wrap: wrap;">
+        <a href="{{ url_for('novo_cliente') }}" class="btn btn-primary">
+            <i class="fas fa-user-plus"></i>
+            Novo Cliente
+        </a>
+        <a href="{{ url_for('nova_apolice') }}" class="btn btn-success">
+            <i class="fas fa-file-plus"></i>
+            Nova Apólice
+        </a>
+        <a href="{{ url_for('novo_sinistro') }}" class="btn btn-danger">
+            <i class="fas fa-exclamation-circle"></i>
+            Registrar Sinistro
+        </a>
+        <a href="{{ url_for('nova_tarefa') }}" class="btn btn-secondary">
+            <i class="fas fa-plus"></i>
+            Nova Tarefa
+        </a>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    // Cores do tema
+    const colors = {
+        primary: '#2563eb',
+        success: '#16a34a',
+        warning: '#ca8a04',
+        danger: '#dc2626',
+        gray: '#64748b'
+    };
+
+    // Dados para o gráfico de apólices por tipo (dados estáticos para demonstração)
+    const apolicesPorTipoData = {
+        labels: ['Auto', 'Vida', 'Residencial', 'Empresarial'],
+        datasets: [{
+            label: 'Apólices',
+            data: [45, 35, 25, 15],
+            backgroundColor: [
+                colors.primary,
+                colors.success,
+                colors.warning,
+                colors.danger
+            ],
+            borderWidth: 2,
+            borderColor: '#ffffff'
+        }]
+    };
+
+    // Dados para o gráfico de sinistros por status (dados estáticos)
+    const sinistrosStatusData = {
+        labels: ['Aberto', 'Em Análise', 'Aprovado', 'Rejeitado'],
+        datasets: [{
+            label: 'Sinistros',
+            data: [8, 12, 3, 2],
+            backgroundColor: [
+                colors.warning,
+                colors.primary,
+                colors.success,
+                colors.danger,
+                colors.gray
+            ],
+            borderWidth: 2,
+            borderColor: '#ffffff'
+        }]
+    };
+
+    // Configurações dos gráficos
+    const chartOptions = {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+            legend: {
+                position: 'bottom',
+                labels: {
+                    padding: 20,
+                    font: {
+                        family: 'Inter, sans-serif',
+                        size: 12
+                    }
+                }
+            }
+        }
+    };
+
+    // Criar gráfico de apólices por tipo
+    const ctx1 = document.getElementById('apolicesPorTipoChart').getContext('2d');
+    new Chart(ctx1, {
+        type: 'doughnut',
+        data: apolicesPorTipoData,
+        options: {
+            ...chartOptions,
+            plugins: {
+                ...chartOptions.plugins,
+                legend: {
+                    ...chartOptions.plugins.legend,
+                    display: true
+                }
+            }
+        }
+    });
+
+    // Criar gráfico de sinistros por status
+    const ctx2 = document.getElementById('sinistrosStatusChart').getContext('2d');
+    new Chart(ctx2, {
+        type: 'pie',
+        data: sinistrosStatusData,
+        options: {
+            ...chartOptions,
+            plugins: {
+                ...chartOptions.plugins,
+                legend: {
+                    ...chartOptions.plugins.legend,
+                    display: true
+                }
+            }
+        }
+    });
+
+    // Animação para os números
+    function animateCounters() {
+        const counters = document.querySelectorAll('.stat-card-value');
+        
+        counters.forEach(counter => {
+            const target = parseInt(counter.textContent.replace(/[^\d]/g, ''));
+            if (isNaN(target)) return;
+            
+            let current = 0;
+            const increment = Math.ceil(target / 100);
+            const timer = setInterval(() => {
+                current += increment;
+                if (current >= target) {
+                    current = target;
+                    clearInterval(timer);
+                }
+                
+                if (counter.textContent.includes('R$')) {
+                    counter.textContent = formatCurrency(current);
+                } else {
+                    counter.textContent = formatNumber(current);
+                }
+            }, 20);
+        });
+    }
+
+    // Executar animação quando a página carregar
+    document.addEventListener('DOMContentLoaded', function() {
+        setTimeout(animateCounters, 500);
+    });
+</script>
+{% endblock %}

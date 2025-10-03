@@ -1,0 +1,119 @@
+{% extends "base_simple.html" %}
+
+{% block title %}Nova Apólice - CLIVER SEGUROS{% endblock %}
+
+{% block content %}
+<div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
+    <h2>Nova Apólice</h2>
+    <a href="{{ url_for('apolices_simple') }}" class="btn btn-secondary">Voltar para Lista</a>
+</div>
+
+<div style="background: white; padding: 2rem; border: 1px solid #ddd; border-radius: 8px;">
+    <form method="POST">
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; margin-bottom: 2rem;">
+            <div>
+                <h3 style="color: #00B391; margin-bottom: 1rem;">Dados da Apólice</h3>
+                
+                <div class="form-group">
+                    <label for="numero_apolice">Número da Apólice*:</label>
+                    <input type="text" id="numero_apolice" name="numero_apolice" required 
+                           placeholder="Ex: 2024001">
+                </div>
+                
+                <div class="form-group">
+                    <label for="cliente_id">Cliente*:</label>
+                    <select id="cliente_id" name="cliente_id" required>
+                        <option value="">Selecione um cliente...</option>
+                        {% for cliente in clientes %}
+                        <option value="{{ cliente.id }}">{{ cliente.nome }} - {{ cliente.cpf }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label for="seguradora_id">Seguradora*:</label>
+                    <select id="seguradora_id" name="seguradora_id" required>
+                        <option value="">Selecione uma seguradora...</option>
+                        {% for seguradora in seguradoras %}
+                        <option value="{{ seguradora.id }}">{{ seguradora.nome }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label for="tipo_seguro_id">Tipo de Seguro*:</label>
+                    <select id="tipo_seguro_id" name="tipo_seguro_id" required>
+                        <option value="">Selecione o tipo...</option>
+                        {% for tipo in tipos_seguro %}
+                        <option value="{{ tipo.id }}">{{ tipo.nome }} - {{ tipo.categoria }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+            </div>
+            
+            <div>
+                <h3 style="color: #00B391; margin-bottom: 1rem;">Valores e Vigência</h3>
+                
+                <div class="form-group">
+                    <label for="valor_premio">Valor do Prêmio (R$)*:</label>
+                    <input type="number" id="valor_premio" name="valor_premio" step="0.01" required 
+                           placeholder="0,00">
+                </div>
+                
+                <div class="form-group">
+                    <label for="valor_franquia">Valor da Franquia (R$):</label>
+                    <input type="number" id="valor_franquia" name="valor_franquia" step="0.01" 
+                           placeholder="0,00">
+                </div>
+                
+                <div class="form-group">
+                    <label for="data_inicio">Data de Início*:</label>
+                    <input type="date" id="data_inicio" name="data_inicio" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="data_vencimento">Data de Vencimento*:</label>
+                    <input type="date" id="data_vencimento" name="data_vencimento" required>
+                </div>
+            </div>
+        </div>
+        
+        <div class="form-group">
+            <label for="observacoes">Observações:</label>
+            <textarea id="observacoes" name="observacoes" rows="3" 
+                      placeholder="Observações adicionais sobre a apólice..."></textarea>
+        </div>
+        
+        <div style="display: flex; gap: 1rem; margin-top: 2rem;">
+            <button type="submit" class="btn">Cadastrar Apólice</button>
+            <button type="reset" class="btn btn-secondary">Limpar Formulário</button>
+        </div>
+    </form>
+</div>
+
+<script>
+// Auto-calcular data de vencimento (1 ano após início)
+document.getElementById('data_inicio').addEventListener('change', function() {
+    var dataInicio = new Date(this.value);
+    if (dataInicio) {
+        var dataVencimento = new Date(dataInicio);
+        dataVencimento.setFullYear(dataVencimento.getFullYear() + 1);
+        
+        var ano = dataVencimento.getFullYear();
+        var mes = String(dataVencimento.getMonth() + 1).padStart(2, '0');
+        var dia = String(dataVencimento.getDate()).padStart(2, '0');
+        
+        document.getElementById('data_vencimento').value = ano + '-' + mes + '-' + dia;
+    }
+});
+
+// Formatação de valores monetários
+document.querySelectorAll('input[type="number"]').forEach(function(input) {
+    input.addEventListener('blur', function() {
+        if (this.value) {
+            this.value = parseFloat(this.value).toFixed(2);
+        }
+    });
+});
+</script>
+{% endblock %}

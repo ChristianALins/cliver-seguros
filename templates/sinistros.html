@@ -1,0 +1,273 @@
+{% extends "base.html" %}
+
+{% block title %}Sinistros - CLIVER SEGUROS{% endblock %}
+
+{% block header_title %}Sinistros{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <div class="page-title">
+        <h1><i class="fas fa-exclamation-triangle"></i> Gerenciar Sinistros</h1>
+        <p>Controle e acompanhe todos os sinistros da corretora</p>
+    </div>
+    <div class="page-actions">
+        <a href="{{ url_for('novo_sinistro') }}" class="btn btn-primary">
+            <i class="fas fa-plus"></i> Novo Sinistro
+        </a>
+    </div>
+</div>
+
+<!-- Cards de Estatísticas -->
+<div class="stats-grid">
+    <div class="stat-card">
+        <div class="stat-icon" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
+            <i class="fas fa-exclamation-triangle"></i>
+        </div>
+        <div class="stat-content">
+            <div class="stat-number">{{ sinistros|length or 0 }}</div>
+            <div class="stat-label">Total de Sinistros</div>
+            <div class="stat-change neutral">Registrados</div>
+        </div>
+    </div>
+
+    <div class="stat-card">
+        <div class="stat-icon" style="background: linear-gradient(135deg, #48BB78 0%, #38A169 100%);">
+            <i class="fas fa-check-circle"></i>
+        </div>
+        <div class="stat-content">
+            <div class="stat-number">{{ (sinistros|selectattr('status_sinistro', 'equalto', 'Pago')|list)|length or 0 }}</div>
+            <div class="stat-label">Sinistros Pagos</div>
+            <div class="stat-change positive">Concluídos</div>
+        </div>
+    </div>
+
+    <div class="stat-card">
+        <div class="stat-icon" style="background: linear-gradient(135deg, #F56565 0%, #E53E3E 100%);">
+            <i class="fas fa-clock"></i>
+        </div>
+        <div class="stat-content">
+            <div class="stat-number">{{ (sinistros|selectattr('status_sinistro', 'equalto', 'Em Analise')|list)|length or 0 }}</div>
+            <div class="stat-label">Em Análise</div>
+            <div class="stat-change warning">Aguardando</div>
+        </div>
+    </div>
+
+    <div class="stat-card">
+        <div class="stat-icon" style="background: linear-gradient(135deg, #ECC94B 0%, #D69E2E 100%);">
+            <i class="fas fa-dollar-sign"></i>
+        </div>
+        <div class="stat-content">
+            <div class="stat-number">R$ {{ "{:,.2f}".format(sinistros|sum(attribute='valor_indenizacao')|default(0, true)) }}</div>
+            <div class="stat-label">Valor Total</div>
+            <div class="stat-change neutral">Indenizações</div>
+        </div>
+    </div>
+</div>
+
+<!-- Filtros e Pesquisa -->
+<div class="data-controls">
+    <div class="search-container">
+        <i class="fas fa-search search-icon"></i>
+        <input type="text" id="searchInput" placeholder="Pesquisar por apólice, descrição ou processo..." class="search-input">
+    </div>
+    
+    <div class="filters">
+        <select id="statusFilter" class="filter-select">
+            <option value="">Todos os Status</option>
+            <option value="Em Analise">Em Análise</option>
+            <option value="Pago">Pago</option>
+            <option value="Negado">Negado</option>
+            <option value="Em Andamento">Em Andamento</option>
+        </select>
+        
+        <button class="btn btn-secondary" onclick="clearFilters()">
+            <i class="fas fa-times"></i> Limpar Filtros
+        </button>
+    </div>
+</div>
+
+<!-- Tabela de Sinistros -->
+<div class="data-table-container">
+    <div class="table-responsive">
+        <table class="data-table" id="sinistrosTable">
+            <thead>
+                <tr>
+                    <th>Apólice</th>
+                    <th>Data do Ocorrido</th>
+                    <th>Descrição</th>
+                    <th>Status</th>
+                    <th>Processo</th>
+                    <th>Valor Indenização</th>
+                    <th>Ações</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for s in sinistros %}
+                <tr class="table-row" data-status="{{ s.status_sinistro }}">
+                    <td>
+                        <div class="policy-info">
+                            <i class="fas fa-file-contract"></i>
+                            <strong>{{ s.numero_apolice }}</strong>
+                        </div>
+                    </td>
+                    <td>
+                        <div class="date-info">
+                            <i class="fas fa-calendar-alt"></i>
+                            {{ s.data_ocorrido.strftime('%d/%m/%Y') if s.data_ocorrido else 'N/A' }}
+                        </div>
+                    </td>
+                    <td>
+                        <div class="description">
+                            {{ s.descricao_sinistro[:50] + '...' if s.descricao_sinistro and s.descricao_sinistro|length > 50 else (s.descricao_sinistro or 'Sem descrição') }}
+                        </div>
+                    </td>
+                    <td>
+                        <span class="status-badge status-{{ s.status_sinistro.lower().replace(' ', '-') }}">
+                            {% if s.status_sinistro == 'Pago' %}
+                                <i class="fas fa-check-circle"></i>
+                            {% elif s.status_sinistro == 'Em Analise' %}
+                                <i class="fas fa-clock"></i>
+                            {% elif s.status_sinistro == 'Negado' %}
+                                <i class="fas fa-times-circle"></i>
+                            {% else %}
+                                <i class="fas fa-hourglass-half"></i>
+                            {% endif %}
+                            {{ s.status_sinistro }}
+                        </span>
+                    </td>
+                    <td>
+                        <div class="process-info">
+                            {% if s.numero_processo_seguradora %}
+                                <span class="badge badge-info">{{ s.numero_processo_seguradora }}</span>
+                            {% else %}
+                                <span class="text-muted">Não informado</span>
+                            {% endif %}
+                        </div>
+                    </td>
+                    <td>
+                        <div class="amount {% if s.valor_indenizacao %}positive{% else %}neutral{% endif %}">
+                            {% if s.valor_indenizacao %}
+                                R$ {{ "{:,.2f}".format(s.valor_indenizacao) }}
+                            {% else %}
+                                A definir
+                            {% endif %}
+                        </div>
+                    </td>
+                    <td>
+                        <div class="action-buttons">
+                            <button class="btn-icon btn-view" title="Visualizar">
+                                <i class="fas fa-eye"></i>
+                            </button>
+                            <a href="{{ url_for('editar_sinistro', id=s.id_sinistro) }}" class="btn-icon btn-edit" title="Editar">
+                                <i class="fas fa-edit"></i>
+                            </a>
+                            <button class="btn-icon btn-delete" title="Excluir">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </div>
+                    </td>
+                </tr>
+                {% else %}
+                <tr class="empty-state">
+                    <td colspan="7">
+                        <div class="empty-message">
+                            <i class="fas fa-exclamation-triangle"></i>
+                            <h3>Nenhum sinistro encontrado</h3>
+                            <p>Comece registrando um novo sinistro quando necessário.</p>
+                            <a href="{{ url_for('novo_sinistro') }}" class="btn btn-primary">
+                                <i class="fas fa-plus"></i> Registrar Primeiro Sinistro
+                            </a>
+                        </div>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const searchInput = document.getElementById('searchInput');
+    const statusFilter = document.getElementById('statusFilter');
+    const tableRows = document.querySelectorAll('.table-row');
+
+    function filterTable() {
+        const searchTerm = searchInput.value.toLowerCase();
+        const statusValue = statusFilter.value.toLowerCase();
+
+        let visibleRows = 0;
+
+        tableRows.forEach(row => {
+            const text = row.textContent.toLowerCase();
+            const status = row.getAttribute('data-status').toLowerCase();
+
+            const matchesSearch = text.includes(searchTerm);
+            const matchesStatus = !statusValue || status === statusValue;
+
+            if (matchesSearch && matchesStatus) {
+                row.style.display = '';
+                visibleRows++;
+            } else {
+                row.style.display = 'none';
+            }
+        });
+
+        // Mostrar mensagem se não houver resultados
+        const emptyMessage = document.querySelector('.empty-state');
+        if (emptyMessage) {
+            emptyMessage.style.display = visibleRows === 0 ? '' : 'none';
+        }
+    }
+
+    searchInput.addEventListener('input', filterTable);
+    statusFilter.addEventListener('change', filterTable);
+});
+
+function clearFilters() {
+    document.getElementById('searchInput').value = '';
+    document.getElementById('statusFilter').value = '';
+    
+    const event = new Event('input');
+    document.getElementById('searchInput').dispatchEvent(event);
+}
+
+// Animação de contadores
+document.addEventListener('DOMContentLoaded', function() {
+    const counters = document.querySelectorAll('.stat-number');
+    
+    counters.forEach(counter => {
+        const text = counter.innerText;
+        if (text.includes('R$')) {
+            const target = parseFloat(text.replace(/[^\d.-]/g, '')) || 0;
+            const duration = 2000;
+            const increment = target / (duration / 16);
+            let current = 0;
+            
+            const timer = setInterval(() => {
+                current += increment;
+                if (current >= target) {
+                    current = target;
+                    clearInterval(timer);
+                }
+                counter.innerText = 'R$ ' + current.toLocaleString('pt-BR', {minimumFractionDigits: 2, maximumFractionDigits: 2});
+            }, 16);
+        } else {
+            const target = parseFloat(text.replace(/[^\d.-]/g, '')) || 0;
+            const duration = 2000;
+            const increment = target / (duration / 16);
+            let current = 0;
+            
+            const timer = setInterval(() => {
+                current += increment;
+                if (current >= target) {
+                    current = target;
+                    clearInterval(timer);
+                }
+                counter.innerText = Math.floor(current).toLocaleString('pt-BR');
+            }, 16);
+        }
+    });
+});
+</script>
+{% endblock %}

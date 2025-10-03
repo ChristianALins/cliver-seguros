@@ -1,0 +1,13 @@
+{% extends 'base.html' %}
+{% block title %}{{ 'Editar' if seguradora else 'Nova' }} Seguradora{% endblock %}
+{% block content %}
+<h2>{{ 'Editar' if seguradora else 'Nova' }} Seguradora</h2>
+<form method="post">
+    <input type="text" name="nome_seguradora" placeholder="Nome" value="{{ seguradora.nome_seguradora if seguradora else '' }}" required><br>
+    <input type="text" name="cnpj_seguradora" placeholder="CNPJ" value="{{ seguradora.cnpj_seguradora if seguradora else '' }}" required><br>
+    <input type="text" name="contato_seguradora" placeholder="Contato" value="{{ seguradora.contato_seguradora if seguradora else '' }}"><br>
+    <input type="email" name="email_seguradora" placeholder="Email" value="{{ seguradora.email_seguradora if seguradora else '' }}"><br>
+    <button type="submit">Salvar</button>
+</form>
+<a href="{{ url_for('seguradoras') }}">Voltar</a>
+{% endblock %}

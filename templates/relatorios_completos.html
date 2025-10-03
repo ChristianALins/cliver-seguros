@@ -1,0 +1,264 @@
+{% extends "base_simple.html" %}
+
+{% block title %}Relatórios - CLIVER SEGUROS{% endblock %}
+
+{% block content %}
+<div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
+    <h2>Central de Relatórios</h2>
+</div>
+
+<!-- Relatórios Principais -->
+<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 2rem; margin-bottom: 2rem;">
+    <!-- Relatório de Vendas -->
+    <div style="background: white; padding: 2rem; border: 1px solid #ddd; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
+        <h3 style="color: #00B391; margin-bottom: 1rem;">📈 Relatório de Vendas</h3>
+        <p style="margin-bottom: 1rem;">Análise detalhada de vendas por período</p>
+        <a href="/relatorios/vendas" class="btn" style="width: 100%; display: inline-block; text-align: center; text-decoration: none;">Gerar Relatório</a>
+        <div style="margin-top: 1rem; font-size: 12px; color: #666;">
+            <p>• Vendas por período</p>
+            <p>• Performance por corretor</p>
+            <p>• Tipos de seguro mais vendidos</p>
+        </div>
+    </div>
+    
+    <!-- Relatório de Comissões -->
+    <div style="background: white; padding: 2rem; border: 1px solid #ddd; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
+        <h3 style="color: #00B391; margin-bottom: 1rem;">💰 Relatório de Comissões</h3>
+        <p style="margin-bottom: 1rem;">Controle de comissões dos corretores</p>
+        <a href="/relatorios/comissoes" class="btn" style="width: 100%; display: inline-block; text-align: center; text-decoration: none;">Gerar Relatório</a>
+        <div style="margin-top: 1rem; font-size: 12px; color: #666;">
+            <p>• Comissões por corretor</p>
+            <p>• Histórico de pagamentos</p>
+            <p>• Comissões pendentes</p>
+        </div>
+    </div>
+    
+    <!-- Relatório de Sinistros -->
+    <div style="background: white; padding: 2rem; border: 1px solid #ddd; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
+        <h3 style="color: #00B391; margin-bottom: 1rem;">⚠️ Relatório de Sinistros</h3>
+        <p style="margin-bottom: 1rem;">Análise de sinistros e indenizações</p>
+        <a href="/relatorios/sinistros" class="btn" style="width: 100%; display: inline-block; text-align: center; text-decoration: none;">Gerar Relatório</a>
+        <div style="margin-top: 1rem; font-size: 12px; color: #666;">
+            <p>• Sinistros por tipo</p>
+            <p>• Valor de indenizações</p>
+            <p>• Taxa de sinistralidade</p>
+        </div>
+    </div>
+    
+    <!-- Relatório de Renovações -->
+    <div style="background: white; padding: 2rem; border: 1px solid #ddd; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
+        <h3 style="color: #00B391; margin-bottom: 1rem;">🔄 Relatório de Renovações</h3>
+        <p style="margin-bottom: 1rem;">Controle de renovações de apólices</p>
+        <a href="/relatorios/renovacoes" class="btn" style="width: 100%; display: inline-block; text-align: center; text-decoration: none;">Gerar Relatório</a>
+        <div style="margin-top: 1rem; font-size: 12px; color: #666;">
+            <p>• Renovações por vencer</p>
+            <p>• Taxa de renovação</p>
+            <p>• Histórico de renovações</p>
+        </div>
+    </div>
+</div>
+
+<!-- Gerador de Relatórios Personalizado -->
+<div style="background: white; padding: 2rem; border: 1px solid #ddd; border-radius: 8px; margin-bottom: 2rem;">
+    <h3 style="color: #00B391; margin-bottom: 1rem;">🛠️ Gerador de Relatórios Personalizado</h3>
+    
+    <form style="margin-bottom: 2rem;">
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; margin-bottom: 1rem;">
+            <div class="form-group">
+                <label for="tipo_relatorio">Tipo de Relatório:</label>
+                <select id="tipo_relatorio" name="tipo_relatorio">
+                    <option value="">Selecione...</option>
+                    <option value="vendas">Vendas</option>
+                    <option value="comissoes">Comissões</option>
+                    <option value="sinistros">Sinistros</option>
+                    <option value="renovacoes">Renovações</option>
+                    <option value="clientes">Clientes</option>
+                    <option value="performance">Performance</option>
+                </select>
+            </div>
+            
+            <div class="form-group">
+                <label for="periodo_relatorio">Período:</label>
+                <select id="periodo_relatorio" name="periodo_relatorio">
+                    <option value="mes_atual">Mês Atual</option>
+                    <option value="mes_anterior">Mês Anterior</option>
+                    <option value="trimestre">Último Trimestre</option>
+                    <option value="semestre">Último Semestre</option>
+                    <option value="ano">Ano Atual</option>
+                    <option value="personalizado">Personalizado</option>
+                </select>
+            </div>
+            
+            <div class="form-group">
+                <label for="formato_relatorio">Formato:</label>
+                <select id="formato_relatorio" name="formato_relatorio">
+                    <option value="pdf">PDF</option>
+                    <option value="excel">Excel</option>
+                    <option value="csv">CSV</option>
+                    <option value="html">HTML</option>
+                </select>
+            </div>
+        </div>
+        
+        <div id="periodo_personalizado" style="display: none; margin-bottom: 1rem;">
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+                <div class="form-group">
+                    <label for="data_inicio">Data Início:</label>
+                    <input type="date" id="data_inicio" name="data_inicio">
+                </div>
+                <div class="form-group">
+                    <label for="data_fim">Data Fim:</label>
+                    <input type="date" id="data_fim" name="data_fim">
+                </div>
+            </div>
+        </div>
+        
+        <div style="display: flex; gap: 1rem;">
+            <button type="submit" class="btn">Gerar Relatório</button>
+            <button type="button" class="btn btn-secondary">Visualizar Prévia</button>
+        </div>
+    </form>
+</div>
+
+<!-- Dashboards e Métricas -->
+<div style="background: white; padding: 2rem; border: 1px solid #ddd; border-radius: 8px; margin-bottom: 2rem;">
+    <h3 style="color: #00B391; margin-bottom: 1rem;">📊 Dashboards e Métricas</h3>
+    
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; margin-bottom: 2rem;">
+        <div style="background: #f8f9fa; padding: 1.5rem; border-radius: 8px; text-align: center;">
+            <h4 style="color: #00B391; font-size: 2rem; margin-bottom: 0.5rem;">156</h4>
+            <p style="margin: 0; color: #666;">Apólices Ativas</p>
+        </div>
+        
+        <div style="background: #f8f9fa; padding: 1.5rem; border-radius: 8px; text-align: center;">
+            <h4 style="color: #28a745; font-size: 2rem; margin-bottom: 0.5rem;">R$ 45.890</h4>
+            <p style="margin: 0; color: #666;">Vendas do Mês</p>
+        </div>
+        
+        <div style="background: #f8f9fa; padding: 1.5rem; border-radius: 8px; text-align: center;">
+            <h4 style="color: #ffc107; font-size: 2rem; margin-bottom: 0.5rem;">23</h4>
+            <p style="margin: 0; color: #666;">Renovações Pendentes</p>
+        </div>
+        
+        <div style="background: #f8f9fa; padding: 1.5rem; border-radius: 8px; text-align: center;">
+            <h4 style="color: #dc3545; font-size: 2rem; margin-bottom: 0.5rem;">8</h4>
+            <p style="margin: 0; color: #666;">Sinistros Abertos</p>
+        </div>
+    </div>
+    
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1rem;">
+        <div>
+            <h4>Top 5 Tipos de Seguro</h4>
+            <ul style="list-style: none; padding: 0;">
+                <li style="display: flex; justify-content: space-between; padding: 0.5rem 0; border-bottom: 1px solid #eee;">
+                    <span>Auto</span>
+                    <strong>45%</strong>
+                </li>
+                <li style="display: flex; justify-content: space-between; padding: 0.5rem 0; border-bottom: 1px solid #eee;">
+                    <span>Residencial</span>
+                    <strong>28%</strong>
+                </li>
+                <li style="display: flex; justify-content: space-between; padding: 0.5rem 0; border-bottom: 1px solid #eee;">
+                    <span>Vida</span>
+                    <strong>15%</strong>
+                </li>
+                <li style="display: flex; justify-content: space-between; padding: 0.5rem 0; border-bottom: 1px solid #eee;">
+                    <span>Empresarial</span>
+                    <strong>8%</strong>
+                </li>
+                <li style="display: flex; justify-content: space-between; padding: 0.5rem 0;">
+                    <span>Outros</span>
+                    <strong>4%</strong>
+                </li>
+            </ul>
+        </div>
+        
+        <div>
+            <h4>Performance dos Corretores</h4>
+            <ul style="list-style: none; padding: 0;">
+                <li style="display: flex; justify-content: space-between; padding: 0.5rem 0; border-bottom: 1px solid #eee;">
+                    <span>Maria Silva</span>
+                    <strong>R$ 18.500</strong>
+                </li>
+                <li style="display: flex; justify-content: space-between; padding: 0.5rem 0; border-bottom: 1px solid #eee;">
+                    <span>João Santos</span>
+                    <strong>R$ 15.200</strong>
+                </li>
+                <li style="display: flex; justify-content: space-between; padding: 0.5rem 0; border-bottom: 1px solid #eee;">
+                    <span>Ana Costa</span>
+                    <strong>R$ 12.190</strong>
+                </li>
+            </ul>
+        </div>
+    </div>
+</div>
+
+<!-- Histórico de Relatórios -->
+<div style="background: white; padding: 2rem; border: 1px solid #ddd; border-radius: 8px;">
+    <h3 style="margin-bottom: 1rem;">📋 Histórico de Relatórios</h3>
+    
+    <table>
+        <thead>
+            <tr>
+                <th>Data</th>
+                <th>Tipo</th>
+                <th>Período</th>
+                <th>Formato</th>
+                <th>Status</th>
+                <th>Ações</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>01/10/2024 14:30</td>
+                <td>Vendas</td>
+                <td>Setembro/2024</td>
+                <td>PDF</td>
+                <td><span style="background: #28a745; color: white; padding: 2px 8px; border-radius: 3px;">Concluído</span></td>
+                <td>
+                    <button class="btn" style="padding: 5px 10px; font-size: 12px;">Download</button>
+                    <button class="btn btn-secondary" style="padding: 5px 10px; font-size: 12px;">Visualizar</button>
+                </td>
+            </tr>
+            <tr>
+                <td>30/09/2024 10:15</td>
+                <td>Comissões</td>
+                <td>Setembro/2024</td>
+                <td>Excel</td>
+                <td><span style="background: #28a745; color: white; padding: 2px 8px; border-radius: 3px;">Concluído</span></td>
+                <td>
+                    <button class="btn" style="padding: 5px 10px; font-size: 12px;">Download</button>
+                    <button class="btn btn-secondary" style="padding: 5px 10px; font-size: 12px;">Visualizar</button>
+                </td>
+            </tr>
+            <tr>
+                <td>25/09/2024 16:45</td>
+                <td>Sinistros</td>
+                <td>3º Trimestre/2024</td>
+                <td>PDF</td>
+                <td><span style="background: #ffc107; color: white; padding: 2px 8px; border-radius: 3px;">Processando</span></td>
+                <td>
+                    <button class="btn btn-secondary" style="padding: 5px 10px; font-size: 12px;" disabled>Aguardando</button>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+</div>
+
+<div style="margin-top: 2rem;">
+    <a href="/dashboard" class="btn btn-secondary">Voltar ao Dashboard</a>
+    <button class="btn">Agendar Relatório</button>
+    <button class="btn">Configurar Email Automático</button>
+</div>
+
+<script>
+document.getElementById('periodo_relatorio').addEventListener('change', function() {
+    var periodoPersonalizado = document.getElementById('periodo_personalizado');
+    if (this.value === 'personalizado') {
+        periodoPersonalizado.style.display = 'block';
+    } else {
+        periodoPersonalizado.style.display = 'none';
+    }
+});
+</script>
+{% endblock %}

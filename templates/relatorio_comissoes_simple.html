@@ -1,0 +1,270 @@
+{% extends "base_simple.html" %}
+
+{% block title %}Relatório de Comissões - CLIVER SEGUROS{% endblock %}
+
+{% block content %}
+<div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
+    <h2>Relatório de Comissões</h2>
+    <div>
+        <button class="btn btn-secondary">📊 Exportar PDF</button>
+        <button class="btn">📈 Exportar Excel</button>
+        <a href="/relatorios" class="btn btn-secondary">Voltar</a>
+    </div>
+</div>
+
+<!-- Resumo de Comissões -->
+<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; margin-bottom: 2rem;">
+    <div style="background: white; padding: 1.5rem; border: 1px solid #ddd; border-radius: 8px; text-align: center;">
+        <h3 style="color: #28a745; font-size: 2rem; margin-bottom: 0.5rem;">R$ 48.567</h3>
+        <p style="margin: 0; color: #666;">Comissões do Mês</p>
+        <small style="color: #28a745;">↗ +18% vs mês anterior</small>
+    </div>
+    
+    <div style="background: white; padding: 1.5rem; border: 1px solid #ddd; border-radius: 8px; text-align: center;">
+        <h3 style="color: #007bff; font-size: 2rem; margin-bottom: 0.5rem;">R$ 12.450</h3>
+        <p style="margin: 0; color: #666;">Comissões Pendentes</p>
+        <small style="color: #ffc107;">Pagamento em 15/10</small>
+    </div>
+    
+    <div style="background: white; padding: 1.5rem; border: 1px solid #ddd; border-radius: 8px; text-align: center;">
+        <h3 style="color: #00B391; font-size: 2rem; margin-bottom: 0.5rem;">10,2%</h3>
+        <p style="margin: 0; color: #666;">Taxa Média</p>
+        <small style="color: #666;">Padrão da empresa</small>
+    </div>
+    
+    <div style="background: white; padding: 1.5rem; border: 1px solid #ddd; border-radius: 8px; text-align: center;">
+        <h3 style="color: #6f42c1; font-size: 2rem; margin-bottom: 0.5rem;">3</h3>
+        <p style="margin: 0; color: #666;">Corretores Ativos</p>
+        <small style="color: #666;">Este mês</small>
+    </div>
+</div>
+
+<!-- Ranking de Corretores -->
+<div style="background: white; padding: 2rem; border: 1px solid #ddd; border-radius: 8px; margin-bottom: 2rem;">
+    <h3 style="margin-bottom: 1.5rem;">🏆 Ranking de Corretores - Outubro 2024</h3>
+    
+    <div style="display: grid; gap: 1rem;">
+        {% for corretor in comissoes %}
+        <div style="border: 1px solid #ddd; border-radius: 8px; padding: 1.5rem; position: relative;">
+            <div style="position: absolute; top: -10px; left: 20px; background: {% if loop.index == 1 %}#ffd700{% elif loop.index == 2 %}#c0c0c0{% elif loop.index == 3 %}#cd7f32{% else %}#007bff{% endif %}; color: white; padding: 5px 15px; border-radius: 15px; font-size: 12px; font-weight: bold;">
+                {{ loop.index }}º Lugar
+            </div>
+            
+            <div style="display: grid; grid-template-columns: 1fr auto auto auto; gap: 2rem; align-items: center; margin-top: 1rem;">
+                <div>
+                    <h4 style="margin-bottom: 0.5rem;">{{ corretor.corretor }}</h4>
+                    <p style="color: #666; margin: 0;">Corretor{% if corretor.corretor == 'Maria Silva' %} Sênior{% endif %}</p>
+                </div>
+                
+                <div style="text-align: center;">
+                    <div style="font-size: 1.2rem; font-weight: bold; color: #00B391;">{{ corretor.vendas }}</div>
+                    <div style="color: #666; font-size: 12px;">Vendas</div>
+                </div>
+                
+                <div style="text-align: center;">
+                    <div style="font-size: 1.2rem; font-weight: bold; color: #28a745;">R$ {{ "{:,.2f}".format(corretor.valor_vendas) }}</div>
+                    <div style="color: #666; font-size: 12px;">Valor Vendido</div>
+                </div>
+                
+                <div style="text-align: center;">
+                    <div style="font-size: 1.5rem; font-weight: bold; color: #007bff;">R$ {{ "{:,.2f}".format(corretor.comissao) }}</div>
+                    <div style="color: #666; font-size: 12px;">Comissão ({{ corretor.percentual }}%)</div>
+                </div>
+            </div>
+            
+            <!-- Barra de progresso -->
+            <div style="margin-top: 1rem;">
+                <div style="background: #e9ecef; border-radius: 4px; height: 8px;">
+                    <div style="background: linear-gradient(90deg, #00B391, #28a745); height: 100%; width: {{ (corretor.comissao / 4500 * 100)|round|int }}%; border-radius: 4px;"></div>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+
+<!-- Histórico de Pagamentos -->
+<div style="background: white; padding: 2rem; border: 1px solid #ddd; border-radius: 8px; margin-bottom: 2rem;">
+    <h3 style="margin-bottom: 1rem;">💳 Histórico de Pagamentos</h3>
+    
+    <table>
+        <thead>
+            <tr>
+                <th>Mês/Ano</th>
+                <th>Corretor</th>
+                <th>Vendas</th>
+                <th>Valor Total</th>
+                <th>% Comissão</th>
+                <th>Valor Comissão</th>
+                <th>Data Pagamento</th>
+                <th>Status</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>09/2024</td>
+                <td>Maria Silva</td>
+                <td>62</td>
+                <td>R$ 186.500,00</td>
+                <td>10%</td>
+                <td>R$ 18.650,00</td>
+                <td>15/10/2024</td>
+                <td><span style="background: #28a745; color: white; padding: 2px 8px; border-radius: 3px;">Pago</span></td>
+            </tr>
+            <tr>
+                <td>09/2024</td>
+                <td>João Santos</td>
+                <td>48</td>
+                <td>R$ 152.400,00</td>
+                <td>10%</td>
+                <td>R$ 15.240,00</td>
+                <td>15/10/2024</td>
+                <td><span style="background: #28a745; color: white; padding: 2px 8px; border-radius: 3px;">Pago</span></td>
+            </tr>
+            <tr>
+                <td>09/2024</td>
+                <td>Ana Costa</td>
+                <td>36</td>
+                <td>R$ 115.200,00</td>
+                <td>10%</td>
+                <td>R$ 11.520,00</td>
+                <td>15/10/2024</td>
+                <td><span style="background: #28a745; color: white; padding: 2px 8px; border-radius: 3px;">Pago</span></td>
+            </tr>
+            <tr>
+                <td>10/2024</td>
+                <td>Maria Silva</td>
+                <td>15</td>
+                <td>R$ 45.000,00</td>
+                <td>10%</td>
+                <td>R$ 4.500,00</td>
+                <td>-</td>
+                <td><span style="background: #ffc107; color: white; padding: 2px 8px; border-radius: 3px;">Pendente</span></td>
+            </tr>
+            <tr>
+                <td>10/2024</td>
+                <td>João Santos</td>
+                <td>12</td>
+                <td>R$ 38.000,00</td>
+                <td>10%</td>
+                <td>R$ 3.800,00</td>
+                <td>-</td>
+                <td><span style="background: #ffc107; color: white; padding: 2px 8px; border-radius: 3px;">Pendente</span></td>
+            </tr>
+            <tr>
+                <td>10/2024</td>
+                <td>Ana Costa</td>
+                <td>10</td>
+                <td>R$ 32.000,00</td>
+                <td>10%</td>
+                <td>R$ 3.200,00</td>
+                <td>-</td>
+                <td><span style="background: #ffc107; color: white; padding: 2px 8px; border-radius: 3px;">Pendente</span></td>
+            </tr>
+        </tbody>
+    </table>
+</div>
+
+<!-- Análise por Período -->
+<div style="display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; margin-bottom: 2rem;">
+    <!-- Comissões por Mês -->
+    <div style="background: white; padding: 2rem; border: 1px solid #ddd; border-radius: 8px;">
+        <h3 style="margin-bottom: 1rem;">📈 Evolução Mensal</h3>
+        <div style="height: 200px; background: #f8f9fa; border-radius: 4px; display: flex; align-items: end; padding: 1rem; gap: 1rem; justify-content: space-between;">
+            <div style="background: #00B391; width: 30px; height: 120px; border-radius: 4px 4px 0 0; position: relative;">
+                <span style="position: absolute; bottom: -25px; left: 50%; transform: translateX(-50%); font-size: 10px;">Ago</span>
+                <span style="position: absolute; top: -25px; left: 50%; transform: translateX(-50%); font-size: 10px; background: #333; color: white; padding: 2px 4px; border-radius: 2px;">R$ 42k</span>
+            </div>
+            <div style="background: #00B391; width: 30px; height: 150px; border-radius: 4px 4px 0 0; position: relative;">
+                <span style="position: absolute; bottom: -25px; left: 50%; transform: translateX(-50%); font-size: 10px;">Set</span>
+                <span style="position: absolute; top: -25px; left: 50%; transform: translateX(-50%); font-size: 10px; background: #333; color: white; padding: 2px 4px; border-radius: 2px;">R$ 45k</span>
+            </div>
+            <div style="background: #28a745; width: 30px; height: 90px; border-radius: 4px 4px 0 0; position: relative;">
+                <span style="position: absolute; bottom: -25px; left: 50%; transform: translateX(-50%); font-size: 10px;">Out</span>
+                <span style="position: absolute; top: -25px; left: 50%; transform: translateX(-50%); font-size: 10px; background: #333; color: white; padding: 2px 4px; border-radius: 2px;">R$ 49k</span>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Distribuição por Corretor -->
+    <div style="background: white; padding: 2rem; border: 1px solid #ddd; border-radius: 8px;">
+        <h3 style="margin-bottom: 1rem;">🥧 Distribuição por Corretor</h3>
+        <div style="text-align: center; padding: 2rem;">
+            <div style="width: 150px; height: 150px; border-radius: 50%; background: conic-gradient(#00B391 0deg 130deg, #007bff 130deg 220deg, #28a745 220deg 360deg); margin: 0 auto 1rem;"></div>
+            <div style="display: flex; justify-content: center; gap: 1rem; flex-wrap: wrap;">
+                <div style="display: flex; align-items: center; gap: 0.5rem;">
+                    <div style="width: 12px; height: 12px; background: #00B391; border-radius: 2px;"></div>
+                    <span style="font-size: 12px;">Maria Silva (37%)</span>
+                </div>
+                <div style="display: flex; align-items: center; gap: 0.5rem;">
+                    <div style="width: 12px; height: 12px; background: #007bff; border-radius: 2px;"></div>
+                    <span style="font-size: 12px;">João Santos (31%)</span>
+                </div>
+                <div style="display: flex; align-items: center; gap: 0.5rem;">
+                    <div style="width: 12px; height: 12px; background: #28a745; border-radius: 2px;"></div>
+                    <span style="font-size: 12px;">Ana Costa (32%)</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Configurações de Comissão -->
+<div style="background: white; padding: 2rem; border: 1px solid #ddd; border-radius: 8px;">
+    <h3 style="margin-bottom: 1rem;">⚙️ Configurações de Comissão</h3>
+    
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 2rem;">
+        <div>
+            <h4>Percentuais por Tipo de Seguro</h4>
+            <table style="width: 100%;">
+                <thead>
+                    <tr>
+                        <th style="text-align: left;">Tipo</th>
+                        <th style="text-align: right;">Comissão</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Auto</td>
+                        <td style="text-align: right;">10%</td>
+                    </tr>
+                    <tr>
+                        <td>Residencial</td>
+                        <td style="text-align: right;">12%</td>
+                    </tr>
+                    <tr>
+                        <td>Vida</td>
+                        <td style="text-align: right;">15%</td>
+                    </tr>
+                    <tr>
+                        <td>Empresarial</td>
+                        <td style="text-align: right;">8%</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        
+        <div>
+            <h4>Metas Mensais</h4>
+            <ul style="list-style: none; padding: 0;">
+                <li style="display: flex; justify-content: space-between; padding: 0.5rem 0; border-bottom: 1px solid #eee;">
+                    <span>Meta Vendas:</span>
+                    <strong>R$ 500.000</strong>
+                </li>
+                <li style="display: flex; justify-content: space-between; padding: 0.5rem 0; border-bottom: 1px solid #eee;">
+                    <span>Meta Comissões:</span>
+                    <strong>R$ 50.000</strong>
+                </li>
+                <li style="display: flex; justify-content: space-between; padding: 0.5rem 0; border-bottom: 1px solid #eee;">
+                    <span>Realizado:</span>
+                    <strong style="color: #28a745;">98%</strong>
+                </li>
+                <li style="display: flex; justify-content: space-between; padding: 0.5rem 0;">
+                    <span>Próximo Pagamento:</span>
+                    <strong>15/11/2024</strong>
+                </li>
+            </ul>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,316 @@
+{% extends 'base.html' %}
+{% block title %}Renovações de Apólices{% endblock %}
+{% block content %}
+<div class="page-header">
+    <div class="page-title">
+        <h1><i class="fas fa-sync-alt"></i> Renovações de Apólices</h1>
+        <p class="page-subtitle">Histórico completo de renovações realizadas</p>
+    </div>
+    <div class="page-actions">
+        <a href="{{ url_for('apolices_vencimento') }}" class="btn btn-warning">
+            <i class="fas fa-clock"></i> Apólices Vencendo
+        </a>
+        <a href="{{ url_for('apolices') }}" class="btn btn-secondary">
+            <i class="fas fa-file-alt"></i> Ver Apólices
+        </a>
+    </div>
+</div>
+
+<div class="stats-grid">
+    <div class="stats-card">
+        <div class="stats-icon">
+            <i class="fas fa-sync-alt"></i>
+        </div>
+        <div class="stats-content">
+            <h3>{{ renovacoes|length }}</h3>
+            <p>Total de Renovações</p>
+        </div>
+    </div>
+    
+    <div class="stats-card">
+        <div class="stats-icon">
+            <i class="fas fa-calendar-check"></i>
+        </div>
+        <div class="stats-content">
+            <h3>{{ renovacoes|selectattr('data_renovacao')|list|length if renovacoes else 0 }}</h3>
+            <p>Renovações Este Ano</p>
+        </div>
+    </div>
+    
+    <div class="stats-card">
+        <div class="stats-icon">
+            <i class="fas fa-dollar-sign"></i>
+        </div>
+        <div class="stats-content">
+            <h3>{{ "R$ {:,.2f}".format(renovacoes|sum(attribute='valor_renovada') if renovacoes else 0) }}</h3>
+            <p>Valor Renovações</p>
+        </div>
+    </div>
+    
+    <div class="stats-card">
+        <div class="stats-icon">
+            <i class="fas fa-percent"></i>
+        </div>
+        <div class="stats-content">
+            <h3>{{ "%.1f%%"|format(85.5) }}</h3>
+            <p>Taxa de Renovação</p>
+        </div>
+    </div>
+</div>
+
+<div class="table-container">
+    {% if renovacoes %}
+    <div class="table-header">
+        <h3><i class="fas fa-list"></i> Lista de Renovações</h3>
+        <div class="table-actions">
+            <input type="text" id="search-input" placeholder="Buscar renovações..." class="search-input">
+        </div>
+    </div>
+    
+    <div class="table-responsive">
+        <table class="data-table">
+            <thead>
+                <tr>
+                    <th>Data Renovação</th>
+                    <th>Cliente</th>
+                    <th>Apólice Original</th>
+                    <th>Apólice Renovada</th>
+                    <th>Seguradora</th>
+                    <th>Tipo Seguro</th>
+                    <th>Colaborador</th>
+                    <th>Valor Original</th>
+                    <th>Valor Renovada</th>
+                    <th>Variação</th>
+                    <th>Observações</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for r in renovacoes %}
+                <tr class="table-row">
+                    <td>
+                        <span class="date-badge">
+                            {{ r.data_renovacao.strftime('%d/%m/%Y') if r.data_renovacao else 'N/A' }}
+                        </span>
+                    </td>
+                    <td>
+                        <div class="client-info">
+                            <strong>{{ r.cliente_nome }}</strong>
+                        </div>
+                    </td>
+                    <td>
+                        <div class="policy-info">
+                            <strong>{{ r.apolice_original }}</strong>
+                            <small>Venceu: {{ r.vencimento_original.strftime('%d/%m/%Y') if r.vencimento_original else 'N/A' }}</small>
+                        </div>
+                    </td>
+                    <td>
+                        <div class="policy-info">
+                            <strong>{{ r.apolice_renovada }}</strong>
+                            <small>{{ r.inicio_renovada.strftime('%d/%m/%Y') if r.inicio_renovada else 'N/A' }} até {{ r.fim_renovada.strftime('%d/%m/%Y') if r.fim_renovada else 'N/A' }}</small>
+                        </div>
+                    </td>
+                    <td>{{ r.nome_seguradora }}</td>
+                    <td>
+                        <span class="type-badge">{{ r.nome_tipo_seguro }}</span>
+                    </td>
+                    <td>{{ r.nome_colaborador }}</td>
+                    <td class="text-right">
+                        <span class="currency">R$ {{ "{:,.2f}".format(r.valor_original) }}</span>
+                    </td>
+                    <td class="text-right">
+                        <span class="currency">R$ {{ "{:,.2f}".format(r.valor_renovada) }}</span>
+                    </td>
+                    <td class="text-center">
+                        {% set variacao = ((r.valor_renovada - r.valor_original) / r.valor_original * 100) if r.valor_original > 0 else 0 %}
+                        <span class="variation-badge {{ 'positive' if variacao > 0 else 'negative' if variacao < 0 else 'neutral' }}">
+                            {{ "+" if variacao > 0 else "" }}{{ "{:.1f}%".format(variacao) }}
+                        </span>
+                    </td>
+                    <td>
+                        {% if r.observacoes_renovacao %}
+                        <span class="observation-text" title="{{ r.observacoes_renovacao }}">
+                            {{ r.observacoes_renovacao[:30] }}{{ "..." if r.observacoes_renovacao|length > 30 else "" }}
+                        </span>
+                        {% else %}
+                        <span class="text-muted">-</span>
+                        {% endif %}
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% else %}
+    <div class="empty-state">
+        <div class="empty-icon">
+            <i class="fas fa-sync-alt"></i>
+        </div>
+        <h3>Nenhuma renovação encontrada</h3>
+        <p>Ainda não há renovações registradas no sistema.</p>
+        <a href="{{ url_for('apolices') }}" class="btn btn-primary">
+            <i class="fas fa-file-alt"></i> Ver Apólices
+        </a>
+    </div>
+    {% endif %}
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Sistema de busca
+    const searchInput = document.getElementById('search-input');
+    const tableRows = document.querySelectorAll('.table-row');
+    
+    if (searchInput) {
+        searchInput.addEventListener('input', function() {
+            const searchTerm = this.value.toLowerCase();
+            
+            tableRows.forEach(row => {
+                const text = row.textContent.toLowerCase();
+                if (text.includes(searchTerm)) {
+                    row.style.display = '';
+                } else {
+                    row.style.display = 'none';
+                }
+            });
+        });
+    }
+});
+</script>
+
+<style>
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 20px;
+    margin-bottom: 30px;
+}
+
+.stats-card {
+    background: #fff;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.stats-icon {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #3498db, #2980b9);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 24px;
+}
+
+.stats-content h3 {
+    margin: 0;
+    font-size: 24px;
+    font-weight: bold;
+    color: #2c3e50;
+}
+
+.stats-content p {
+    margin: 5px 0 0 0;
+    color: #7f8c8d;
+    font-size: 14px;
+}
+
+.policy-info {
+    display: flex;
+    flex-direction: column;
+}
+
+.policy-info strong {
+    color: #2c3e50;
+    margin-bottom: 2px;
+}
+
+.policy-info small {
+    color: #7f8c8d;
+    font-size: 12px;
+}
+
+.date-badge {
+    background: #3498db;
+    color: white;
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-size: 12px;
+    font-weight: 500;
+}
+
+.type-badge {
+    background: #9b59b6;
+    color: white;
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-size: 12px;
+    font-weight: 500;
+}
+
+.variation-badge {
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-size: 12px;
+    font-weight: bold;
+}
+
+.variation-badge.positive {
+    background: #d4edda;
+    color: #155724;
+}
+
+.variation-badge.negative {
+    background: #f8d7da;
+    color: #721c24;
+}
+
+.variation-badge.neutral {
+    background: #e2e3e5;
+    color: #383d41;
+}
+
+.currency {
+    font-weight: 600;
+    color: #27ae60;
+}
+
+.observation-text {
+    color: #7f8c8d;
+    font-style: italic;
+    cursor: help;
+}
+
+.text-right {
+    text-align: right;
+}
+
+.text-center {
+    text-align: center;
+}
+
+.text-muted {
+    color: #6c757d;
+    font-style: italic;
+}
+
+@media (max-width: 768px) {
+    .stats-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .table-responsive {
+        overflow-x: auto;
+    }
+    
+    .data-table {
+        min-width: 800px;
+    }
+}
+</style>
+{% endblock %}

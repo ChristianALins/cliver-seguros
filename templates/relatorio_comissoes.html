@@ -1,0 +1,489 @@
+{% extends "base.html" %}
+
+{% block title %}Relatório de Comissões - CLIVER SEGUROS{% endblock %}
+
+{% block header_title %}Comissões por Colaborador{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <div class="page-title">
+        <h1><i class="fas fa-dollar-sign"></i> Relatório de Comissões</h1>
+        <p>Análise detalhada das comissões por colaborador</p>
+    </div>
+    <div class="page-actions">
+        <a href="{{ url_for('relatorios') }}" class="btn btn-secondary">
+            <i class="fas fa-arrow-left"></i> Voltar aos Relatórios
+        </a>
+        <button onclick="window.print()" class="btn btn-primary">
+            <i class="fas fa-print"></i> Imprimir
+        </button>
+    </div>
+</div>
+
+<!-- Filtros -->
+<div class="filters-card">
+    <form method="GET" class="filters-form">
+        <div class="filter-group">
+            <label for="data_inicio">Data Início:</label>
+            <input type="date" id="data_inicio" name="data_inicio" value="{{ filtros.data_inicio }}" class="form-control">
+        </div>
+        
+        <div class="filter-group">
+            <label for="data_fim">Data Fim:</label>
+            <input type="date" id="data_fim" name="data_fim" value="{{ filtros.data_fim }}" class="form-control">
+        </div>
+        
+        <div class="filter-group">
+            <label for="colaborador_id">Colaborador:</label>
+            <select id="colaborador_id" name="colaborador_id" class="form-control">
+                <option value="">Todos os colaboradores</option>
+                {% for colaborador in colaboradores %}
+                <option value="{{ colaborador.id_colaborador }}" 
+                        {% if filtros.colaborador_id|string == colaborador.id_colaborador|string %}selected{% endif %}>
+                    {{ colaborador.nome_colaborador }}
+                </option>
+                {% endfor %}
+            </select>
+        </div>
+        
+        <div class="filter-actions">
+            <button type="submit" class="btn btn-primary">
+                <i class="fas fa-search"></i> Filtrar
+            </button>
+            <a href="{{ url_for('relatorio_comissoes') }}" class="btn btn-secondary">
+                <i class="fas fa-times"></i> Limpar
+            </a>
+        </div>
+    </form>
+</div>
+
+<!-- Estatísticas Gerais -->
+<div class="stats-summary">
+    <div class="summary-card">
+        <div class="summary-icon">
+            <i class="fas fa-users"></i>
+        </div>
+        <div class="summary-content">
+            <div class="summary-value">{{ estatisticas.total_colaboradores or 0 }}</div>
+            <div class="summary-label">Colaboradores</div>
+        </div>
+    </div>
+    
+    <div class="summary-card">
+        <div class="summary-icon">
+            <i class="fas fa-file-contract"></i>
+        </div>
+        <div class="summary-content">
+            <div class="summary-value">{{ estatisticas.total_apolices or 0 }}</div>
+            <div class="summary-label">Apólices Vendidas</div>
+        </div>
+    </div>
+    
+    <div class="summary-card">
+        <div class="summary-icon">
+            <i class="fas fa-chart-line"></i>
+        </div>
+        <div class="summary-content">
+            <div class="summary-value">R$ {{ "{:,.2f}".format(estatisticas.valor_total_vendas or 0) }}</div>
+            <div class="summary-label">Valor Total Vendas</div>
+        </div>
+    </div>
+    
+    <div class="summary-card highlight">
+        <div class="summary-icon">
+            <i class="fas fa-dollar-sign"></i>
+        </div>
+        <div class="summary-content">
+            <div class="summary-value">R$ {{ "{:,.2f}".format(estatisticas.total_comissoes or 0) }}</div>
+            <div class="summary-label">Total Comissões</div>
+        </div>
+    </div>
+</div>
+
+<!-- Tabela de Comissões -->
+<div class="report-table-container">
+    <div class="table-header">
+        <h3><i class="fas fa-table"></i> Detalhamento por Colaborador</h3>
+        <div class="table-info">
+            Mostrando {{ comissoes|length }} colaborador(es)
+        </div>
+    </div>
+    
+    <div class="table-responsive">
+        <table class="report-table">
+            <thead>
+                <tr>
+                    <th>Colaborador</th>
+                    <th>Contato</th>
+                    <th>Apólices</th>
+                    <th>Valor Total Vendas</th>
+                    <th>% Médio</th>
+                    <th>Comissão Total</th>
+                    <th>Primeira Venda</th>
+                    <th>Última Venda</th>
+                    <th>Performance</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for comissao in comissoes %}
+                <tr>
+                    <td>
+                        <div class="colaborador-info">
+                            <div class="colaborador-avatar">
+                                {{ comissao.nome_colaborador[:2].upper() }}
+                            </div>
+                            <div class="colaborador-details">
+                                <div class="colaborador-name">{{ comissao.nome_colaborador }}</div>
+                                <div class="colaborador-id">ID: {{ comissao.id_colaborador }}</div>
+                            </div>
+                        </div>
+                    </td>
+                    <td>
+                        <div class="contact-info">
+                            {% if comissao.email_colaborador %}
+                                <div><i class="fas fa-envelope"></i> {{ comissao.email_colaborador }}</div>
+                            {% endif %}
+                        </div>
+                    </td>
+                    <td>
+                        <div class="metric-value">
+                            <span class="number">{{ comissao.total_apolices or 0 }}</span>
+                            <span class="label">apólices</span>
+                        </div>
+                    </td>
+                    <td>
+                        <div class="currency-value">
+                            R$ {{ "{:,.2f}".format(comissao.valor_total_premios or 0) }}
+                        </div>
+                    </td>
+                    <td>
+                        <div class="percentage-value">
+                            {{ "{:.1f}".format(comissao.percentual_medio or 0) }}%
+                        </div>
+                    </td>
+                    <td>
+                        <div class="commission-value highlight">
+                            R$ {{ "{:,.2f}".format(comissao.comissao_total or 0) }}
+                        </div>
+                    </td>
+                    <td>
+                        <div class="date-value">
+                            {% if comissao.primeira_venda %}
+                                {{ comissao.primeira_venda.strftime('%d/%m/%Y') }}
+                            {% else %}
+                                <span class="text-muted">-</span>
+                            {% endif %}
+                        </div>
+                    </td>
+                    <td>
+                        <div class="date-value">
+                            {% if comissao.ultima_venda %}
+                                {{ comissao.ultima_venda.strftime('%d/%m/%Y') }}
+                            {% else %}
+                                <span class="text-muted">-</span>
+                            {% endif %}
+                        </div>
+                    </td>
+                    <td>
+                        {% set performance_score = (comissao.comissao_total or 0) / (estatisticas.total_comissoes or 1) * 100 %}
+                        <div class="performance-badge 
+                            {% if performance_score >= 20 %}excellent
+                            {% elif performance_score >= 10 %}good
+                            {% elif performance_score >= 5 %}average
+                            {% else %}low{% endif %}">
+                            {% if performance_score >= 20 %}
+                                <i class="fas fa-star"></i> Excelente
+                            {% elif performance_score >= 10 %}
+                                <i class="fas fa-thumbs-up"></i> Bom
+                            {% elif performance_score >= 5 %}
+                                <i class="fas fa-minus"></i> Regular
+                            {% else %}
+                                <i class="fas fa-arrow-up"></i> Potencial
+                            {% endif %}
+                        </div>
+                    </td>
+                </tr>
+                {% else %}
+                <tr class="empty-state">
+                    <td colspan="9">
+                        <div class="empty-message">
+                            <i class="fas fa-search"></i>
+                            <h4>Nenhum resultado encontrado</h4>
+                            <p>Tente ajustar os filtros para ver os dados de comissão.</p>
+                        </div>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<style>
+.filters-card {
+    background: var(--white);
+    padding: 2rem;
+    border-radius: var(--radius-xl);
+    box-shadow: var(--shadow-md);
+    border: 1px solid var(--gray-200);
+    margin-bottom: 2rem;
+}
+
+.filters-form {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1rem;
+    align-items: end;
+}
+
+.filter-group label {
+    display: block;
+    font-weight: 500;
+    color: var(--gray-700);
+    margin-bottom: 0.5rem;
+    font-size: 0.875rem;
+}
+
+.filter-actions {
+    display: flex;
+    gap: 0.5rem;
+}
+
+.stats-summary {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1.5rem;
+    margin-bottom: 2rem;
+}
+
+.summary-card {
+    background: var(--white);
+    padding: 1.5rem;
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-sm);
+    border: 1px solid var(--gray-200);
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.summary-card.highlight {
+    border-left: 4px solid var(--primary-color);
+    background: linear-gradient(135deg, var(--white) 0%, #f8faff 100%);
+}
+
+.summary-icon {
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 1.25rem;
+}
+
+.summary-value {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--gray-900);
+}
+
+.summary-label {
+    font-size: 0.875rem;
+    color: var(--gray-600);
+    margin-top: 0.25rem;
+}
+
+.report-table-container {
+    background: var(--white);
+    border-radius: var(--radius-xl);
+    box-shadow: var(--shadow-md);
+    border: 1px solid var(--gray-200);
+    overflow: hidden;
+}
+
+.table-header {
+    padding: 1.5rem 2rem;
+    border-bottom: 1px solid var(--gray-200);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: var(--gray-50);
+}
+
+.table-header h3 {
+    margin: 0;
+    color: var(--gray-900);
+    font-size: 1.125rem;
+}
+
+.table-info {
+    font-size: 0.875rem;
+    color: var(--gray-600);
+}
+
+.report-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.report-table th {
+    background: var(--gray-50);
+    padding: 1rem;
+    text-align: left;
+    font-weight: 600;
+    color: var(--gray-900);
+    font-size: 0.875rem;
+    border-bottom: 1px solid var(--gray-200);
+}
+
+.report-table td {
+    padding: 1rem;
+    border-bottom: 1px solid var(--gray-200);
+    vertical-align: middle;
+}
+
+.report-table tbody tr:hover {
+    background: var(--gray-50);
+}
+
+.colaborador-info {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+.colaborador-avatar {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: var(--primary-color);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-weight: 600;
+    font-size: 0.875rem;
+}
+
+.colaborador-name {
+    font-weight: 500;
+    color: var(--gray-900);
+}
+
+.colaborador-id {
+    font-size: 0.75rem;
+    color: var(--gray-500);
+}
+
+.contact-info {
+    font-size: 0.875rem;
+    color: var(--gray-600);
+}
+
+.contact-info i {
+    width: 16px;
+    color: var(--gray-400);
+}
+
+.metric-value .number {
+    font-weight: 600;
+    color: var(--gray-900);
+}
+
+.metric-value .label {
+    font-size: 0.75rem;
+    color: var(--gray-500);
+    margin-left: 0.25rem;
+}
+
+.currency-value {
+    font-weight: 600;
+    color: var(--success-color);
+}
+
+.percentage-value {
+    font-weight: 500;
+    color: var(--primary-color);
+}
+
+.commission-value.highlight {
+    font-weight: 700;
+    font-size: 1.125rem;
+    color: var(--primary-color);
+}
+
+.date-value {
+    font-size: 0.875rem;
+    color: var(--gray-700);
+}
+
+.performance-badge {
+    padding: 0.25rem 0.75rem;
+    border-radius: 1rem;
+    font-size: 0.75rem;
+    font-weight: 500;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.25rem;
+}
+
+.performance-badge.excellent {
+    background: #dcfce7;
+    color: #166534;
+}
+
+.performance-badge.good {
+    background: #dbeafe;
+    color: #1e40af;
+}
+
+.performance-badge.average {
+    background: #fef3c7;
+    color: #92400e;
+}
+
+.performance-badge.low {
+    background: #fef2f2;
+    color: #991b1b;
+}
+
+.empty-message {
+    text-align: center;
+    padding: 3rem;
+    color: var(--gray-600);
+}
+
+.empty-message i {
+    font-size: 3rem;
+    color: var(--gray-300);
+    margin-bottom: 1rem;
+}
+
+@media print {
+    .page-actions, .filters-card {
+        display: none;
+    }
+}
+
+@media (max-width: 768px) {
+    .filters-form {
+        grid-template-columns: 1fr;
+    }
+    
+    .stats-summary {
+        grid-template-columns: 1fr;
+    }
+    
+    .table-responsive {
+        overflow-x: auto;
+    }
+    
+    .report-table {
+        min-width: 1000px;
+    }
+}
+</style>
+{% endblock %}

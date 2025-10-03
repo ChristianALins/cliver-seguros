@@ -1,0 +1,15 @@
+{% extends 'base.html' %}
+{% block title %}Dashboard Banco de Dados{% endblock %}
+{% block content %}
+<h2>Dashboard do Banco de Dados</h2>
+<ul>
+    <li><a href="{{ url_for('clientes') }}">Clientes</a></li>
+    <li><a href="{{ url_for('colaboradores') }}">Colaboradores</a></li>
+    <li><a href="{{ url_for('seguradoras') }}">Seguradoras</a></li>
+    <li><a href="{{ url_for('tipos_seguro') }}">Tipos de Seguro</a></li>
+    <li><a href="{{ url_for('apolices') }}">Apólices</a></li>
+    <li><a href="{{ url_for('sinistros') }}">Sinistros</a></li>
+    <li><a href="{{ url_for('renovacoes') }}">Renovações de Apólices</a></li>
+    <li><a href="{{ url_for('tarefas') }}">Tarefas</a></li>
+</ul>
+{% endblock %}

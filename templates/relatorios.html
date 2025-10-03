@@ -1,0 +1,236 @@
+{% extends "base.html" %}
+
+{% block title %}Relatórios - CLIVER SEGUROS{% endblock %}
+
+{% block header_title %}Relatórios{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <div class="page-title">
+        <h1><i class="fas fa-chart-bar"></i> Central de Relatórios</h1>
+        <p>Análises detalhadas e insights do seu negócio</p>
+    </div>
+</div>
+
+<div class="reports-grid">
+    <!-- Relatório de Comissões -->
+    <div class="report-card">
+        <div class="report-icon">
+            <i class="fas fa-dollar-sign"></i>
+        </div>
+        <div class="report-content">
+            <h3>Comissões por Colaborador</h3>
+            <p>Análise detalhada das comissões ganhas por cada colaborador em períodos específicos</p>
+            <ul class="report-features">
+                <li><i class="fas fa-check"></i> Filtros por período</li>
+                <li><i class="fas fa-check"></i> Comissões individuais</li>
+                <li><i class="fas fa-check"></i> Estatísticas gerais</li>
+                <li><i class="fas fa-check"></i> Ranking de performance</li>
+            </ul>
+        </div>
+        <div class="report-actions">
+            <a href="{{ url_for('relatorio_comissoes') }}" class="btn btn-primary">
+                <i class="fas fa-eye"></i> Visualizar Relatório
+            </a>
+        </div>
+    </div>
+
+    <!-- Relatório de Vendas por Período -->
+    <div class="report-card">
+        <div class="report-icon">
+            <i class="fas fa-chart-line"></i>
+        </div>
+        <div class="report-content">
+            <h3>Vendas por Período</h3>
+            <p>Análise temporal das vendas com métricas de crescimento e sazonalidade</p>
+            <ul class="report-features">
+                <li><i class="fas fa-check"></i> Últimos 12 meses</li>
+                <li><i class="fas fa-check"></i> Top colaboradores</li>
+                <li><i class="fas fa-check"></i> Tipos mais vendidos</li>
+                <li><i class="fas fa-check"></i> Ticket médio</li>
+            </ul>
+        </div>
+        <div class="report-actions">
+            <a href="{{ url_for('relatorio_vendas_periodo') }}" class="btn btn-primary">
+                <i class="fas fa-eye"></i> Visualizar Relatório
+            </a>
+        </div>
+    </div>
+
+    <!-- Relatório de Performance Detalhada -->
+    <div class="report-card">
+        <div class="report-icon">
+            <i class="fas fa-trophy"></i>
+        </div>
+        <div class="report-content">
+            <h3>Performance Detalhada</h3>
+            <p>Métricas avançadas de performance individual e análise de renovações</p>
+            <ul class="report-features">
+                <li><i class="fas fa-check"></i> Métricas individuais</li>
+                <li><i class="fas fa-check"></i> Taxa de renovação</li>
+                <li><i class="fas fa-check"></i> Vendas por mês</li>
+                <li><i class="fas fa-check"></i> Histórico completo</li>
+            </ul>
+        </div>
+        <div class="report-actions">
+            <a href="{{ url_for('relatorio_performance_detalhada') }}" class="btn btn-primary">
+                <i class="fas fa-eye"></i> Visualizar Relatório
+            </a>
+        </div>
+    </div>
+
+    <!-- Card de Estatísticas Gerais -->
+    <div class="report-card highlight">
+        <div class="report-icon">
+            <i class="fas fa-chart-pie"></i>
+        </div>
+        <div class="report-content">
+            <h3>Dashboard Executivo</h3>
+            <p>Visão geral dos principais KPIs e métricas do negócio</p>
+            <div class="quick-stats">
+                <div class="quick-stat">
+                    <div class="stat-value">{{ total_colaboradores or 0 }}</div>
+                    <div class="stat-label">Colaboradores</div>
+                </div>
+                <div class="quick-stat">
+                    <div class="stat-value">{{ total_apolices or 0 }}</div>
+                    <div class="stat-label">Apólices</div>
+                </div>
+                <div class="quick-stat">
+                    <div class="stat-value">R$ {{ "{:,.0f}".format(valor_total or 0) }}</div>
+                    <div class="stat-label">Faturamento</div>
+                </div>
+            </div>
+        </div>
+        <div class="report-actions">
+            <a href="{{ url_for('dashboard') }}" class="btn btn-secondary">
+                <i class="fas fa-tachometer-alt"></i> Ir ao Dashboard
+            </a>
+        </div>
+    </div>
+</div>
+
+<style>
+.reports-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+    gap: 2rem;
+    margin-top: 2rem;
+}
+
+.report-card {
+    background: var(--white);
+    border-radius: var(--radius-xl);
+    box-shadow: var(--shadow-md);
+    border: 1px solid var(--gray-200);
+    overflow: hidden;
+    transition: all 0.3s ease;
+    display: flex;
+    flex-direction: column;
+}
+
+.report-card:hover {
+    transform: translateY(-4px);
+    box-shadow: var(--shadow-lg);
+}
+
+.report-card.highlight {
+    border: 2px solid var(--primary-color);
+    background: linear-gradient(135deg, var(--white) 0%, #f8faff 100%);
+}
+
+.report-icon {
+    padding: 2rem 2rem 1rem;
+    text-align: center;
+}
+
+.report-icon i {
+    font-size: 3rem;
+    color: var(--primary-color);
+}
+
+.report-content {
+    padding: 0 2rem 1.5rem;
+    flex-grow: 1;
+}
+
+.report-content h3 {
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: var(--gray-900);
+    margin-bottom: 0.5rem;
+}
+
+.report-content p {
+    color: var(--gray-600);
+    font-size: 0.875rem;
+    line-height: 1.5;
+    margin-bottom: 1rem;
+}
+
+.report-features {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.report-features li {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.25rem 0;
+    font-size: 0.875rem;
+    color: var(--gray-700);
+}
+
+.report-features i {
+    color: var(--success-color);
+    font-size: 0.75rem;
+}
+
+.report-actions {
+    padding: 1.5rem 2rem;
+    border-top: 1px solid var(--gray-200);
+    background: var(--gray-50);
+}
+
+.quick-stats {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1rem;
+    margin-top: 1rem;
+}
+
+.quick-stat {
+    text-align: center;
+    padding: 1rem;
+    background: var(--white);
+    border-radius: var(--radius-lg);
+    border: 1px solid var(--gray-200);
+}
+
+.stat-value {
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: var(--primary-color);
+}
+
+.stat-label {
+    font-size: 0.75rem;
+    color: var(--gray-600);
+    margin-top: 0.25rem;
+}
+
+@media (max-width: 768px) {
+    .reports-grid {
+        grid-template-columns: 1fr;
+        gap: 1rem;
+    }
+    
+    .quick-stats {
+        grid-template-columns: 1fr;
+        gap: 0.5rem;
+    }
+}
+</style>
+{% endblock %}

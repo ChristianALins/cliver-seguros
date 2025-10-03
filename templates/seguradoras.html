@@ -1,0 +1,21 @@
+{% extends 'base.html' %}
+{% block title %}Seguradoras{% endblock %}
+{% block content %}
+<h2>Seguradoras</h2>
+<a href="{{ url_for('nova_seguradora') }}">Nova Seguradora</a>
+<table border="1" width="100%" style="margin-top:20px;">
+    <tr>
+        <th>ID</th><th>Nome</th><th>CNPJ</th><th>Contato</th><th>Email</th><th>Ações</th>
+    </tr>
+    {% for s in seguradoras %}
+    <tr>
+        <td>{{ s.id_seguradora }}</td>
+        <td>{{ s.nome_seguradora }}</td>
+        <td>{{ s.cnpj_seguradora }}</td>
+        <td>{{ s.contato_seguradora }}</td>
+        <td>{{ s.email_seguradora }}</td>
+        <td><a href="{{ url_for('editar_seguradora', id=s.id_seguradora) }}">Editar</a></td>
+    </tr>
+    {% endfor %}
+</table>
+{% endblock %}

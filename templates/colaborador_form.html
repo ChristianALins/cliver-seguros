@@ -1,0 +1,18 @@
+{% extends 'base.html' %}
+{% block title %}{{ 'Editar' if colaborador else 'Novo' }} Colaborador{% endblock %}
+{% block content %}
+<h2>{{ 'Editar' if colaborador else 'Novo' }} Colaborador</h2>
+<form method="post">
+    <input type="text" name="nome_colaborador" placeholder="Nome" value="{{ colaborador.nome_colaborador if colaborador else '' }}" required><br>
+    <input type="email" name="email_colaborador" placeholder="Email" value="{{ colaborador.email_colaborador if colaborador else '' }}" required><br>
+    <input type="password" name="senha" placeholder="Senha" {% if not colaborador %}required{% endif %}><br>
+    <input type="text" name="cargo" placeholder="Cargo" value="{{ colaborador.cargo if colaborador else '' }}"><br>
+    <input type="date" name="data_contratacao" value="{{ colaborador.data_contratacao if colaborador else '' }}"><br>
+    <select name="status">
+        <option value="Ativo" {% if colaborador and colaborador.status=='Ativo' %}selected{% endif %}>Ativo</option>
+        <option value="Inativo" {% if colaborador and colaborador.status=='Inativo' %}selected{% endif %}>Inativo</option>
+    </select><br>
+    <button type="submit">Salvar</button>
+</form>
+<a href="{{ url_for('colaboradores') }}">Voltar</a>
+{% endblock %}

@@ -1,0 +1,22 @@
+{% extends 'base.html' %}
+{% block title %}{{ 'Editar' if cliente else 'Novo' }} Cliente{% endblock %}
+{% block content %}
+<h2>{{ 'Editar' if cliente else 'Novo' }} Cliente</h2>
+<form method="post">
+    <input type="text" name="nome" placeholder="Nome" value="{{ cliente.nome if cliente else '' }}" required><br>
+    <select name="tipo_pessoa" required>
+        <option value="Fisica" {% if cliente and cliente.tipo_pessoa=='Fisica' %}selected{% endif %}>Física</option>
+        <option value="Juridica" {% if cliente and cliente.tipo_pessoa=='Juridica' %}selected{% endif %}>Jurídica</option>
+    </select><br>
+    <input type="text" name="documento" placeholder="CPF/CNPJ" value="{{ cliente.documento if cliente else '' }}" required><br>
+    <input type="date" name="data_nascimento" value="{{ cliente.data_nascimento if cliente else '' }}"><br>
+    <input type="email" name="email" placeholder="Email" value="{{ cliente.email if cliente else '' }}"><br>
+    <input type="text" name="telefone" placeholder="Telefone" value="{{ cliente.telefone if cliente else '' }}"><br>
+    <input type="text" name="endereco" placeholder="Endereço" value="{{ cliente.endereco if cliente else '' }}"><br>
+    <input type="text" name="cidade" placeholder="Cidade" value="{{ cliente.cidade if cliente else '' }}"><br>
+    <input type="text" name="estado" placeholder="Estado" value="{{ cliente.estado if cliente else '' }}"><br>
+    <input type="text" name="cep" placeholder="CEP" value="{{ cliente.cep if cliente else '' }}"><br>
+    <button type="submit">Salvar</button>
+</form>
+<a href="{{ url_for('clientes') }}">Voltar</a>
+{% endblock %}
