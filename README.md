@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 # 🏢 Sistema de Gestão para Corretora de Seguros
 
 ![Python](https://img.shields.io/badge/python-v3.11+-blue.svg)
@@ -294,3 +295,7 @@ Este projeto está licenciado sob a Licença MIT - veja o arquivo [LICENSE](LICE
 **Desenvolvido com ❤️ para modernizar a gestão de corretoras de seguros**
 
 ![Footer](https://via.placeholder.com/800x100/f8f9fa/6c757d?text=Sistema+de+Gestão+para+Corretoras+de+Seguros)
+=======
+# cliver-seguros
+Sistema de Gestão para Corretora de Seguros - Cliver Seguros v1.2
+>>>>>>> eb06adb4c9518d0f4fa88fba38d0801bf203e043
