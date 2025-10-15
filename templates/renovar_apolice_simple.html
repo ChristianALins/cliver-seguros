@@ -1,0 +1,201 @@
+{% extends "base_simple.html" %}
+
+{% block title %}Renovar Apólice - Cliver Seguros{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row">
+        <!-- Sidebar -->
+        <nav class="col-md-2 d-none d-md-block bg-primary sidebar">
+            <div class="sidebar-sticky pt-3">
+                <ul class="nav flex-column">
+                    <li class="nav-item">
+                        <a class="nav-link text-white" href="{{ url_for('dashboard') }}">
+                            <i class="fas fa-tachometer-alt me-2"></i>Dashboard
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link text-white" href="{{ url_for('listar_apolices') }}">
+                            <i class="fas fa-file-contract me-2"></i>Voltar às Apólices
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </nav>
+
+        <!-- Main content -->
+        <main role="main" class="col-md-10 ml-sm-auto px-4">
+            <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+                <h1 class="h2 text-primary">
+                    <i class="fas fa-redo me-2"></i>Renovar Apólice
+                </h1>
+            </div>
+
+            <!-- Informações da Apólice Original -->
+            <div class="card mb-4">
+                <div class="card-header bg-info text-white">
+                    <h5 class="mb-0">
+                        <i class="fas fa-info-circle me-2"></i>Informações da Apólice Atual
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <p><strong>Número:</strong> {{ apolice.numero_apolice }}</p>
+                            <p><strong>Cliente:</strong> {{ apolice.cliente_nome }}</p>
+                            <p><strong>Seguradora:</strong> {{ apolice.seguradora_nome }}</p>
+                            <p><strong>Tipo de Seguro:</strong> {{ apolice.tipo_seguro_nome }}</p>
+                        </div>
+                        <div class="col-md-6">
+                            <p><strong>Vigência Atual:</strong> {{ apolice.data_inicio }} a {{ apolice.data_vencimento }}</p>
+                            <p><strong>Valor Atual:</strong> R$ {{ "%.2f"|format(apolice.valor_premio) }}</p>
+                            <p><strong>Status:</strong> <span class="badge bg-{{ 'success' if apolice.status == 'ativa' else 'warning' }}">{{ apolice.status }}</span></p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Formulário de Renovação -->
+            <div class="card">
+                <div class="card-header bg-success text-white">
+                    <h5 class="mb-0">
+                        <i class="fas fa-edit me-2"></i>Dados da Renovação
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <form method="POST">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group mb-3">
+                                    <label for="novo_valor_premio" class="form-label">
+                                        <strong>Novo Valor do Prêmio</strong>
+                                    </label>
+                                    <div class="input-group">
+                                        <span class="input-group-text">R$</span>
+                                        <input type="number" step="0.01" class="form-control" 
+                                               id="novo_valor_premio" name="novo_valor_premio" 
+                                               value="{{ apolice.valor_premio }}" required>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-md-3">
+                                <div class="form-group mb-3">
+                                    <label for="percentual_comissao_corretora" class="form-label">
+                                        <strong>Comissão Corretora (%)</strong>
+                                    </label>
+                                    <input type="number" step="0.01" class="form-control" 
+                                           id="percentual_comissao_corretora" name="percentual_comissao_corretora" 
+                                           value="{{ apolice.percentual_comissao_corretora }}" required>
+                                </div>
+                            </div>
+
+                            <div class="col-md-3">
+                                <div class="form-group mb-3">
+                                    <label for="percentual_comissao_colaborador" class="form-label">
+                                        <strong>Comissão Colaborador (%)</strong>
+                                    </label>
+                                    <input type="number" step="0.01" class="form-control" 
+                                           id="percentual_comissao_colaborador" name="percentual_comissao_colaborador" 
+                                           value="{{ apolice.percentual_comissao_colaborador }}" required>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group mb-3">
+                                    <label for="nova_data_inicio" class="form-label">
+                                        <strong>Nova Data de Início</strong>
+                                    </label>
+                                    <input type="date" class="form-control" id="nova_data_inicio" 
+                                           name="nova_data_inicio" required>
+                                </div>
+                            </div>
+
+                            <div class="col-md-6">
+                                <div class="form-group mb-3">
+                                    <label for="nova_data_vencimento" class="form-label">
+                                        <strong>Nova Data de Vencimento</strong>
+                                    </label>
+                                    <input type="date" class="form-control" id="nova_data_vencimento" 
+                                           name="nova_data_vencimento" required>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="form-group mb-3">
+                            <label for="observacoes_renovacao" class="form-label">
+                                <strong>Observações da Renovação</strong>
+                            </label>
+                            <textarea class="form-control" id="observacoes_renovacao" 
+                                      name="observacoes_renovacao" rows="3" 
+                                      placeholder="Informações adicionais sobre a renovação..."></textarea>
+                        </div>
+
+                        <!-- Preview das Comissões -->
+                        <div class="alert alert-info">
+                            <h6><i class="fas fa-calculator me-2"></i>Preview das Comissões:</h6>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <p class="mb-1"><strong>Comissão Corretora:</strong> <span id="preview_comissao_corretora">R$ 0,00</span></p>
+                                </div>
+                                <div class="col-md-6">
+                                    <p class="mb-1"><strong>Comissão Colaborador:</strong> <span id="preview_comissao_colaborador">R$ 0,00</span></p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-12">
+                                <button type="submit" class="btn btn-success btn-lg">
+                                    <i class="fas fa-check me-2"></i>Confirmar Renovação
+                                </button>
+                                <a href="{{ url_for('listar_apolices') }}" class="btn btn-secondary btn-lg ms-2">
+                                    <i class="fas fa-times me-2"></i>Cancelar
+                                </a>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </main>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Calcular preview das comissões em tempo real
+    function calcularPreviewComissoes() {
+        const valor = parseFloat(document.getElementById('novo_valor_premio').value) || 0;
+        const percCorretora = parseFloat(document.getElementById('percentual_comissao_corretora').value) || 0;
+        const percColaborador = parseFloat(document.getElementById('percentual_comissao_colaborador').value) || 0;
+        
+        const comissaoCorretora = (valor * percCorretora) / 100;
+        const comissaoColaborador = (valor * percColaborador) / 100;
+        
+        document.getElementById('preview_comissao_corretora').textContent = 
+            'R$ ' + comissaoCorretora.toLocaleString('pt-BR', {minimumFractionDigits: 2});
+        document.getElementById('preview_comissao_colaborador').textContent = 
+            'R$ ' + comissaoColaborador.toLocaleString('pt-BR', {minimumFractionDigits: 2});
+    }
+    
+    // Adicionar listeners aos campos
+    document.getElementById('novo_valor_premio').addEventListener('input', calcularPreviewComissoes);
+    document.getElementById('percentual_comissao_corretora').addEventListener('input', calcularPreviewComissoes);
+    document.getElementById('percentual_comissao_colaborador').addEventListener('input', calcularPreviewComissoes);
+    
+    // Calcular inicial
+    calcularPreviewComissoes();
+    
+    // Definir data de início como hoje por padrão
+    const hoje = new Date().toISOString().split('T')[0];
+    document.getElementById('nova_data_inicio').value = hoje;
+    
+    // Definir data de vencimento como 1 ano a partir de hoje
+    const proximoAno = new Date();
+    proximoAno.setFullYear(proximoAno.getFullYear() + 1);
+    document.getElementById('nova_data_vencimento').value = proximoAno.toISOString().split('T')[0];
+});
+</script>
+{% endblock %}

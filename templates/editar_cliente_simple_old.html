@@ -1,0 +1,143 @@
+{% extends "base_simple.html" %}
+
+{% block title %}Editar Cliente{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h2><i class="fas fa-user-edit"></i> Editar Cliente</h2>
+    <a href="{{ url_for('clientes_simple') }}" class="btn btn-secondary">
+        <i class="fas fa-arrow-left"></i> Voltar
+    </a>
+</div>
+
+<div class="form-container">
+    <form method="POST" class="cliente-form">
+        <div class="row">
+            <div class="col-md-6">
+                <div class="form-group">
+                    <label for="nome">Nome Completo *</label>
+                    <input type="text" id="nome" name="nome" value="{{ cliente.nome }}" required>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="form-group">
+                    <label for="cpf">CPF *</label>
+                    <input type="text" id="cpf" name="cpf" value="{{ cliente.cpf }}" required>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-6">
+                <div class="form-group">
+                    <label for="email">E-mail</label>
+                    <input type="email" id="email" name="email" value="{{ cliente.email }}">
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="form-group">
+                    <label for="telefone">Telefone</label>
+                    <input type="text" id="telefone" name="telefone" value="{{ cliente.telefone }}">
+                </div>
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label for="endereco">Endereço Completo</label>
+            <textarea id="endereco" name="endereco" rows="3">{{ cliente.endereco }}</textarea>
+        </div>
+
+        <div class="form-group">
+            <label for="data_nascimento">Data de Nascimento</label>
+            <input type="date" id="data_nascimento" name="data_nascimento" value="{{ cliente.data_nascimento }}">
+        </div>
+
+        <div class="form-actions">
+            <button type="submit" class="btn btn-primary">
+                <i class="fas fa-save"></i> Salvar Alterações
+            </button>
+            <a href="{{ url_for('listar_clientes') }}" class="btn btn-secondary">
+                <i class="fas fa-times"></i> Cancelar
+            </a>
+        </div>
+    </form>
+</div>
+
+<style>
+.cliente-form {
+    background: white;
+    padding: 2rem;
+    border-radius: 8px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+}
+
+.form-group {
+    margin-bottom: 1.5rem;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 0.5rem;
+    font-weight: 600;
+    color: #333;
+}
+
+.form-group input,
+.form-group textarea {
+    width: 100%;
+    padding: 0.75rem;
+    border: 2px solid #ddd;
+    border-radius: 5px;
+    font-size: 1rem;
+}
+
+.form-group input:focus,
+.form-group textarea:focus {
+    outline: none;
+    border-color: #00B391;
+}
+
+.row {
+    display: flex;
+    gap: 1rem;
+}
+
+.col-md-6 {
+    flex: 1;
+}
+
+.form-actions {
+    display: flex;
+    gap: 1rem;
+    margin-top: 2rem;
+    padding-top: 2rem;
+    border-top: 1px solid #eee;
+}
+
+.btn {
+    padding: 0.75rem 1.5rem;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 1rem;
+}
+
+.btn-primary {
+    background: #00B391;
+    color: white;
+}
+
+.btn-secondary {
+    background: #6c757d;
+    color: white;
+}
+
+.btn:hover {
+    opacity: 0.9;
+}
+</style>
+{% endblock %}

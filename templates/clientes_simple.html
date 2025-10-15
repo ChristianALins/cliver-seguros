@@ -10,8 +10,32 @@
 
 <div style="background: #f8f9fa; padding: 1rem; border-radius: 4px; margin-bottom: 2rem;">
     <p><strong>Total de Clientes:</strong> {{ clientes|length }}</p>
-    <p>Gerencie todos os clientes cadastrados no sistema.</p>
+    <p>Gerencie todos os clientes cadastrados no sistema. Use os filtros para buscar clientes específicos.</p>
 </div>
+
+<!-- Filtros de Busca -->
+<form method="GET" style="background: #fff; padding: 1rem; border: 1px solid #ddd; border-radius: 4px; margin-bottom: 2rem;">
+    <div style="display: grid; grid-template-columns: 2fr 1fr 1fr auto; gap: 1rem; align-items: end;">
+        <div>
+            <label for="busca">Buscar Cliente:</label>
+            <input type="text" id="busca" name="busca" value="{{ busca or '' }}" placeholder="Nome, CPF/CNPJ, email, telefone...">
+        </div>
+        <div>
+            <label for="tipo_pessoa">Tipo:</label>
+            <select id="tipo_pessoa" name="tipo_pessoa">
+                <option value="">Todos</option>
+                <option value="PF" {% if tipo_pessoa == 'PF' %}selected{% endif %}>Pessoa Física</option>
+                <option value="PJ" {% if tipo_pessoa == 'PJ' %}selected{% endif %}>Pessoa Jurídica</option>
+            </select>
+        </div>
+        <div>
+            <button type="submit" class="btn">Buscar</button>
+        </div>
+        <div>
+            <a href="{{ url_for('listar_clientes') }}" class="btn btn-secondary">Limpar</a>
+        </div>
+    </div>
+</form>
 
 <h3>Lista de Clientes:</h3>
 <div style="margin-bottom: 1rem;">
@@ -26,9 +50,11 @@
             <tr>
                 <th>ID</th>
                 <th>Nome</th>
-                <th>CPF</th>
+                <th>Tipo</th>
+                <th>CPF/CNPJ</th>
                 <th>Email</th>
                 <th>Telefone</th>
+                <th>Cidade</th>
                 <th>Status</th>
                 <th>Ações</th>
             </tr>
@@ -38,9 +64,15 @@
             <tr>
                 <td>{{ cliente.id }}</td>
                 <td>{{ cliente.nome }}</td>
-                <td>{{ cliente.cpf }}</td>
+                <td>
+                    <span class="badge {% if cliente.tipo_pessoa == 'PJ' %}badge-info{% else %}badge-success{% endif %}">
+                        {{ cliente.tipo_pessoa or 'PF' }}
+                    </span>
+                </td>
+                <td>{{ cliente.cpf_cnpj or cliente.cpf or 'N/A' }}</td>
                 <td>{{ cliente.email or 'N/A' }}</td>
-                <td>{{ cliente.telefone or 'N/A' }}</td>
+                <td>{{ cliente.celular or cliente.telefone or 'N/A' }}</td>
+                <td>{{ cliente.cidade or 'N/A' }}</td>
                 <td>
                     <span class="status-badge status-{{ cliente.status }}">
                         {{ cliente.status.title() }}

@@ -1,0 +1,6 @@
+# CLIVER Seguros - Sistema SQL Server
+# Dependências necessárias para executar o sistema
+
+Flask>=2.3.0
+pyodbc>=4.0.39
+Werkzeug>=2.3.0

@@ -1,0 +1,322 @@
+{% extends "base_simple.html" %}
+
+{% block title %}Relatório de Comissões - Cliver Seguros{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row">
+        <!-- Sidebar -->
+        <nav class="col-md-2 d-none d-md-block bg-primary sidebar">
+            <div class="sidebar-sticky pt-3">
+                <ul class="nav flex-column">
+                    <li class="nav-item">
+                        <a class="nav-link text-white" href="{{ url_for('dashboard') }}">
+                            <i class="fas fa-tachometer-alt me-2"></i>Dashboard
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link text-white" href="{{ url_for('listar_apolices') }}">
+                            <i class="fas fa-file-contract me-2"></i>Apólices
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </nav>
+
+        <!-- Main content -->
+        <main role="main" class="col-md-10 ml-sm-auto px-4">
+            <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+                <h1 class="h2 text-primary">
+                    <i class="fas fa-calculator me-2"></i>Relatório de Comissões
+                </h1>
+                <div class="btn-toolbar mb-2 mb-md-0">
+                    <button class="btn btn-success" onclick="exportarRelatorio()">
+                        <i class="fas fa-download me-2"></i>Exportar
+                    </button>
+                </div>
+            </div>
+
+            <!-- Filtros -->
+            <div class="card mb-4">
+                <div class="card-header bg-secondary text-white">
+                    <h6 class="mb-0">
+                        <i class="fas fa-filter me-2"></i>Filtros
+                    </h6>
+                </div>
+                <div class="card-body">
+                    <form method="GET" class="row g-3">
+                        <div class="col-md-4">
+                            <label class="form-label">Colaborador</label>
+                            <select name="colaborador_id" class="form-select">
+                                <option value="">Todos os colaboradores</option>
+                                {% for colaborador in colaboradores %}
+                                <option value="{{ colaborador.id_colaborador }}" 
+                                        {{ 'selected' if colaborador_id == colaborador.id_colaborador|string }}>
+                                    {{ colaborador.nome_colaborador }}
+                                </option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label">Período</label>
+                            <select name="periodo" class="form-select">
+                                <option value="mes_atual" {{ 'selected' if periodo == 'mes_atual' }}>Mês Atual</option>
+                                <option value="trimestre" {{ 'selected' if periodo == 'trimestre' }}>Último Trimestre</option>
+                                <option value="ano" {{ 'selected' if periodo == 'ano' }}>Ano Atual</option>
+                                <option value="todos" {{ 'selected' if periodo == 'todos' }}>Todos</option>
+                            </select>
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label">&nbsp;</label>
+                            <div>
+                                <button type="submit" class="btn btn-primary">
+                                    <i class="fas fa-search me-2"></i>Filtrar
+                                </button>
+                                <a href="{{ url_for('relatorio_comissoes_apolices') }}" class="btn btn-secondary">
+                                    <i class="fas fa-times me-2"></i>Limpar
+                                </a>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Totalizadores -->
+            <div class="row mb-4">
+                <div class="col-md-3">
+                    <div class="card bg-primary text-white">
+                        <div class="card-body text-center">
+                            <h4>{{ apolices|length }}</h4>
+                            <p class="mb-0">Apólices Ativas</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="card bg-success text-white">
+                        <div class="card-body text-center">
+                            <h5>R$ {{ "{:,.2f}".format(total_comissao_corretora) }}</h5>
+                            <p class="mb-0">Comissão Corretora</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="card bg-warning text-white">
+                        <div class="card-body text-center">
+                            <h5>R$ {{ "{:,.2f}".format(total_comissao_colaborador) }}</h5>
+                            <p class="mb-0">Comissão Colaboradores</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="card bg-info text-white">
+                        <div class="card-body text-center">
+                            <h5>R$ {{ "{:,.2f}".format(total_comissao_corretora + total_comissao_colaborador) }}</h5>
+                            <p class="mb-0">Total Geral</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            {% if apolices %}
+                <!-- Tabela de Comissões -->
+                <div class="card">
+                    <div class="card-header bg-primary text-white">
+                        <h5 class="mb-0">
+                            <i class="fas fa-table me-2"></i>Detalhamento por Apólice
+                        </h5>
+                    </div>
+                    <div class="card-body p-0">
+                        <div class="table-responsive">
+                            <table class="table table-striped table-hover mb-0" id="tabelaComissoes">
+                                <thead class="table-dark">
+                                    <tr>
+                                        <th>Apólice</th>
+                                        <th>Cliente</th>
+                                        <th>Seguradora</th>
+                                        <th>Tipo</th>
+                                        <th>Colaborador</th>
+                                        <th>Valor Prêmio</th>
+                                        <th>% Corr.</th>
+                                        <th>Comissão Corretora</th>
+                                        <th>% Col.</th>
+                                        <th>Comissão Colaborador</th>
+                                        <th>Data</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for apolice in apolices %}
+                                    <tr>
+                                        <td>
+                                            <a href="{{ url_for('editar_apolice', apolice_id=apolice.id) }}" 
+                                               class="text-decoration-none">
+                                                <strong>{{ apolice.numero_apolice }}</strong>
+                                            </a>
+                                        </td>
+                                        <td>{{ apolice.cliente_nome }}</td>
+                                        <td>{{ apolice.seguradora_nome }}</td>
+                                        <td>
+                                            <span class="badge bg-secondary">{{ apolice.tipo_seguro_nome }}</span>
+                                        </td>
+                                        <td>{{ apolice.nome_colaborador or '-' }}</td>
+                                        <td>
+                                            <strong>R$ {{ "%.2f"|format(apolice.valor_premio) }}</strong>
+                                        </td>
+                                        <td>{{ "%.1f"|format(apolice.percentual_comissao_corretora or 0) }}%</td>
+                                        <td>
+                                            <span class="badge bg-success">
+                                                R$ {{ "%.2f"|format(apolice.valor_comissao_corretora or 0) }}
+                                            </span>
+                                        </td>
+                                        <td>{{ "%.1f"|format(apolice.percentual_comissao_colaborador or 0) }}%</td>
+                                        <td>
+                                            <span class="badge bg-warning">
+                                                R$ {{ "%.2f"|format(apolice.valor_comissao_colaborador or 0) }}
+                                            </span>
+                                        </td>
+                                        <td>{{ apolice.created_at.split(' ')[0] if apolice.created_at else '-' }}</td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                                <tfoot class="table-dark">
+                                    <tr>
+                                        <th colspan="7">TOTAIS:</th>
+                                        <th>
+                                            <span class="badge bg-success">
+                                                R$ {{ "{:,.2f}".format(total_comissao_corretora) }}
+                                            </span>
+                                        </th>
+                                        <th></th>
+                                        <th>
+                                            <span class="badge bg-warning">
+                                                R$ {{ "{:,.2f}".format(total_comissao_colaborador) }}
+                                            </span>
+                                        </th>
+                                        <th></th>
+                                    </tr>
+                                </tfoot>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Gráfico de Comissões por Colaborador -->
+                <div class="card mt-4">
+                    <div class="card-header bg-info text-white">
+                        <h5 class="mb-0">
+                            <i class="fas fa-chart-bar me-2"></i>Comissões por Colaborador
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <canvas id="graficoComissoes" width="400" height="200"></canvas>
+                    </div>
+                </div>
+            {% else %}
+                <!-- Estado vazio -->
+                <div class="text-center py-5">
+                    <i class="fas fa-calculator fa-3x text-muted mb-3"></i>
+                    <h4 class="text-muted">Nenhuma apólice encontrada</h4>
+                    <p class="text-muted">Não há apólices ativas para o período selecionado.</p>
+                    <a href="{{ url_for('nova_apolice') }}" class="btn btn-primary">
+                        <i class="fas fa-plus me-2"></i>Cadastrar Apólice
+                    </a>
+                </div>
+            {% endif %}
+        </main>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    {% if apolices %}
+    // Preparar dados para o gráfico
+    const colaboradores = {};
+    {% for apolice in apolices %}
+        const nomeCol = '{{ apolice.nome_colaborador or "Sem Colaborador" }}';
+        const comissaoCol = parseFloat('{{ apolice.valor_comissao_colaborador or 0 }}');
+        
+        if (colaboradores[nomeCol]) {
+            colaboradores[nomeCol] += comissaoCol;
+        } else {
+            colaboradores[nomeCol] = comissaoCol;
+        }
+    {% endfor %}
+    
+    // Criar gráfico
+    const ctx = document.getElementById('graficoComissoes').getContext('2d');
+    new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: Object.keys(colaboradores),
+            datasets: [{
+                label: 'Comissão (R$)',
+                data: Object.values(colaboradores),
+                backgroundColor: 'rgba(54, 162, 235, 0.6)',
+                borderColor: 'rgba(54, 162, 235, 1)',
+                borderWidth: 1
+            }]
+        },
+        options: {
+            responsive: true,
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    ticks: {
+                        callback: function(value) {
+                            return 'R$ ' + value.toLocaleString('pt-BR', {minimumFractionDigits: 2});
+                        }
+                    }
+                }
+            },
+            plugins: {
+                tooltip: {
+                    callbacks: {
+                        label: function(context) {
+                            return 'R$ ' + context.parsed.y.toLocaleString('pt-BR', {minimumFractionDigits: 2});
+                        }
+                    }
+                }
+            }
+        }
+    });
+    {% endif %}
+});
+
+function exportarRelatorio() {
+    // Implementar exportação (CSV, PDF, etc.)
+    const tabela = document.getElementById('tabelaComissoes');
+    const dados = [];
+    
+    // Cabeçalho
+    const cabecalho = [];
+    tabela.querySelectorAll('thead th').forEach(th => {
+        cabecalho.push(th.textContent.trim());
+    });
+    dados.push(cabecalho);
+    
+    // Dados
+    tabela.querySelectorAll('tbody tr').forEach(tr => {
+        const linha = [];
+        tr.querySelectorAll('td').forEach(td => {
+            linha.push(td.textContent.trim());
+        });
+        dados.push(linha);
+    });
+    
+    // Converter para CSV
+    const csv = dados.map(linha => linha.join(',')).join('\n');
+    
+    // Download
+    const blob = new Blob([csv], { type: 'text/csv' });
+    const url = window.URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.style.display = 'none';
+    a.href = url;
+    a.download = 'relatorio_comissoes_' + new Date().toISOString().split('T')[0] + '.csv';
+    document.body.appendChild(a);
+    a.click();
+    window.URL.revokeObjectURL(url);
+    document.body.removeChild(a);
+}
+</script>
+{% endblock %}

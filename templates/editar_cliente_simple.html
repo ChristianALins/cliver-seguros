@@ -1,143 +1,169 @@
 {% extends "base_simple.html" %}
 
-{% block title %}Editar Cliente{% endblock %}
+{% block title %}Editar Cliente - {{ cliente.nome }}{% endblock %}
 
 {% block content %}
-<div class="page-header">
-    <h2><i class="fas fa-user-edit"></i> Editar Cliente</h2>
-    <a href="{{ url_for('clientes_simple') }}" class="btn btn-secondary">
-        <i class="fas fa-arrow-left"></i> Voltar
-    </a>
+<div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
+    <h2>Editar Cliente: {{ cliente.nome }}</h2>
+    <a href="{{ url_for('listar_clientes') }}" class="btn btn-secondary">Voltar para Clientes</a>
 </div>
 
-<div class="form-container">
-    <form method="POST" class="cliente-form">
-        <div class="row">
-            <div class="col-md-6">
-                <div class="form-group">
-                    <label for="nome">Nome Completo *</label>
-                    <input type="text" id="nome" name="nome" value="{{ cliente.nome }}" required>
-                </div>
-            </div>
-            <div class="col-md-6">
-                <div class="form-group">
-                    <label for="cpf">CPF *</label>
-                    <input type="text" id="cpf" name="cpf" value="{{ cliente.cpf }}" required>
-                </div>
-            </div>
-        </div>
-
-        <div class="row">
-            <div class="col-md-6">
-                <div class="form-group">
-                    <label for="email">E-mail</label>
-                    <input type="email" id="email" name="email" value="{{ cliente.email }}">
-                </div>
-            </div>
-            <div class="col-md-6">
-                <div class="form-group">
-                    <label for="telefone">Telefone</label>
-                    <input type="text" id="telefone" name="telefone" value="{{ cliente.telefone }}">
-                </div>
-            </div>
-        </div>
-
+<form method="POST" style="max-width: 800px;">
+    <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 1rem;">
         <div class="form-group">
-            <label for="endereco">Endereço Completo</label>
-            <textarea id="endereco" name="endereco" rows="3">{{ cliente.endereco }}</textarea>
+            <label for="nome">Nome Completo *</label>
+            <input type="text" id="nome" name="nome" value="{{ cliente.nome or '' }}" required>
         </div>
-
+        
+        <div class="form-group">
+            <label for="tipo_pessoa">Tipo de Pessoa *</label>
+            <select id="tipo_pessoa" name="tipo_pessoa" required onchange="toggleDocumentField()">
+                <option value="PF" {% if cliente.tipo_pessoa == 'PF' %}selected{% endif %}>Pessoa Física</option>
+                <option value="PJ" {% if cliente.tipo_pessoa == 'PJ' %}selected{% endif %}>Pessoa Jurídica</option>
+            </select>
+        </div>
+        
+        <div class="form-group">
+            <label for="cpf_cnpj" id="doc_label">{% if cliente.tipo_pessoa == 'PJ' %}CNPJ{% else %}CPF{% endif %} *</label>
+            <input type="text" id="cpf_cnpj" name="cpf_cnpj" value="{{ cliente.cpf_cnpj or '' }}" required>
+        </div>
+        
+        <div class="form-group">
+            <label for="rg_ie" id="rg_ie_label">{% if cliente.tipo_pessoa == 'PJ' %}Inscrição Estadual{% else %}RG{% endif %}</label>
+            <input type="text" id="rg_ie" name="rg_ie" value="{{ cliente.rg_ie or '' }}">
+        </div>
+        
+        <div class="form-group">
+            <label for="email">E-mail *</label>
+            <input type="email" id="email" name="email" value="{{ cliente.email or '' }}" required>
+        </div>
+        
+        <div class="form-group">
+            <label for="telefone">Telefone</label>
+            <input type="text" id="telefone" name="telefone" value="{{ cliente.telefone or '' }}">
+        </div>
+        
+        <div class="form-group">
+            <label for="celular">Celular *</label>
+            <input type="text" id="celular" name="celular" value="{{ cliente.celular or '' }}" required>
+        </div>
+        
         <div class="form-group">
             <label for="data_nascimento">Data de Nascimento</label>
-            <input type="date" id="data_nascimento" name="data_nascimento" value="{{ cliente.data_nascimento }}">
+            <input type="date" id="data_nascimento" name="data_nascimento" value="{{ cliente.data_nascimento or '' }}">
         </div>
-
-        <div class="form-actions">
-            <button type="submit" class="btn btn-primary">
-                <i class="fas fa-save"></i> Salvar Alterações
-            </button>
-            <a href="{{ url_for('listar_clientes') }}" class="btn btn-secondary">
-                <i class="fas fa-times"></i> Cancelar
-            </a>
+        
+        <div class="form-group">
+            <label for="profissao">Profissão</label>
+            <input type="text" id="profissao" name="profissao" value="{{ cliente.profissao or '' }}">
         </div>
-    </form>
-</div>
+        
+        <div class="form-group">
+            <label for="renda">Renda Mensal</label>
+            <input type="number" id="renda" name="renda" step="0.01" value="{{ cliente.renda or '' }}">
+        </div>
+    </div>
+    
+    <h3 style="margin: 2rem 0 1rem 0;">Endereço</h3>
+    <div style="display: grid; grid-template-columns: 2fr 1fr 1fr; gap: 1rem;">
+        <div class="form-group">
+            <label for="endereco">Endereço Completo</label>
+            <input type="text" id="endereco" name="endereco" value="{{ cliente.endereco or '' }}">
+        </div>
+        
+        <div class="form-group">
+            <label for="cep">CEP</label>
+            <input type="text" id="cep" name="cep" value="{{ cliente.cep or '' }}">
+        </div>
+        
+        <div class="form-group">
+            <label for="cidade">Cidade *</label>
+            <input type="text" id="cidade" name="cidade" value="{{ cliente.cidade or '' }}" required>
+        </div>
+        
+        <div class="form-group">
+            <label for="estado">Estado *</label>
+            <select id="estado" name="estado" required>
+                <option value="">Selecione...</option>
+                <option value="AC" {% if cliente.estado == 'AC' %}selected{% endif %}>Acre</option>
+                <option value="AL" {% if cliente.estado == 'AL' %}selected{% endif %}>Alagoas</option>
+                <option value="AP" {% if cliente.estado == 'AP' %}selected{% endif %}>Amapá</option>
+                <option value="AM" {% if cliente.estado == 'AM' %}selected{% endif %}>Amazonas</option>
+                <option value="BA" {% if cliente.estado == 'BA' %}selected{% endif %}>Bahia</option>
+                <option value="CE" {% if cliente.estado == 'CE' %}selected{% endif %}>Ceará</option>
+                <option value="DF" {% if cliente.estado == 'DF' %}selected{% endif %}>Distrito Federal</option>
+                <option value="ES" {% if cliente.estado == 'ES' %}selected{% endif %}>Espírito Santo</option>
+                <option value="GO" {% if cliente.estado == 'GO' %}selected{% endif %}>Goiás</option>
+                <option value="MA" {% if cliente.estado == 'MA' %}selected{% endif %}>Maranhão</option>
+                <option value="MT" {% if cliente.estado == 'MT' %}selected{% endif %}>Mato Grosso</option>
+                <option value="MS" {% if cliente.estado == 'MS' %}selected{% endif %}>Mato Grosso do Sul</option>
+                <option value="MG" {% if cliente.estado == 'MG' %}selected{% endif %}>Minas Gerais</option>
+                <option value="PA" {% if cliente.estado == 'PA' %}selected{% endif %}>Pará</option>
+                <option value="PB" {% if cliente.estado == 'PB' %}selected{% endif %}>Paraíba</option>
+                <option value="PR" {% if cliente.estado == 'PR' %}selected{% endif %}>Paraná</option>
+                <option value="PE" {% if cliente.estado == 'PE' %}selected{% endif %}>Pernambuco</option>
+                <option value="PI" {% if cliente.estado == 'PI' %}selected{% endif %}>Piauí</option>
+                <option value="RJ" {% if cliente.estado == 'RJ' %}selected{% endif %}>Rio de Janeiro</option>
+                <option value="RN" {% if cliente.estado == 'RN' %}selected{% endif %}>Rio Grande do Norte</option>
+                <option value="RS" {% if cliente.estado == 'RS' %}selected{% endif %}>Rio Grande do Sul</option>
+                <option value="RO" {% if cliente.estado == 'RO' %}selected{% endif %}>Rondônia</option>
+                <option value="RR" {% if cliente.estado == 'RR' %}selected{% endif %}>Roraima</option>
+                <option value="SC" {% if cliente.estado == 'SC' %}selected{% endif %}>Santa Catarina</option>
+                <option value="SP" {% if cliente.estado == 'SP' %}selected{% endif %}>São Paulo</option>
+                <option value="SE" {% if cliente.estado == 'SE' %}selected{% endif %}>Sergipe</option>
+                <option value="TO" {% if cliente.estado == 'TO' %}selected{% endif %}>Tocantins</option>
+            </select>
+        </div>
+    </div>
+    
+    <h3 style="margin: 2rem 0 1rem 0;">Observações</h3>
+    <div class="form-group">
+        <label for="observacoes">Observações Gerais</label>
+        <textarea id="observacoes" name="observacoes" rows="4">{{ cliente.observacoes or '' }}</textarea>
+    </div>
+    
+    <div style="display: flex; gap: 1rem; margin-top: 2rem;">
+        <button type="submit" class="btn">Atualizar Cliente</button>
+        <a href="{{ url_for('listar_clientes') }}" class="btn btn-secondary">Cancelar</a>
+        <button type="button" onclick="confirmarExclusao()" class="btn btn-danger" style="margin-left: auto;">Excluir Cliente</button>
+    </div>
+</form>
 
-<style>
-.cliente-form {
-    background: white;
-    padding: 2rem;
-    border-radius: 8px;
-    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+<script>
+function toggleDocumentField() {
+    const tipoPessoa = document.getElementById('tipo_pessoa').value;
+    const docLabel = document.getElementById('doc_label');
+    const docField = document.getElementById('cpf_cnpj');
+    const rgIeLabel = document.getElementById('rg_ie_label');
+    const rgIeField = document.getElementById('rg_ie');
+    
+    if (tipoPessoa === 'PJ') {
+        docLabel.textContent = 'CNPJ *';
+        docField.placeholder = '00.000.000/0000-00';
+        rgIeLabel.textContent = 'Inscrição Estadual';
+        rgIeField.placeholder = '000.000.000.000';
+    } else {
+        docLabel.textContent = 'CPF *';
+        docField.placeholder = '000.000.000-00';
+        rgIeLabel.textContent = 'RG';
+        rgIeField.placeholder = '00.000.000-0';
+    }
 }
 
-.form-group {
-    margin-bottom: 1.5rem;
+function confirmarExclusao() {
+    if (confirm('Tem certeza que deseja excluir este cliente? Esta ação não pode ser desfeita.')) {
+        const form = document.createElement('form');
+        form.method = 'POST';
+        form.action = '{{ url_for("excluir_cliente", cliente_id=cliente.id) }}';
+        document.body.appendChild(form);
+        form.submit();
+    }
 }
 
-.form-group label {
-    display: block;
-    margin-bottom: 0.5rem;
-    font-weight: 600;
-    color: #333;
-}
+// Inicializar os campos corretamente
+document.addEventListener('DOMContentLoaded', function() {
+    toggleDocumentField();
+});
+</script>
 
-.form-group input,
-.form-group textarea {
-    width: 100%;
-    padding: 0.75rem;
-    border: 2px solid #ddd;
-    border-radius: 5px;
-    font-size: 1rem;
-}
-
-.form-group input:focus,
-.form-group textarea:focus {
-    outline: none;
-    border-color: #00B391;
-}
-
-.row {
-    display: flex;
-    gap: 1rem;
-}
-
-.col-md-6 {
-    flex: 1;
-}
-
-.form-actions {
-    display: flex;
-    gap: 1rem;
-    margin-top: 2rem;
-    padding-top: 2rem;
-    border-top: 1px solid #eee;
-}
-
-.btn {
-    padding: 0.75rem 1.5rem;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-    text-decoration: none;
-    display: inline-flex;
-    align-items: center;
-    gap: 0.5rem;
-    font-size: 1rem;
-}
-
-.btn-primary {
-    background: #00B391;
-    color: white;
-}
-
-.btn-secondary {
-    background: #6c757d;
-    color: white;
-}
-
-.btn:hover {
-    opacity: 0.9;
-}
-</style>
 {% endblock %}

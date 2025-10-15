@@ -1,0 +1,196 @@
+{% extends "base_simple.html" %}
+
+{% block title %}Detalhes do Cliente - {{ cliente.nome }}{% endblock %}
+
+{% block content %}
+<div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
+    <h2>Detalhes do Cliente</h2>
+    <div>
+        <a href="{{ url_for('editar_cliente', cliente_id=cliente.id) }}" class="btn">Editar Cliente</a>
+        <a href="{{ url_for('listar_clientes') }}" class="btn btn-secondary">Voltar</a>
+    </div>
+</div>
+
+<!-- Dados Pessoais -->
+<div style="background: white; padding: 1.5rem; margin-bottom: 2rem; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
+    <h3 style="margin-bottom: 1rem; color: #00B391;">Dados Pessoais</h3>
+    <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 1rem;">
+        <div>
+            <strong>Nome:</strong><br>
+            {{ cliente.nome }}
+        </div>
+        <div>
+            <strong>Tipo:</strong><br>
+            <span class="badge {% if cliente.tipo_pessoa == 'PJ' %}badge-info{% else %}badge-success{% endif %}">
+                {% if cliente.tipo_pessoa == 'PJ' %}Pessoa Jurídica{% else %}Pessoa Física{% endif %}
+            </span>
+        </div>
+        <div>
+            <strong>{% if cliente.tipo_pessoa == 'PJ' %}CNPJ{% else %}CPF{% endif %}:</strong><br>
+            {{ cliente.cpf_cnpj or 'Não informado' }}
+        </div>
+        <div>
+            <strong>{% if cliente.tipo_pessoa == 'PJ' %}Inscrição Estadual{% else %}RG{% endif %}:</strong><br>
+            {{ cliente.rg_ie or 'Não informado' }}
+        </div>
+        <div>
+            <strong>Email:</strong><br>
+            {{ cliente.email or 'Não informado' }}
+        </div>
+        <div>
+            <strong>Data de Nascimento:</strong><br>
+            {{ cliente.data_nascimento or 'Não informada' }}
+        </div>
+        <div>
+            <strong>Telefone:</strong><br>
+            {{ cliente.telefone or 'Não informado' }}
+        </div>
+        <div>
+            <strong>Celular:</strong><br>
+            {{ cliente.celular or 'Não informado' }}
+        </div>
+        <div>
+            <strong>Profissão:</strong><br>
+            {{ cliente.profissao or 'Não informada' }}
+        </div>
+        {% if cliente.renda %}
+        <div>
+            <strong>Renda:</strong><br>
+            R$ {{ "%.2f"|format(cliente.renda) }}
+        </div>
+        {% endif %}
+        <div>
+            <strong>Status:</strong><br>
+            <span class="status-badge status-{{ cliente.status }}">
+                {{ cliente.status.title() }}
+            </span>
+        </div>
+    </div>
+</div>
+
+<!-- Endereço -->
+<div style="background: white; padding: 1.5rem; margin-bottom: 2rem; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
+    <h3 style="margin-bottom: 1rem; color: #00B391;">Endereço</h3>
+    <div style="display: grid; grid-template-columns: 2fr 1fr 1fr; gap: 1rem;">
+        <div>
+            <strong>Endereço:</strong><br>
+            {{ cliente.endereco or 'Não informado' }}
+        </div>
+        <div>
+            <strong>CEP:</strong><br>
+            {{ cliente.cep or 'Não informado' }}
+        </div>
+        <div>
+            <strong>Cidade:</strong><br>
+            {{ cliente.cidade or 'Não informada' }}
+        </div>
+        <div>
+            <strong>Estado:</strong><br>
+            {{ cliente.estado or 'Não informado' }}
+        </div>
+    </div>
+</div>
+
+<!-- Observações -->
+{% if cliente.observacoes %}
+<div style="background: white; padding: 1.5rem; margin-bottom: 2rem; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
+    <h3 style="margin-bottom: 1rem; color: #00B391;">Observações</h3>
+    <p>{{ cliente.observacoes }}</p>
+</div>
+{% endif %}
+
+<!-- Apólices do Cliente -->
+<div style="background: white; padding: 1.5rem; margin-bottom: 2rem; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
+    <h3 style="margin-bottom: 1rem; color: #00B391;">Apólices ({{ apolices|length }})</h3>
+    {% if apolices %}
+        <table class="data-table">
+            <thead>
+                <tr>
+                    <th>Número</th>
+                    <th>Seguradora</th>
+                    <th>Tipo</th>
+                    <th>Vigência</th>
+                    <th>Valor</th>
+                    <th>Status</th>
+                    <th>Ações</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for apolice in apolices %}
+                <tr>
+                    <td>{{ apolice.numero_apolice }}</td>
+                    <td>{{ apolice.seguradora_nome }}</td>
+                    <td>{{ apolice.tipo_seguro_nome }}</td>
+                    <td>{{ apolice.data_inicio }} até {{ apolice.data_vencimento }}</td>
+                    <td>R$ {{ "%.2f"|format(apolice.valor_premio) }}</td>
+                    <td>
+                        <span class="status-badge status-{{ apolice.status }}">
+                            {{ apolice.status.title() }}
+                        </span>
+                    </td>
+                    <td>
+                        <a href="{{ url_for('editar_apolice', apolice_id=apolice.id) }}" class="btn-small btn-edit">Ver</a>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    {% else %}
+        <p>Nenhuma apólice encontrada para este cliente.</p>
+        <a href="{{ url_for('nova_apolice') }}?cliente_id={{ cliente.id }}" class="btn">Nova Apólice</a>
+    {% endif %}
+</div>
+
+<!-- Sinistros do Cliente -->
+<div style="background: white; padding: 1.5rem; margin-bottom: 2rem; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
+    <h3 style="margin-bottom: 1rem; color: #00B391;">Sinistros ({{ sinistros|length }})</h3>
+    {% if sinistros %}
+        <table class="data-table">
+            <thead>
+                <tr>
+                    <th>Protocolo</th>
+                    <th>Apólice</th>
+                    <th>Ocorrência</th>
+                    <th>Tipo</th>
+                    <th>Valor</th>
+                    <th>Status</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for sinistro in sinistros %}
+                <tr>
+                    <td>{{ sinistro.protocolo }}</td>
+                    <td>{{ sinistro.numero_apolice }}</td>
+                    <td>{{ sinistro.data_ocorrencia }}</td>
+                    <td>{{ sinistro.tipo_sinistro }}</td>
+                    <td>R$ {{ "%.2f"|format(sinistro.valor_estimado) }}</td>
+                    <td>
+                        <span class="status-badge status-{{ sinistro.status }}">
+                            {{ sinistro.status.title() }}
+                        </span>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    {% else %}
+        <p>Nenhum sinistro registrado para este cliente.</p>
+    {% endif %}
+</div>
+
+<!-- Histórico -->
+<div style="background: white; padding: 1.5rem; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
+    <h3 style="margin-bottom: 1rem; color: #00B391;">Histórico</h3>
+    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 2rem;">
+        <div>
+            <strong>Cadastrado em:</strong><br>
+            {{ cliente.created_at }}
+        </div>
+        <div>
+            <strong>Última atualização:</strong><br>
+            {{ cliente.updated_at or 'Nunca atualizado' }}
+        </div>
+    </div>
+</div>
+
+{% endblock %}

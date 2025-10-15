@@ -16,8 +16,21 @@
         </div>
         
         <div class="form-group">
-            <label for="cpf">CPF *</label>
-            <input type="text" id="cpf" name="cpf" required placeholder="000.000.000-00">
+            <label for="tipo_pessoa">Tipo de Pessoa *</label>
+            <select id="tipo_pessoa" name="tipo_pessoa" required onchange="toggleDocumentField()">
+                <option value="PF">Pessoa Física</option>
+                <option value="PJ">Pessoa Jurídica</option>
+            </select>
+        </div>
+        
+        <div class="form-group">
+            <label for="cpf_cnpj" id="doc_label">CPF *</label>
+            <input type="text" id="cpf_cnpj" name="cpf_cnpj" required placeholder="000.000.000-00">
+        </div>
+        
+        <div class="form-group">
+            <label for="rg_ie" id="rg_ie_label">RG</label>
+            <input type="text" id="rg_ie" name="rg_ie" placeholder="00.000.000-0">
         </div>
         
         <div class="form-group">
@@ -26,13 +39,28 @@
         </div>
         
         <div class="form-group">
-            <label for="telefone">Telefone *</label>
-            <input type="text" id="telefone" name="telefone" required placeholder="(11) 99999-9999">
+            <label for="telefone">Telefone</label>
+            <input type="text" id="telefone" name="telefone" placeholder="(11) 3333-3333">
+        </div>
+        
+        <div class="form-group">
+            <label for="celular">Celular *</label>
+            <input type="text" id="celular" name="celular" required placeholder="(11) 99999-9999">
         </div>
         
         <div class="form-group">
             <label for="data_nascimento">Data de Nascimento</label>
             <input type="date" id="data_nascimento" name="data_nascimento">
+        </div>
+        
+        <div class="form-group">
+            <label for="profissao">Profissão</label>
+            <input type="text" id="profissao" name="profissao" placeholder="Ex: Engenheiro, Médico">
+        </div>
+        
+        <div class="form-group">
+            <label for="renda">Renda Mensal</label>
+            <input type="number" id="renda" name="renda" step="0.01" placeholder="0.00">
         </div>
         
         <div class="form-group">
@@ -48,20 +76,10 @@
     </div>
     
     <h3 style="margin: 2rem 0 1rem 0;">Endereço</h3>
-    <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 1rem;">
+    <div style="display: grid; grid-template-columns: 2fr 1fr 1fr; gap: 1rem;">
         <div class="form-group">
-            <label for="endereco">Logradouro</label>
-            <input type="text" id="endereco" name="endereco" placeholder="Rua, Avenida, etc.">
-        </div>
-        
-        <div class="form-group">
-            <label for="numero">Número</label>
-            <input type="text" id="numero" name="numero">
-        </div>
-        
-        <div class="form-group">
-            <label for="complemento">Complemento</label>
-            <input type="text" id="complemento" name="complemento" placeholder="Apt, Casa, etc.">
+            <label for="endereco">Endereço Completo</label>
+            <input type="text" id="endereco" name="endereco" placeholder="Rua, Avenida, número">
         </div>
         
         <div class="form-group">
@@ -70,13 +88,42 @@
         </div>
         
         <div class="form-group">
-            <label for="bairro">Bairro</label>
-            <input type="text" id="bairro" name="bairro">
+            <label for="cidade">Cidade *</label>
+            <input type="text" id="cidade" name="cidade" required placeholder="São Paulo">
         </div>
         
         <div class="form-group">
-            <label for="cidade">Cidade</label>
-            <input type="text" id="cidade" name="cidade">
+            <label for="estado">Estado *</label>
+            <select id="estado" name="estado" required>
+                <option value="">Selecione...</option>
+                <option value="AC">Acre</option>
+                <option value="AL">Alagoas</option>
+                <option value="AP">Amapá</option>
+                <option value="AM">Amazonas</option>
+                <option value="BA">Bahia</option>
+                <option value="CE">Ceará</option>
+                <option value="DF">Distrito Federal</option>
+                <option value="ES">Espírito Santo</option>
+                <option value="GO">Goiás</option>
+                <option value="MA">Maranhão</option>
+                <option value="MT">Mato Grosso</option>
+                <option value="MS">Mato Grosso do Sul</option>
+                <option value="MG">Minas Gerais</option>
+                <option value="PA">Pará</option>
+                <option value="PB">Paraíba</option>
+                <option value="PR">Paraná</option>
+                <option value="PE">Pernambuco</option>
+                <option value="PI">Piauí</option>
+                <option value="RJ">Rio de Janeiro</option>
+                <option value="RN">Rio Grande do Norte</option>
+                <option value="RS">Rio Grande do Sul</option>
+                <option value="RO">Rondônia</option>
+                <option value="RR">Roraima</option>
+                <option value="SC">Santa Catarina</option>
+                <option value="SP" selected>São Paulo</option>
+                <option value="SE">Sergipe</option>
+                <option value="TO">Tocantins</option>
+            </select>
         </div>
         
         <div class="form-group">
@@ -100,12 +147,40 @@
     <div style="display: flex; gap: 1rem; margin-top: 2rem;">
         <button type="submit" class="btn">Salvar Cliente</button>
         <button type="reset" class="btn btn-secondary">Limpar Formulário</button>
-        <a href="/clientes" class="btn btn-secondary">Cancelar</a>
+        <a href="{{ url_for('listar_clientes') }}" class="btn btn-secondary">Cancelar</a>
     </div>
 </form>
 
 <div style="background: #e7f3ff; padding: 1rem; border-radius: 4px; margin-top: 2rem;">
     <p><strong>Nota:</strong> Campos marcados com * são obrigatórios.</p>
-    <p>Após o cadastro, o cliente receberá um e-mail de confirmação com seus dados.</p>
+    <p>Pessoa Física: Use CPF e RG. Pessoa Jurídica: Use CNPJ e Inscrição Estadual.</p>
 </div>
+
+<script>
+function toggleDocumentField() {
+    const tipoPessoa = document.getElementById('tipo_pessoa').value;
+    const docLabel = document.getElementById('doc_label');
+    const docField = document.getElementById('cpf_cnpj');
+    const rgIeLabel = document.getElementById('rg_ie_label');
+    const rgIeField = document.getElementById('rg_ie');
+    
+    if (tipoPessoa === 'PJ') {
+        docLabel.textContent = 'CNPJ *';
+        docField.placeholder = '00.000.000/0000-00';
+        rgIeLabel.textContent = 'Inscrição Estadual';
+        rgIeField.placeholder = '000.000.000.000';
+    } else {
+        docLabel.textContent = 'CPF *';
+        docField.placeholder = '000.000.000-00';
+        rgIeLabel.textContent = 'RG';
+        rgIeField.placeholder = '00.000.000-0';
+    }
+}
+
+// Inicializar os campos corretamente
+document.addEventListener('DOMContentLoaded', function() {
+    toggleDocumentField();
+});
+</script>
+
 {% endblock %}
